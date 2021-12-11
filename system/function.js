@@ -1,6 +1,5 @@
 let axios = require('axios')
 let fetch = require('node-fetch')
-let cheerio = require('cheerio')
 let fs = require('fs')
 let http = require('https')
 let chalk = require('chalk')
@@ -57,6 +56,17 @@ class Function {
 		})
 	}
 
+	mtype(data) {
+		function replaceAll(str) {
+			let res = str.replace(new RegExp('```', 'g'), '')
+			.replace(new RegExp('_', 'g'), '')
+			.replace(new RegExp(/[*]/, 'g'), '')
+			return res
+		}
+		let type = (typeof data.text !== 'object') ? replaceAll(data.text) : ''
+		return type
+	}
+
 	color(text, color) {
     	return chalk.keyword(color || 'green').bold(text)
 	}
@@ -64,11 +74,6 @@ class Function {
     switcher(status, isTrue, isFalse) {
     	return (status) ? this.texted('bold', isTrue) : this.texted('bold', isFalse) 
     }
-
-	extractLink(text) {
-		let regex = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi; 
-		return text.match(regex)
-	}
 	
 	sizeLimit(str, max) {
 		let data
@@ -109,26 +114,6 @@ class Function {
 		return `• ${this.texted('bold', 'Example')} : ${isPrefix + command} ${args}`
 	}
 	
-	toDate(ms) {
-		let temp = ms
-		let days = Math.floor(ms / (24*60*60*1000));
-		let daysms = ms % (24*60*60*1000);
-		let hours = Math.floor((daysms)/(60*60*1000));
-		let hoursms = ms % (60*60*1000);
-		let minutes = Math.floor((hoursms)/(60*1000));
-		let minutesms = ms % (60*1000);
-		let sec = Math.floor((minutesms)/(1000));
-		if (days == 0 && hours == 0 && minutes == 0){
-			return "Recently"
-		} else {
-			return days+"D "+hours+"H " + minutes + "M";
-		}
-	}
-	
-	removeSpace(str) {
-		return str.replace(/\s/gi, '-')
-	}
-	
 	uuid() {
    	 var dt = new Date().getTime()
  	   var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -137,6 +122,30 @@ class Function {
 			return (c=='x' ? r :(r&0x3|0x8)).toString(16);
     	}); return uuid
 	}
+
+	toTime(ms) {
+		let h = Math.floor(ms / 3600000)
+		let m = Math.floor(ms / 60000) % 60
+		let s = Math.floor(ms / 1000) % 60
+		return [h, m, s].map(v => v.toString().padStart(2, 0) ).join(':')
+	}
+
+	removeItem(arr, value) {
+		let index = arr.indexOf(value)
+		if (index > -1) arr.splice(index, 1)
+		return arr
+	}
+
+	igFixed(url) {
+		let count = url.split('/')
+		if (count.length == 7) {
+			let username = count[3]
+			let destruct = this.removeItem(count, username)
+			return destruct.map(v => v).join('/')
+		} else return url
+	}
+
+	// tambah sendiri . . .
 }
 
 exports.Function = Function

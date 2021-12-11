@@ -1,5 +1,6 @@
-global.owner = ['994400754740', '380944649449', '6285221100126']
-global.max_upload = 90 // 90MB (1 = 1MB)
+global.owner = '380944649449'
+global.max_upload = 30 // 30MB (1 = 1MB)
+
 global.status = {
 	wait: Func.texted('bold', 'Processed . . .'),
 	invalid: Func.texted('bold', 'URL is Invalid!'),
@@ -20,7 +21,4 @@ global.status = {
 global.users = global.db.users
 global.groups = global.db.groups
 global.chats = global.db.chats
-global.media = global.db.media
-global.sticker = global.db.sticker
 global.statistic = global.db.statistic
-global.bots = global.db.bots

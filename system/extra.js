@@ -5,12 +5,17 @@ let { promisify } = require('util')
 let { resolve } = require('path')
 let readdir = promisify(fs.readdir)
 let stat = promisify(fs.stat)
+let FileType = require('file-type')
+
 const {
     default: makeWASocket,
     proto,
     downloadContentFromMessage,
-    S_WHATSAPP_NET,
-    jidDecode
+	MessageType,
+	Mimetype,
+	generateWAMessageFromContent,
+	generateForwardMessageContent,
+	WAMessageProto
 } = require('@adiwajshing/baileys-md')
 
 Socket = (...args) => {
@@ -22,10 +27,181 @@ Socket = (...args) => {
 
 	let parseMention = text => [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
 
+	client.groupAdmin = async (jid) => {
+		let participant = await (await client.groupMetadata(jid)).participants
+		let admin = []
+    	for (let i of participant) i.admin === "admin" ? admin.push(i.id) : ''
+		return admin
+	}
+
+	client.groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
+
+	client.copyNForward = async (jid, message, forceForward = false, options = {}) => {
+        let vtype
+		if (options.readViewOnce) {
+			message.message = message.message && message.message.ephemeralMessage && message.message.ephemeralMessage.message ? message.message.ephemeralMessage.message : (message.message || undefined)
+			vtype = Object.keys(message.message.viewOnceMessage.message)[0]
+			delete(message.message && message.message.ignore ? message.message.ignore : (message.message || undefined))
+			delete message.message.viewOnceMessage.message[vtype].viewOnce
+			message.message = {
+				...message.message.viewOnceMessage.message
+			}
+		}
+        let mtype = Object.keys(message.message)[0]
+        let content = await generateForwardMessageContent(message, forceForward)
+        let ctype = Object.keys(content)[0]
+		let context = {}
+        if (mtype != "conversation") context = message.message[mtype].contextInfo
+        content[ctype].contextInfo = {
+            ...context,
+            ...content[ctype].contextInfo
+        }
+        const waMessage = await generateWAMessageFromContent(jid, content, options ? {
+            ...content[ctype],
+            ...options,
+            ...(options.contextInfo ? {
+                contextInfo: {
+                    ...content[ctype].contextInfo,
+                    ...options.contextInfo
+                }
+            } : {})
+        } : {})
+        await client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id })
+        return waMessage
+    }
+
+	client.copyMsg = (jid, message, text = '', sender = client.user.id, options = {}) => {
+      let copy = message.toJSON()
+      let type = Object.keys(copy.message)[0]
+      let isEphemeral = type === 'ephemeralMessage'
+      if (isEphemeral) {
+        type = Object.keys(copy.message.ephemeralMessage.message)[0]
+      }
+      let msg = isEphemeral ? copy.message.ephemeralMessage.message : copy.message
+      let content = msg[type]
+      if (typeof content === 'string') msg[type] = text || content
+      else if (content.caption) content.caption = text || content.caption
+      else if (content.text) content.text = text || content.text
+      if (typeof content !== 'string') msg[type] = { ...content, ...options }
+      if (copy.participant) sender = copy.participant = sender || copy.participant
+      else if (copy.key.participant) sender = copy.key.participant = sender || copy.key.participant
+      if (copy.key.remoteJid.includes('@s.whatsapp.net')) sender = sender || copy.key.remoteJid
+      else if (copy.key.remoteJid.includes('@broadcast')) sender = sender || copy.key.remoteJid
+      copy.key.remoteJid = jid
+      copy.key.fromMe = sender === client.user.id
+      return WAMessageProto.WebMessageInfo.fromObject(copy)
+    }
+	
+	client.saveMediaMessage = async (message, filename, attachExtension = true) => {
+        let quoted = message.msg ? message.msg : message
+        let mime = (message.msg || message).mimetype || ''
+        let messageType = mime.split('/')[0].replace('application', 'document') ? mime.split('/')[0].replace('application', 'document') : mime.split('/')[0]
+        const stream = await downloadContentFromMessage(quoted, messageType)
+        let buffer = Buffer.from([])
+        for await(const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk])
+        }
+		let type = await FileType.fromBuffer(buffer)
+        trueFileName = attachExtension ? (filename + '.' + type.ext) : filename
+        await fs.writeFileSync(trueFileName, buffer)
+        return trueFileName
+    }
+
+	client.downloadMediaMessage = async (message) => {
+        let mimes = (message.msg || message).mimetype || ''
+        let messageType = mimes.split('/')[0].replace('application', 'document') ? mimes.split('/')[0].replace('application', 'document') : mimes.split('/')[0]
+        let extension = mimes.split('/')[1]
+        const stream = await downloadContentFromMessage(message, messageType)
+        let buffer = Buffer.from([])
+        for await(const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk])
+		}
+        return buffer
+	}
+
 	client.reply = async (jid, text, quoted, options) => {
 		await client.sendPresenceUpdate('composing', jid)
 		return client.sendMessage(jid, { text: text, contextInfo: { mentionedJid: parseMention(text) }, ...options }, { quoted })
 	}
+
+	client.fakeStory = async (jid, text, header, mention = []) => {
+		let location = {key: {participant: `0@s.whatsapp.net`, ...(jid ? { remoteJid: jid } : {})}, message: {locationMessage: {name: header, jpegThumbnail: fs.readFileSync('./media/images/thumb.jpg') }}}
+		client.reply(jid, text, location)
+	}
+
+	client.sendImage = async (jid, source, text, quoted, options) => {
+		let file = Func.uuid() + '.png'
+	if (Buffer.isBuffer(source)) {
+		fs.writeFileSync('./temp/' + file, source)
+		let media = fs.readFileSync('./temp/' + file)
+		await client.sendPresenceUpdate('composing', jid)
+		client.sendMessage(jid, { image: media, caption: text, contextInfo: { mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') }, ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+	} else {
+		await Func.download(source, './temp/' + file, async () => {
+			let media = fs.readFileSync('./temp/' + file)
+			await client.sendPresenceUpdate('composing', jid)
+			client.sendMessage(jid, { image: media, caption: text, contextInfo: { mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') }, ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+		})
+	}}
+
+    client.sendVideo = async (jid, source, text, quoted, gif = false, options) => {
+		let file = Func.uuid() + '.mp4'
+	if (Buffer.isBuffer(source)) {
+		fs.writeFileSync('./temp/' + file, source)
+		let media = fs.readFileSync('./temp/' + file)
+		await client.sendPresenceUpdate('composing', jid)
+		client.sendMessage(jid, { video: media, caption: text, gifPlayback: gif, ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+	} else {
+		await Func.download(source, './temp/' + file, async () => {
+			let media = fs.readFileSync('./temp/' + file)
+			await client.sendPresenceUpdate('composing', jid)
+			client.sendMessage(jid, { video: media, caption: text, gifPlayback: gif, ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+		})
+	}}
+
+	client.sendAudio = async (jid, source, voice = false, quoted, options) => {
+		let file = Func.uuid() + '.mp3'
+	if (Buffer.isBuffer(source)) {
+		fs.writeFileSync('./temp/' + file, source)
+		let media = fs.readFileSync('./temp/' + file)
+		await client.sendPresenceUpdate(voice ? 'recording' : 'composing', jid)
+		client.sendMessage(jid, { audio: media, ptt: voice, mimetype: 'audio/mpeg', ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+	} else {
+		await Func.download(source, './temp/' + file, async () => {
+			let media = fs.readFileSync('./temp/' + file)
+			await client.sendPresenceUpdate(voice ? 'recording' : 'composing', jid)
+			client.sendMessage(jid, { audio: media, ptt: voice, mimetype: 'audio/mpeg', ...options }, { quoted }).then(() => fs.unlinkSync('./temp/' + file))
+		})
+	}}
+
+	client.sendDocument = async (jid, source, name, quoted, options) => {
+    	let getExt = name.split('.')
+		let ext = getExt[getExt.length - 1]
+    if (Buffer.isBuffer(source)) {
+		fs.writeFileSync('./temp/' + name.replace(/(\/)/g,'-'), source)
+		let media = fs.readFileSync('./temp/' + name.replace(/(\/)/g,'-'))
+		await client.sendPresenceUpdate('composing', jid)
+		client.sendMessage(jid, { document: media, fileName: name, mimetype: typeof mime.lookup(ext) != 'undefined' ? mime.lookup(ext) : mime.lookup('txt') }, { quoted: m }).then(() => fs.unlinkSync('./temp/' + name.replace(/(\/)/g,'-')))
+	} else {
+		await Func.download(source, './temp/' + name.replace(/(\/)/g,'-'), async () => {
+			let media = fs.readFileSync('./temp/' + name.replace(/(\/)/g,'-'))
+			await client.sendPresenceUpdate('composing', jid)
+			client.sendMessage(jid, { document: { url: media }, fileName: name, mimetype: typeof mime.lookup(ext) ? mime.lookup(ext) : mime.lookup('txt') }, { quoted: m }).then(() => fs.unlinkSync('./temp/' + name.replace(/(\/)/g,'-')))
+		})
+	}}
+
+	client.buttonLoc = async(jid, text, footer, buttons = []) => {
+		let btnMsg = {
+			caption: text,
+  		  footer: footer,
+   		 templateButtons: buttons,
+    		location: { jpegThumbnail: await Func.fetchBuffer(global.cover) },
+		}
+		await client.sendPresenceUpdate('composing', jid)
+		client.sendMessage(jid, btnMsg)
+	}
+
+	// tambaj sendiri :v
 
     return client
 }
@@ -78,12 +254,11 @@ Serialize = (client, m) => {
                 message: quoted,
                 ...(m.isGroup ? { participant: m.quoted.sender } : {})
             })       
-            m.quoted.download = () => downloadMediaMessage(m.quoted)
+            m.quoted.download = () => client.downloadMediaMessage(m.quoted)
         }
     }
-    if (m.msg.url) m.download = () => downloadMediaMessage(m.msg)
+    if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
     m.text = (m.mtype == 'listResponseMessage' ? m.message.singleSelectReply.selectedRowId : '') || (m.mtype == 'templateButtonReplyMessage' ? m.message.templateButtonReplyMessage.selectedId : '') || m.msg.text || m.msg.caption || m.msg || ''
-    m.reply = (text, chatId, options) => client.sendMessage(chatId ? chatId : m.chat, { text: text }, { quoted: m, detectLinks: false, thumbnail: global.thumb, ...options })
     return m
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "neoxr-bot-md",
   "version": "1.0.0",
-  "description": "Base WhatsApp Bot Multi Device",
+  "description": "Base Multi Device WhatsApp Bot",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,15 +18,18 @@
   "dependencies": {
     "@adiwajshing/baileys-md": "github:adiwajshing/baileys#multi-device",
     "axios": "~0.24.0",
+	"cfonts": "~2.10.0",
 	"chalk": "~4.1.0",
-    "cheerio": "~1.0.0-rc.10",
 	"child_process": "~1.0.2",
 	"fs": "0.0.1-security",
+	"file-type": "~16.5.2",
+	"form-data": "~4.0.0",
 	"mime-types": "~2.1.32",
 	"moment-timezone": "~0.5.34",
     "node-fetch": "~2.6.1",
 	"path": "~0.12.7",
     "pino": "~7.0.5",
+	"stormdb": "~0.5.2",
 	"syntax-error": "~1.4.0",
     "util": "~0.12.4"
   },
