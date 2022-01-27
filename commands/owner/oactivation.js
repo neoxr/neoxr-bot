@@ -7,7 +7,7 @@ exports.run = {
     }) => {
         let gc = global.groups[m.chat]
         let opt = [0, 1]
-        if (!args || !args[0] || !opt.includes(parseInt(args[0]))) return client.buttonLoc(m.chat, await Func.fetchBuffer(global.cover), Func.texted('bold', `This command to change the bot activation in the group.`), global.footer, [{
+        if (!args || !args[0] || !opt.includes(parseInt(args[0]))) return client.buttonLoc(m.chat, await Func.fetchBuffer(global.setting.cover), Func.texted('bold', `This command to change the bot activation in the group.`), global.setting.footer, [{
                 quickReplyButton: {
                     displayText: `True`,
                     id: `${isPrefix + command} 1`

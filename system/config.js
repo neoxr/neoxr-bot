@@ -24,6 +24,3 @@ global.chats = global.db.chats
 global.sticker = global.db.sticker
 global.statistic = global.db.statistic
 global.setting = global.db.setting
-global.cover = global.setting.cover
-global.header = global.setting.header
-global.footer = global.setting.footer

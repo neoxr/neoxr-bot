@@ -10,6 +10,11 @@ class NeoxrApi {
 		let json = await Func.fetchJson(this.baseUrl + '/ig?url=' + url + '&apikey=' + this.apiKey)
 		return json
 	}
+	
+	async igs(url) {
+		let json = await Func.fetchJson(this.baseUrl + '/igs2?q=' + Func.igFixed(url) + '&apikey=' + this.apiKey)
+		return json
+	}
 
 	async pin(url) {
 		let json = await Func.fetchJson(this.baseUrl + '/pin?url=' + url + '&apikey=' + this.apiKey)

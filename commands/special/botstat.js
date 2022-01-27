@@ -33,7 +33,7 @@ exports.run = {
             hit: Func.formatNumber((hit.reduce((a, b) => a + b) / hit.length).toFixed(0)),
             online: (online.reduce((a, b) => a + b) / online.length).toFixed(0),
         }
-        await client.fakeStory(m.chat, await botstat(groups, chats, users, system, banned, whitelist, hitstat, uptime, avg), global.header, [m.sender])
+        await client.fakeStory(m.chat, await botstat(groups, chats, users, system, banned, whitelist, hitstat, uptime, avg), global.setting.header, [m.sender])
     },
     error: false,
     cache: true,
@@ -69,5 +69,5 @@ let botstat = async (groups, chats, users, system, banned, whitelist, hitstat, u
 	◦  ${Func.switcher(system.groupmode, '[ √ ]', '[ × ]')}  Group Mode
 	◦  Prefix : ${system.multiprefix ? ' ( ' + system.prefix.map(v => v).join(' ') + ' )' : ' ( ' + system.onlyprefix + ' )'}
 
-${global.footer}`
+${global.setting.footer}`
 }

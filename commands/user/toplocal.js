@@ -26,8 +26,8 @@ exports.run = {
         teks += `\n\n`
         teks += `“Your limits are ranked *${rankLimit.indexOf(m.sender) + 1}* out of *${member.length}* ${await (await client.groupMetadata(m.chat)).subject} group members.”\n\n`
         teks += limit.slice(0, isLimit).map(([user, data], i) => (i + 1) + '. @' + user.split`@` [0] + '\n    *🧱  :  ' + Func.formatNumber(data.limit) + '*').join`\n`
-        teks += `\n\n${global.footer}`
-        client.fakeStory(m.chat, teks, global.header)
+        teks += `\n\n${global.setting.footer}`
+        client.fakeStory(m.chat, teks, global.setting.header)
     },
     error: false,
     group: true

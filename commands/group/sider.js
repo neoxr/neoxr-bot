@@ -18,8 +18,8 @@ exports.run = {
         teks += '\n\n'
         teks += `“There are *${lastseen.length}* members of the ${await (await client.groupMetadata(m.chat)).subject} group who have been inactive for more than 1 week.”\n\n`
         teks += lastseen.map(([v, x]) => '	◦  @' + v.replace(/@.+/, '') + '\n	     *Lastseen* : ' + Func.toDate(now - x.lastseen).split('D')[0] + ' days ago').join('\n')
-        teks += `\n\n${global.footer}`
-        client.fakeStory(m.chat, teks, global.header)
+        teks += `\n\n${global.setting.footer}`
+        client.fakeStory(m.chat, teks, global.setting.header)
     },
     error: false,
     group: true

@@ -9,8 +9,8 @@ exports.run = {
         let show = Math.min(10, point.length)
         let teks = `❏  *T O P - G L O B A L*\n\n`
         teks += point.slice(0, show).map(([user, data], i) => (i + 1) + '. @' + user.split`@` [0] + '\n    *💴  :  ' + Func.formatNumber(data.point) + '*').join`\n`
-        teks += `\n\n${global.footer}`
-        client.fakeStory(m.chat, teks, global.header)
+        teks += `\n\n${global.setting.footer}`
+        client.fakeStory(m.chat, teks, global.setting.header)
     },
     error: false
 }

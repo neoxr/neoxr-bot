@@ -27,7 +27,6 @@ const {
     WAMessageProto
 } = require('@adiwajshing/baileys')
 const PhoneNumber = require('awesome-phonenumber')
-const { Sticker, createSticker, StickerTypes, extractMetadata } = require('wa-sticker-formatter')
 
 Socket = (...args) => {
     let client = makeWASocket(...args)
@@ -151,9 +150,11 @@ Socket = (...args) => {
     }
 	
 	client.sendSticker = async (jid, path, quoted, options = {}) => {
+		const WSF = require('wa-sticker-formatter')
 		let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : Buffer.alloc(0)
-		let convert = new Sticker(buff, { ...options, type: StickerTypes.FULL, quality: 50, id: '© neoxr-bot' })
-		await client.sendMessage(jid, await convert.toMessage(), {
+		let img = new WSF.Sticker(buffer, { ...options, crop: false })
+		await img.build()
+		await client.sendMessage(jid, { sticker: await img.get() }, {
             quoted
         })
     }

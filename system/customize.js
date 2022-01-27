@@ -1,4 +1,4 @@
-let {
+const {
     decode
 } = require('html-entities')
 module.exports = async (client, m, setting, myPrefix, participants, isOwner, isPrem) => {

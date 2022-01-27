@@ -32,7 +32,7 @@ exports.run = {
                 teks += '	›  ' + Func.texted('bold', 'Text') + ' : ' + global.sticker[cmdS[i]].text + '\n'
                 teks += '	›  ' + Func.texted('bold', 'Created') + ' : ' + moment(global.sticker[cmdS[i]].created).format('DD/MM/YY HH:mm:ss') + '\n\n'
             }
-            client.fakeStory(m.chat, teks + global.footer, global.header)
+            client.fakeStory(m.chat, teks + global.setting.footer, global.setting.header)
         }
     },
     owner: true

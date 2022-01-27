@@ -1,1 +1,1 @@
-worker: node . 994
+worker: node .

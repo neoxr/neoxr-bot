@@ -38,13 +38,14 @@
       "node-fetch":"2.6.1",
       "os":"^0.1.2",
       "path":"~0.12.7",
+      "pino":"~7.0.5",
       "spinnies":"~0.5.1",
       "stormdb":"~0.5.2",
       "syntax-error":"~1.4.0",
       "translate-google-api":"~1.0.4",
       "util":"~0.12.4",
       "yt-search":"~2.10.0",
-      "wa-sticker-formatter":"github:AlenSaito1/wa-sticker-formatter"
+      "wa-sticker-formatter": "^3.6.0"
    },
    "bugs":{
       "url":"https://github.com/neoxr/neoxr-bot/issues"

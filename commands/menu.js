@@ -42,10 +42,10 @@ exports.run = {
                     }, 180000)
                 ]
             }
-            if (/admintools/.test(command)) return client.fakeStory(m.chat, admin(isPrefix), global.header)
+            if (/admintools/.test(command)) return client.fakeStory(m.chat, admin(isPrefix), global.setting.header)
             if (/tools/.test(command)) {
                 if (!isOwner) return client.reply(m.chat, global.status.owner, m)
-                return client.fakeStory(m.chat, tools(isPrefix), global.header)
+                return client.fakeStory(m.chat, tools(isPrefix), global.setting.header)
             }
         } catch (e) {
             console.log(e)
@@ -83,10 +83,8 @@ ${readmore}
 
 	◦  ${prefix}emo *emoticon*
 	◦  ${prefix}flat *emoticon*
-	◦  ${prefix}flip *reply sticker*
-	◦  ${prefix}flop *reply sticker*
 	◦  ${prefix}ig *link*
-	◦  ${prefix}igs *username or link*
+	◦  ${prefix}igs *username*
 	◦  ${prefix}mediafire *link*
 	◦  ${prefix}play *query*
 	◦  ${prefix}response *link*
@@ -193,7 +191,7 @@ let admin = (prefix) => {
 	◦  ${prefix}textwel *text*
 	└  ${prefix}textout *text*
 
-${global.footer}
+${global.setting.footer}
 `
 }
 
@@ -235,6 +233,6 @@ let tools = (prefix) => {
 	◦  => -- (JS Eval w/ Return)
 	└  $ -- (Command Line)
 
-${global.footer}
+${global.setting.footer}
 `
 }

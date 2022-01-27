@@ -55,7 +55,7 @@ exports.run = {
             caption += `	›  *Muted* : ${Func.switcher(mute, '√', '×')}\n`
             caption += `	›  *Stay* : ${Func.switcher(stay, '√', '×')}\n`
             caption += `	›  *Expired* : ${expired == 0 ? 'NOT SET' : Func.timeReverse(expired - new Date * 1)}\n\n`
-            caption += global.footer
+            caption += global.setting.footer
             client.sendImage(m.chat, pic, caption, m)
         }
     },

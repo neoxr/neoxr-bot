@@ -34,7 +34,7 @@ exports.run = {
                 caption += `	›  *Duration* : ${json.duration}\n`
                 caption += `	›  *Bitrate* : ${json.data.quality}\n`
                 caption += `	›  *Server* : ${json.server}\n\n`
-                caption += global.footer
+                caption += global.setting.footer
                 let chSize = Func.sizeLimit(json.data.size, global.max_upload)
                 if (chSize.oversize) return client.reply(m.chat, `The file size (${json.data.size}) too large the size exceeds the limit, please download it by ur self via this link : ${await (await Func.shorten(json.data.url)).data.url}`, m)
                 client.sendFile(m.chat, json.thumbnail, '', caption, m).then(() => {
@@ -60,7 +60,7 @@ exports.run = {
                 caption += `	›  *Duration* : ${json.duration}\n`
                 caption += `	›  *Quality* : ${json.data.quality}\n`
                 caption += `	›  *Server* : ${json.server}\n\n`
-                caption += global.footer
+                caption += global.setting.footer
                 let chSize = Func.sizeLimit(json.data.size, global.max_upload)
                 if (chSize.oversize) return client.reply(m.chat, `The file size (${json.data.size}) too large the size exceeds the limit, please download it by ur self via this link : ${await (await Func.shorten(json.data.url)).data.url}`, m)
                 let isSize = (json.data.size).replace(/MB/g, '').trim()

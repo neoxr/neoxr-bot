@@ -17,7 +17,7 @@ exports.run = {
             caption += `	›  *Likes* : ${json.like}\n`
             caption += `	›  *Retweets* : ${json.retweet}\n`
             caption += `	›  *Comments* : ${json.reply}\n\n`
-            caption += global.footer
+            caption += global.setting.footer
             for (let i = 0; i < json.data.length; i++) {
                 if (json.data[i].type == 'mp4') {
                     client.sendFile(m.chat, json.data[i].url, 'video.mp4', caption, m)

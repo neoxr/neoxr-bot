@@ -9,7 +9,7 @@ exports.run = {
         try {
             if (!args || !args[0]) return client.reply(m.chat, `• ${Func.texted('bold', `Example`)} :\n\n${isPrefix + command} hosico_cat\n${isPrefix + command} hosico_cat 2\n${isPrefix + command} https://instagram.com/stories/hosico_cat/2691705618766624203?utm_source=ig_story_item_share&utm_medium=copy_link`, m)
             client.reply(m.chat, global.status.getdata, m)
-            let json = await Api.igs(/http?s/i.test(args[0]) ? agrs[0].split('/')[4] : args[0])
+            let json = await Api.igs(/http?s/i.test(args[0]) ? args[0].split('/')[4] : args[0])
             if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
             if (args[0] && !isNaN(args[1])) {
                 var no = args[1] - 1

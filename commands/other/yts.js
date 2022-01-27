@@ -34,7 +34,7 @@ exports.run = {
                 caption += '	›  *Publish* : ' + v.ago + '\n'
                 caption += '	›  *Channel* : ' + v.author.name + '\n\n'
             })
-            client.fakeStory(m.chat, caption + global.footer, global.header)
+            client.fakeStory(m.chat, caption + global.setting.footer, global.setting.header)
         } catch {
             return client.reply(m.chat, global.status.error, m)
         }

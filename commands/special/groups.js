@@ -35,7 +35,7 @@ exports.run = {
                 stay: false
             }
         }
-        client.fakeStory(m.chat, teks + global.footer, global.header)
+        client.fakeStory(m.chat, teks + global.setting.footer, global.setting.header)
     },
     owner: true,
     cache: true,

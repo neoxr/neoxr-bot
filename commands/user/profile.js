@@ -45,7 +45,7 @@ exports.run = {
                 caption += `	›  *Use In Private* : ${Func.switcher(Object.keys(global.chats).includes(user), '√', '×')}\n`
                 caption += `	›  *Premium* : ${Func.switcher(users.premium, '√', '×')}\n`
                 caption += `	›  *Expired* : ${users.expired == 0 ? '-' : Func.timeReverse(users.expired - new Date * 1)}\n\n`
-                caption += global.footer
+                caption += global.setting.footer
                 client.sendImage(m.chat, pic, caption, m)
             }
         }

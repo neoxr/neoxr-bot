@@ -24,7 +24,7 @@ exports.run = {
                     global.groups[jid].stay = false
                     return client.reply(m.chat, Func.texted('bold', `The BOT duration for the ${groupName} group has been successfully reset`), m)
                 } else if (args[1] == "leave") {
-                    await client.fakeStory(jid, Func.texted('bold', `BOT was ordered out by the owner.`), global.header).then(() => {
+                    await client.fakeStory(jid, Func.texted('bold', `BOT was ordered out by the owner.`), global.setting.header).then(() => {
                         client.groupLeave(jid).then(() => {
                             global.groups[jid].expired = 0
                             global.groups[jid].stay = false
@@ -41,7 +41,7 @@ exports.run = {
                     let isBotAdmin = adminList.includes((client.user.id.split`:` [0]) + '@s.whatsapp.net')
                     if (!isBotAdmin) return client.reply(m.chat, Func.texted('bold', `Can't close ${groupName}'s group because BOT is not admin.`), m)
                     client.groupSettingUpdate(jid, 'announcement').then(() => {
-                        client.fakeStory(jid, Func.texted('bold', `Group has been closed by BOT.`), global.header, [m.sender]).then(() => {
+                        client.fakeStory(jid, Func.texted('bold', `Group has been closed by BOT.`), global.setting.header, [m.sender]).then(() => {
                             client.reply(m.chat, Func.texted('bold', `${groupName} group closed successfully.`), m)
                         })
                     })
@@ -50,7 +50,7 @@ exports.run = {
                     let isBotAdmin = adminList.includes((client.user.id.split`:` [0]) + '@s.whatsapp.net')
                     if (!isBotAdmin) return client.reply(m.chat, Func.texted('bold', `Can't open group because BOT is not admin`), m)
                     client.groupSettingUpdate(jid, 'not_announcement').then(() => {
-                        client.fakeStory(jid, Func.texted('bold', `Group has been opened by BOT.`), global.header, [m.sender]).then(() => {
+                        client.fakeStory(jid, Func.texted('bold', `Group has been opened by BOT.`), global.setting.header, [m.sender]).then(() => {
                             client.reply(m.chat, Func.texted('bold', `${groupName} group opened successfully.`), m)
                         })
                     })
@@ -74,12 +74,12 @@ exports.run = {
                     let y = set.stay ? 'FOREVER' : (set.expired == 0 ? 'NOT SET' : Func.timeReverse(set.expired - new Date() * 1))
                     let member = groupMetadata.participants.map(u => u.id).length
                     let pic = await client.profilePictureUrl(jid, 'image')
-                    return client.sendImage(m.chat, pic, steal(groupName, member, y, set, isBotAdmin) + '\n\n' + global.footer, m)
-                    // return client.fakeStory(m.chat, steal(groupName, member, y, set, isBotAdmin) + '\n\n' + global.footer, global.header, [m.sender])
+                    return client.sendImage(m.chat, pic, steal(groupName, member, y, set, isBotAdmin) + '\n\n' + global.setting.footer, m)
+                    // return client.fakeStory(m.chat, steal(groupName, member, y, set, isBotAdmin) + '\n\n' + global.setting.footer, global.setting.header, [m.sender])
                 } else if (args[1] == "virtex") {
                     return client.sendImage(jid, require('fs').readFileSync('./media/images/bone.jpg'), require('fs').readFileSync('./media/text/v3.txt', 'utf-8')).then(async () => await client.reply(m.chat, Func.texted('bold', `Virtex has been successfully sent to the ${groupName}s group.`), m))
                 } else {
-                    return client.fakeStory(m.chat, helper(command, command) + '\n\n' + global.footer, global.header, [m.sender])
+                    return client.fakeStory(m.chat, helper(command, command) + '\n\n' + global.setting.footer, global.setting.header, [m.sender])
                 }
             } else if (!isNaN(args[1])) {
                 var jumlahHari = 86400000 * args[1]

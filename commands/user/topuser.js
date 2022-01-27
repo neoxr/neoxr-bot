@@ -24,16 +24,16 @@ exports.run = {
             let show = Math.min(10, hit.length)
             let teks = `❏  *T O P - U S E R S*\n\n`
             teks += hit.slice(0, show).map(([user, data], i) => (i + 1) + '. @' + user.split`@` [0] + '\n	›  *Hits* :  ' + Func.formatNumber(data.hit) + '\n	›  *Last Seen* : ' + moment(data.lastseen).format('DD/MM/YY HH:mm:ss')).join`\n`
-            teks += `\n\n${global.footer}`
-            client.fakeStory(m.chat, teks, global.header)
+            teks += `\n\n${global.setting.footer}`
+            client.fakeStory(m.chat, teks, global.setting.header)
         } else if (command == 'topuser') {
             let hit = Object.entries(global.users).sort((a, b) => b[1].hit - a[1].hit)
             let getUser = hit.map(v => v[0])
             let show = Math.min(10, hit.length)
             let teks = `❏  *T O P - U S E R S*\n\n`
             teks += hit.slice(0, show).map(([user, data], i) => (i + 1) + '. @' + user.split`@` [0] + '\n	›  *Hits* :  ' + Func.formatNumber(data.hit) + '\n	›  *Last Seen* : ' + moment(data.lastseen).format('DD/MM/YY HH:mm:ss')).join`\n`
-            teks += `\n\n${global.footer}`
-            client.fakeStory(m.chat, teks, global.header)
+            teks += `\n\n${global.setting.footer}`
+            client.fakeStory(m.chat, teks, global.setting.header)
         }
     },
     error: false

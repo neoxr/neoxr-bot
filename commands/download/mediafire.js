@@ -20,10 +20,10 @@ exports.run = {
             caption += '	›  *Mime* : ' + json.data.mime + '\n'
             caption += '	›  *Size* : ' + json.data.size + '\n'
             caption += '	›  *Extension* : ' + json.data.extension + '\n\n'
-            caption += global.footer
+            caption += global.setting.footer
             let chSize = Func.sizeLimit(json.data.size, global.max_upload)
             if (chSize.oversize) return client.reply(m.chat, `The file size (${json.data.size}) the size exceeds the limit, please download it by ur self via this link : ${await (await Func.shorten(json.data.link)).data.url}`, m)
-            client.fakeStory(m.chat, caption, global.header).then(async () => {
+            client.fakeStory(m.chat, caption, global.setting.header).then(async () => {
                 client.sendFile(m.chat, json.data.link, unescape(decode(json.data.filename)), '', m)
             })
         } catch {
