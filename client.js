@@ -19,7 +19,7 @@ global.Func = new Function
 const { Scraper } = require('./system/scraper')
 global.scrap = new Scraper
 const { NeoxrApi } = require('./system/neoxrApi')
-global.Api = new NeoxrApi('YOUR_APIKEY_HERE')
+global.Api = new NeoxrApi('yourkey')
 
 const start = async () => { 
 	global.client = Socket({

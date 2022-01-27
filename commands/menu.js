@@ -18,8 +18,8 @@ exports.run = {
                 client.menu[id] = [
                     await client.sendTemplateButton(m.chat, global.setting.cover, menu(isPrefix, m, readmore, setting), '', [{
                             urlButton: {
-                                displayText: `Rest API`,
-                                url: `https://api.neoxr.eu.org`
+                                displayText: `Script`,
+                                url: `https://github.com/neoxr/neoxr-bot`
                             }
                         },
                         {
@@ -130,14 +130,12 @@ ${readmore}
 	◦  ${prefix}delprefix *prefix*
 	◦  ${prefix}disable *command*
 	◦  ${prefix}enable *command*
-	◦  ${prefix}direct *on / off*
 	◦  ${prefix}games *on / off*
 	◦  ${prefix}gc *option*
 	◦  ${prefix}groupmode *on / off*
 	◦  ${prefix}join *link*
 	◦  ${prefix}multiprefix *on / off*
 	◦  ${prefix}restart
-	◦  ${prefix}rob *reply sticker*
 	◦  ${prefix}self *on / off*
 	◦  ${prefix}setpp *reply photo*
 	◦  ${prefix}setprefix *prefix*
