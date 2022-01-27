@@ -1,0 +1,53 @@
+{
+   "name":"neoxr-bot",
+   "version":"1.0.0",
+   "description":"Base WhatsApp Bot Multi Device",
+   "main":"index.js",
+   "scripts":{
+      "test":"echo \"Error: no test specified\" && exit 1"
+   },
+   "engines":{
+      "node":"14.x",
+      "npm":"7.x"
+   },
+   "repository":{
+      "type":"git",
+      "url":"git+https://github.com/neoxr/neoxr-bot.git"
+   },
+   "keywords":[
+      "wabot-md"
+   ],
+   "author":"Wildan Izzudin",
+   "license":"ISC",
+   "dependencies":{
+      "@adiwajshing/baileys":"github:neoxr-v2/multi-device",
+      "awesome-phonenumber":"~2.59.0",
+      "axios":"~0.24.0",
+      "cfonts":"~2.10.0",
+      "chalk":"~4.1.0",
+      "cheerio":"~1.0.0-rc.5",
+      "child_process":"~1.0.2",
+      "colors":"1.4.0",
+      "emoji-api":"~1.0.2",
+      "fs":"0.0.1-security",
+      "file-type":"~16.5.2",
+      "form-data":"~4.0.0",
+      "html-entities":"~2.3.2",
+      "mime-types":"~2.1.32",
+      "moment-timezone":"~0.5.34",
+      "node-fetch":"2.6.1",
+      "os":"^0.1.2",
+      "path":"~0.12.7",
+      "spinnies":"~0.5.1",
+      "stormdb":"~0.5.2",
+      "syntax-error":"~1.4.0",
+      "translate-google-api":"~1.0.4",
+      "util":"~0.12.4",
+      "yt-search":"~2.10.0",
+      "wa-sticker-formatter":"github:AlenSaito1/wa-sticker-formatter"
+   },
+   "bugs":{
+      "url":"https://github.com/neoxr/neoxr-bot/issues"
+   },
+   "homepage":"https://github.com/neoxr/neoxr-bot#readme"
+}
