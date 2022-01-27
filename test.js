@@ -1,7 +1,7 @@
 var beautify = require('js-beautify').js,
     fs = require('fs')
 const { Scandir } = require('./system/extra')
-Scandir('./system').then(files => {
+Scandir('./lib').then(files => {
 	files.filter(v => v.endsWith('.js')).map(file => {
 		fs.readFile(file, 'utf8', function (err, data) {
    		 if (err) throw err
