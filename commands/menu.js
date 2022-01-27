@@ -1,65 +1,65 @@
 exports.run = {
-    usage: ['menu', 'help', 'bot', 'admintools', 'tools'],
-    async: async (m, {
-        client,
-        isPrefix,
-        command,
-        isOwner
-    }) => {
-        try {
-            let setting = global.setting
-            if (/menu|help|bot/.test(command)) {
-                client.menu = client.menu ? client.menu : {}
-                let id = m.chat
-                if (id in client.menu) {
-                    global.statistic[command].hitstat -= 1
-                    return client.reply(m.chat, `Sorry @${m.sender.split`@`[0]} ^\nTo avoiding spam, menu is displayed *once every 3 minutes* and you can try to scroll up.`, client.menu[id][0])
-                }
-                client.menu[id] = [
-                    await client.sendTemplateButton(m.chat, global.setting.cover, menu(isPrefix, m, readmore, setting), '', [{
-                            urlButton: {
-                                displayText: `Script`,
-                                url: `https://github.com/neoxr/neoxr-bot`
-                            }
-                        },
-                        {
-                            quickReplyButton: {
-                                displayText: 'Botstat',
-                                id: `${isPrefix}stat`
-                            }
-                        },
-                        {
-                            quickReplyButton: {
-                                displayText: 'Hitstat',
-                                id: `${isPrefix}hitstat`
-                            }
-                        }
-                    ], {
-                        location: true
-                    }),
-                    setTimeout(() => {
-                        delete client.menu[id]
-                    }, 180000)
-                ]
+   usage: ['menu', 'help', 'bot', 'admintools', 'tools'],
+   async: async (m, {
+      client,
+      isPrefix,
+      command,
+      isOwner
+   }) => {
+      try {
+         let setting = global.setting
+         if (/menu|help|bot/.test(command)) {
+            client.menu = client.menu ? client.menu : {}
+            let id = m.chat
+            if (id in client.menu) {
+               global.statistic[command].hitstat -= 1
+               return client.reply(m.chat, `Sorry @${m.sender.split`@`[0]} ^\nTo avoiding spam, menu is displayed *once every 3 minutes* and you can try to scroll up.`, client.menu[id][0])
             }
-            if (/admintools/.test(command)) return client.fakeStory(m.chat, admin(isPrefix), global.setting.header)
-            if (/tools/.test(command)) {
-                if (!isOwner) return client.reply(m.chat, global.status.owner, m)
-                return client.fakeStory(m.chat, tools(isPrefix), global.setting.header)
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    },
-    error: false,
-    cache: true,
-    location: __filename
+            client.menu[id] = [
+               await client.sendTemplateButton(m.chat, global.setting.cover, menu(isPrefix, m, readmore, setting), '', [{
+                     urlButton: {
+                        displayText: `Script`,
+                        url: `https://github.com/neoxr/neoxr-bot`
+                     }
+                  },
+                  {
+                     quickReplyButton: {
+                        displayText: 'Botstat',
+                        id: `${isPrefix}stat`
+                     }
+                  },
+                  {
+                     quickReplyButton: {
+                        displayText: 'Hitstat',
+                        id: `${isPrefix}hitstat`
+                     }
+                  }
+               ], {
+                  location: true
+               }),
+               setTimeout(() => {
+                  delete client.menu[id]
+               }, 180000)
+            ]
+         }
+         if (/admintools/.test(command)) return client.fakeStory(m.chat, admin(isPrefix), global.setting.header)
+         if (/tools/.test(command)) {
+            if (!isOwner) return client.reply(m.chat, global.status.owner, m)
+            return client.fakeStory(m.chat, tools(isPrefix), global.setting.header)
+         }
+      } catch (e) {
+         console.log(e)
+      }
+   },
+   error: false,
+   cache: true,
+   location: __filename
 }
 
 let readmore = String.fromCharCode(8206).repeat(4001)
 
 let menu = (prefix, m, readmore, setting) => {
-    return `
+   return `
 Hi ${m.pushName || Beib} 🍟
 
 “${setting.msg}”
@@ -158,7 +158,7 @@ ${readmore}
 }
 
 let admin = (prefix) => {
-    return `❏  *H E L P E R*
+   return `❏  *H E L P E R*
 
 	◦  ${prefix}mute *1 / 0*
 	◦  ${prefix}everyone
@@ -194,7 +194,7 @@ ${global.setting.footer}
 }
 
 let tools = (prefix) => {
-    return `❏  *B Y P A S S*
+   return `❏  *B Y P A S S*
 
 	◦  ${prefix}omute *1 / 0*
 	◦  ${prefix}onotify *on / off*

@@ -1,27 +1,27 @@
 exports.run = {
-    usage: ['textwel', 'textleft'],
-    async: async (m, {
-        client,
-        text,
-        isPrefix,
-        command
-    }) => {
-        let setup = global.groups[m.chat]
-        if (command == 'textwel') {
-            if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
-            setup.textwel = text
-            await client.reply(m.chat, Func.texted('bold', `Successfully set.`), m)
-        } else if (command == 'textleft') {
-            if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
-            setup.textleft = text
-            await client.reply(m.chat, Func.texted('bold', `Successfully set.`), m)
-        }
-    },
-    admin: true
+   usage: ['textwel', 'textleft'],
+   async: async (m, {
+      client,
+      text,
+      isPrefix,
+      command
+   }) => {
+      let setup = global.groups[m.chat]
+      if (command == 'textwel') {
+         if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
+         setup.textwel = text
+         await client.reply(m.chat, Func.texted('bold', `Successfully set.`), m)
+      } else if (command == 'textleft') {
+         if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
+         setup.textleft = text
+         await client.reply(m.chat, Func.texted('bold', `Successfully set.`), m)
+      }
+   },
+   admin: true
 }
 
 const formatWel = (prefix, command) => {
-    return `Sorry, can't return without text, and this explanation and how to use :
+   return `Sorry, can't return without text, and this explanation and how to use :
 
 *1.* +tag : for mention new member on welcome message.
 *2.* +grup : for getting group name.
@@ -30,7 +30,7 @@ const formatWel = (prefix, command) => {
 }
 
 const formatLef = (prefix, command) => {
-    return `Sorry, can't return without text, and this explanation and how to use :
+   return `Sorry, can't return without text, and this explanation and how to use :
 
 *1.* +tag : for mention new member on left message.
 *2.* +grup : for getting group name.
