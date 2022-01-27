@@ -10,6 +10,7 @@ Coming soon . . .
 
 ```
 $ git clone -b multi-device https://github.com/neoxr/neoxr-bot
+$ npm i
 $ node . <session_name>
 ```
 
