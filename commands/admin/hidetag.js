@@ -9,7 +9,7 @@ exports.run = {
    }) => {
       if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'pagi'), m)
       let users = participants.map(u => u.id)
-      client.reply(m.chat, teks, null, {
+      client.reply(m.chat, text, null, {
          contextInfo: {
             mentionedJid: users
          }
