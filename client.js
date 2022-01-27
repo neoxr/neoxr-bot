@@ -36,7 +36,9 @@ global.scrap = new Scraper
 const {
    NeoxrApi
 } = require('./system/neoxrApi')
-global.Api = new NeoxrApi('yourkey')
+
+// Get free apikey register at https://api.neoxr.eu.org
+global.Api = new NeoxrApi('YOUR_APIKEY_HERE')
 
 const start = async () => {
    global.client = Socket({
