@@ -9,6 +9,11 @@ Coming soon . . .
 ### Multi Device
 
 ```
+$ git clone -b multi-device https://github.com/neoxr/neoxr-bot
+```
+
+And then go into the folder and type this on your console.
+```
 $ npm i
 $ node . <session_name>
 ```
