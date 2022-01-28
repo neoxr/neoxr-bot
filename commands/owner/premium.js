@@ -12,12 +12,12 @@ exports.run = {
       let now = new Date() * 1
       let number = isNaN(no.trim()) ? (no.startsWith('+') ? no.replace(/[()+\s-]/g, '').trim() : (no).split`@` [1].trim()) : no.trim()
       if (isNaN(number)) return client.reply(m.chat, Func.texted('bold', `Invalid number.`), m)
-      if (number.length > 15 || quoted) return client.reply(m.chat, global.status.wrong, m)
+      if (number.length > 15 || m.quoted) return client.reply(m.chat, global.status.wrong, m)
       try {
          if (no) {
             var user = number + '@s.whatsapp.net'
-         } else if (quoted.sender) {
-            var user = quoted.sender
+         } else if (m.quoted.sender) {
+            var user = m.quoted.sender
          } else if (m.mentionedJid) {
             var user = number + '@s.whatsapp.net'
          }
