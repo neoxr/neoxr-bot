@@ -150,7 +150,7 @@ Socket = (...args) => {
    }
 
    client.sendSticker = async (jid, path, quoted, options = {}) => {
-      // const WSF = require('wa-sticker-formatter')
+      const WSF = require('wa-sticker-formatter')
       let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : Buffer.alloc(0)
       let img = new WSF.Sticker(buffer, {
          ...options,
@@ -546,7 +546,7 @@ Serialize = (client, m) => {
          m.mtype = Object.keys(m.message.viewOnceMessage.message)[0]
          m.msg = m.message.viewOnceMessage.message[m.mtype]
       } else {
-         m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
+         m.mtype = Object.keys(m.message)[0] == 'senderKeyDistributionMessage' ? Object.keys(m.message)[2] == 'messageContextInfo' ? Object.keys(m.message)[1] : Object.keys(m.message)[2] : Object.keys(m.message)[0] != 'messageContextInfo' ? Object.keys(m.message)[0] : Object.keys(m.message)[1]
          m.msg = m.message[m.mtype]
       }
       if (m.mtype === 'ephemeralMessage') {
