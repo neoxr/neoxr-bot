@@ -108,7 +108,7 @@ module.exports = (m) => {
     		prefix: [ '.', '#', '!', '/' ],
     		onlyprefix: '+',
     		owners: [ '6282275576880', '12202006957'],
-    		cover: 'https://telegra.ph/file/b277cff79c78eba2d9661.jpg',
+    		cover: 'https://telegra.ph/file/5f6b6b5e16d6944f8f6ff.jpg',
     		header: 'JUST FOR FUN',
 			msg: 'I am a Whatsapp BOT, use a bot in private chat so that bots can respond quickly.',
 			footer: 'ᴍᴜʟᴛɪ-ᴅᴇᴠɪᴄᴇ ᴡᴀɴɢsᴀғ ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ ɴᴇᴏxʀ ッ'
