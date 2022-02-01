@@ -1,4 +1,4 @@
-global.owner = '380944649449'
+global.owner = '6282275576880'
 global.max_upload = 30 // 30MB (1 = 1MB)
 
 global.status = {
