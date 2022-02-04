@@ -82,6 +82,7 @@ ${readmore}
 ❏   *F E A T U R E S*
 
 	◦  ${prefix}emo *emoticon*
+	◦  ${prefix}emojimix *emoticon | emoticon*
 	◦  ${prefix}flat *emoticon*
 	◦  ${prefix}ig *link*
 	◦  ${prefix}igs *username*

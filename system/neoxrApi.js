@@ -40,6 +40,11 @@ class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/soundcloud?url=' + url + '&apikey=' + this.apiKey)
       return json
    }
+
+   async emojimix(emo) {
+      let json = await Func.fetchJson(this.baseUrl + '/emoji?q=' + encodeURIComponent(emo) + '&apikey=' + this.apiKey)
+      return json
+   }
 }
 
 exports.NeoxrApi = NeoxrApi
