@@ -149,7 +149,7 @@ Socket = (...args) => {
       })
    }
 
-   client.sendSticker = async (jid, path, quoted, options = {}) => {
+   client.sendSticker = async (jid, path, quoted, options = {}) => { 
       const WSF = require('wa-sticker-formatter')
       let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : Buffer.alloc(0)
       let img = new WSF.Sticker(buffer, {
