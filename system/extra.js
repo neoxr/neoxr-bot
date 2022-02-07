@@ -554,7 +554,7 @@ Serialize = (client, m) => {
          m.mtype = m.msg.mtype
          m.msg = m.msg.msg
       }
-      let quoted = m.quoted = m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null
+      let quoted = m.quoted = typeof m.msg != 'undefined' ? m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null : null
       m.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
       if (m.quoted) {
          let type = Object.keys(m.quoted)[0]
