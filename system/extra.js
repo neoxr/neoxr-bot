@@ -555,7 +555,7 @@ Serialize = (client, m) => {
          m.msg = m.msg.msg
       }
       let quoted = m.quoted = typeof m.msg != 'undefined' ? m.msg.contextInfo ? m.msg.contextInfo.quotedMessage : null : null
-      m.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
+      m.mentionedJid = typeof m.msg != 'undefined' ? m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : [] : []
       if (m.quoted) {
          let type = Object.keys(m.quoted)[0]
          m.quoted = m.quoted[type]
@@ -571,7 +571,6 @@ Serialize = (client, m) => {
          m.quoted.isBot = m.quoted.id ? (m.quoted.id.startsWith('BAE5') && m.quoted.id.length === 16 || m.quoted.id.startsWith('3EB0') && m.quoted.id.length === 12 || m.quoted.id.startsWith('3EB0') && m.quoted.id.length === 20 || m.quoted.id.startsWith('B24E') && m.quoted.id.length === 20) : false
          m.quoted.sender = m.msg.contextInfo.participant.split(":")[0] || m.msg.contextInfo.participant
          m.quoted.fromMe = m.quoted.sender === (client.user && client.user.id)
-         m.quoted.text = m.quoted.text || m.quoted.caption || ''
          m.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
          let vM = m.quoted.fakeObj = M.fromObject({
             key: {
@@ -584,11 +583,15 @@ Serialize = (client, m) => {
                participant: m.quoted.sender
             } : {})
          })
+         m.quoted.mtype = m.quoted != null ? Object.keys(m.quoted.fakeObj.message)[0] : null
+         m.quoted.text = m.quoted.text || m.quoted.caption || (m.quoted.mtype == 'buttonsMessage' ? m.quoted.contentText : '') || (m.quoted.mtype == 'templateMessage' ? m.quoted.hydratedFourRowTemplate.hydratedContentText : '') || ''
          m.quoted.download = () => client.downloadMediaMessage(m.quoted)
       }
    }
-   if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
-   m.text = (m.mtype == 'buttonsResponseMessage' ? m.message.buttonsResponseMessage.selectedButtonId : '') || (m.mtype == 'templateButtonReplyMessage' ? m.message.templateButtonReplyMessage.selectedId : '') || (m.mtype == 'stickerMessage' ? (typeof global.sticker[m.msg.fileSha256.toString().replace(/,/g, '')] != 'undefined') ? global.sticker[m.msg.fileSha256.toString().replace(/,/g, '')].text : '' : '') || m.msg.text || m.msg.caption || m.msg || ''
+   if (typeof m.msg != 'undefined') {
+      if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
+   }
+   m.text = (m.mtype == 'stickerMessage' ? (typeof global.sticker[m.msg.fileSha256.toString().replace(/,/g, '')] != 'undefined') ? global.sticker[m.msg.fileSha256.toString().replace(/,/g, '')].text : '' : '') || (m.mtype == 'listResponseMessage' ? m.message.listResponseMessage.singleSelectReply.selectedRowId : '') || (m.mtype == 'buttonsResponseMessage' ? m.message.buttonsResponseMessage.selectedButtonId : '') || (m.mtype == 'templateButtonReplyMessage' ? m.message.templateButtonReplyMessage.selectedId : '') || (typeof m.msg != 'undefined' ? m.msg.text : '') || (typeof m.msg != 'undefined' ? m.msg.caption : '') || m.msg || ''
    return m
 }
 
