@@ -1,15 +1,14 @@
 ## neoxr-bot
-Baileys WhatsApp Bot 
+WhatsApp Bot (Base)
 
-### Non Multi Device
-```
-Coming soon . . .
-```
+### Database Setup
 
-### Multi Device
+Create a heroku account, then go to the AddOns page and add Heroku Postgres.
+
+### Installation
 
 ```
-$ git clone -b multi-device https://github.com/neoxr/neoxr-bot
+$ git clone https://github.com/neoxr/neoxr-bot
 ```
 
 And then go into the folder and type this on your console.
