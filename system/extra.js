@@ -143,26 +143,6 @@ Socket = (...args) => {
       })
    }
 
-   client.fakeStory = async (jid, text, caption) => {
-      let location = {
-         key: {
-            fromMe: false,
-            participant: `0@s.whatsapp.net`,
-            ...(jid ? {
-               remoteJid: 'status@broadcast'
-            } : {})
-         },
-         message: {
-            "imageMessage": {
-               "mimetype": "image/jpeg",
-               "caption": caption,
-               "jpegThumbnail": fs.readFileSync(`./media/image/thumb.jpg`)
-            }
-         }
-      }
-      return client.reply(jid, text, location)
-   }
-
    client.sendFile = async (jid, url, name, caption = '', quoted, opts, options) => {
       let {
          status,
