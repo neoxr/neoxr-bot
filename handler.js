@@ -56,8 +56,6 @@ module.exports = async (client, m) => {
             }
          }
       }
-      if (setting.self)
-         if (!m.fromMe && !isOwner) return
       let isPrefix
       if (body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) {
          let args = body.replace(isPrefix, '').split` `.filter(v => v)
@@ -81,9 +79,9 @@ module.exports = async (client, m) => {
             global.db.chats[m.chat].lastseen = new Date() * 1
          }
          if (!commands.includes(command) && matcher.length > 0) {
-            if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Perintah / Command yang kamu gunakan salah, silahkan coba rekomendasi berikut :\n\n${matcher.map(v => '➠ *' + isPrefix + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
+            if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + isPrefix + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
          }
-         if (setting.error.includes(command)) return client.reply(m.chat, Func.texted('bold', `🚩 Perintah / Command _${isPrefix + command}_ di nonaktifkan sementara oleh Owner.`), m)
+         if (setting.error.includes(command)) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${isPrefix + command}_ disabled.`), m)
          if (commands.includes(command)) {
             if (!global.db.statistic[command]) {
                global.db.statistic[command] = {
@@ -105,8 +103,9 @@ module.exports = async (client, m) => {
             if (body && global.evaluate_chars.some(v => body.startsWith(v)) && !body.startsWith(myPrefix)) return
             if (!turn) continue
             if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
+            if (setting.self && !isOwner && !m.fromMe) return
             if (setting.pluginDisable.includes(name)) return client.reply(m.chat, Func.texted('bold', `🚩 Plugin disabled by Owner.`), m)
-            if (!['owner', 'information'].includes(name) && setting.groupmode) return client.reply(m.chat, Func.texted('bold', `🚩 Bot system is in "group only" mode and can only be used in groups.`), m)
+            if (!['owner', 'information'].includes(name) && setting.groupmode) return client.reply(m.chat, Func.texted('bold', `🚩 System is in "group only" mode and can only be used in groups.`), m)
             if (!['me', 'owner'].includes(name) && users && users.banned) return
             if (cmd.cache && cmd.location) {
                let file = require.resolve(cmd.location)
@@ -156,9 +155,10 @@ module.exports = async (client, m) => {
                let file = require.resolve(event.location)
                Func.reload(file)
             }
-            // if (!m.isGroup && ['91', '92', '212'].some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
-            // if (m.isGroup && !['exec'].includes(name) && groupSet.mute) continue
+            if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
+            if (m.isGroup && !['exec'].includes(name) && groupSet.mute) continue
             if (setting.pluginDisable.includes(name)) continue
+            if (setting.self && !['chatAI', 'exec'].includes(name) && !isOwner && !m.fromMe) continue
             if (!m.isGroup && ['chatAI'].includes(name) && body && Func.socmed(body)) continue
             if (!m.isGroup && ['chatAI'].includes(name) && chats && new Date() * 1 - chats.lastchat < global.timer) continue
             if (!['exec', 'restrict'].includes(name) && users && users.banned) continue
@@ -171,10 +171,6 @@ module.exports = async (client, m) => {
             if (event.botAdmin && !isBotAdmin) continue
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue
-            // if (event.register && !users.register && event.regex && body && body.match(event.regex) && m.sender.startsWith('62')) {
-               // return client.reply(m.chat, Func.texted('bold', `🚩 Nomor kamu belum ter-verifikasi silahkan kirim ${prefixes[0]}tnc untuk melakukan verifikasi.`), m)
-               // continue
-            // }
             if (event.download && (!setting.autodownload || (body && global.evaluate_chars.some(v => body.startsWith(v))))) continue
             event.async(m, {
                client,
