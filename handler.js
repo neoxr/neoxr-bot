@@ -4,6 +4,7 @@ module.exports = async (client, m) => {
    try {
       require('./system/database')(m)
       const isOwner = [client.user.id.split`:` [0], global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      const isPrem = (typeof global.db.users[m.sender] != 'undefined' && global.db.users[m.sender].premium) || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []
       const adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
@@ -27,6 +28,7 @@ module.exports = async (client, m) => {
          chats.lastseen = new Date() * 1
          chats.chat += 1
       } 
+      if (moment.tz('Asia/Jakarta').format('HH') == 00 && setting.online) Object.entries(global.db.users).filter(([jid, data]) => !data.premium).map(([jid, data]) => data.limit = global.limit)
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
          if (!groupSet.member[m.sender]) {
@@ -63,6 +65,7 @@ module.exports = async (client, m) => {
          let start = body.replace(isPrefix, '')
          let clean = start.trim().split` `.slice(1)
          let text = clean.join` `
+         let prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
          const is_commands = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))
          let commands = Func.arrayJoin(Object.values(is_commands).map(v => v.run.usage))
          let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
@@ -78,11 +81,13 @@ module.exports = async (client, m) => {
             global.db.chats[m.chat].chat = 1
             global.db.chats[m.chat].lastseen = new Date() * 1
          }
-         if (!commands.includes(command) && matcher.length > 0) {
+         if (!commands.includes(command) && matcher.length > 0 && !setting.self) {
             if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + isPrefix + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
          }
-         if (setting.error.includes(command)) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${isPrefix + command}_ disabled.`), m)
+         if (setting.error.includes(command) && !setting.self) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${isPrefix + command}_ disabled.`), m)
          if (commands.includes(command)) {
+            users.hit += 1
+            users.usebot = new Date() * 1
             if (!global.db.statistic[command]) {
                global.db.statistic[command] = {
                   hitstat: 1,
@@ -118,6 +123,23 @@ module.exports = async (client, m) => {
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
+            }
+            if (cmd.premium && !isPrem) {
+               client.reply(m.chat, global.status.premium, m)
+               continue
+            }
+            if (cmd.limit && users.limit < 1) {
+               return client.reply(m.chat, `🚩 Your bot usage has reached the limit and will be reset at 00.00\n\nTo get more limits, upgrade to a premium plan send *${prefixes[0]}premium*`, m)
+               continue
+            }
+            if (cmd.limit && users.limit > 0) {
+               let limit = cmd.limit.constructor.name == 'Boolean' ? 1 : cmd.limit
+               if (users.limit >= limit) {
+                  users.limit -= limit
+               } else {
+                  client.reply(m.chat, Func.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
+                  continue
+               }
             }
             if (cmd.group && !m.isGroup) {
                client.reply(m.chat, global.status.group, m)
@@ -168,6 +190,7 @@ module.exports = async (client, m) => {
             if (event.owner && !isOwner) continue
             if (event.moderator && !isMod) continue
             if (event.group && !m.isGroup) continue
+            if (event.limit && users.limit < 1) continue 
             if (event.botAdmin && !isBotAdmin) continue
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue

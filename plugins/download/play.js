@@ -1,3 +1,4 @@
+const { decode } = require('html-entities')
 const { yta } = require('../../lib/y2mate')
 const yt = require('@citoyasha/yt-search')
 exports.run = {
@@ -10,6 +11,7 @@ exports.run = {
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
+         client.sendReact(m.chat, '🕒', m.key)
          const search = await yt.search(text, 1)
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
          const {
@@ -19,7 +21,7 @@ exports.run = {
             filesizeF
          } = await yta(search[0].link)
          if (!dl_link) return client.reply(m.chat, global.status.fail, m)
-         let caption = `◦  *Title* : ${title}\n`
+         let caption = `◦  *Title* : ${decode(title)}\n`
          caption += `◦  *Size* : ${filesizeF}\n`
          caption += `◦  *Duration* : ${search[0].time}\n`
          caption += `◦  *Bitrate* : 128kbps`
@@ -36,6 +38,7 @@ exports.run = {
       }
    },
    error: false,
+   limit: true,
    cache: true,
    location: __filename
 }

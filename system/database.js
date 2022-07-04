@@ -5,25 +5,22 @@ module.exports = (m) => {
       if (!('banned' in user)) user.banned = false
       if (!isNumber(user.banTemp)) user.banTemp = 0
       if (!isNumber(user.banTimes)) user.banTimes = 0
+      if (!isNumber(user.limit)) user.limit = global.limit
+      if (!('premium' in user)) user.premium = false
       if (!isNumber(user.lastseen)) user.lastseen = 0
+      if (!isNumber(user.hit)) user.hit = 0
       if (!isNumber(user.spam)) user.spam = 0
-      if (!('gender' in user)) user.gender = ''
-      if (!isNumber(user.age)) user.age = 0
-      if (!('city' in user)) user.city= ''  
-      if (!('register' in user)) user.register = false
       if (!isNumber(user.warning)) user.warning = 0
    } else {
       global.db.users[m.sender] = {
          banned: false,
          banTemp: 0,
          banTimes: 0,
+         limit: global.limit,
+         premium: false,
          lastseen: 0,
          hit: 0,
          spam: 0,
-         gender: '',
-         age: 0,
-         city: '',
-         register: false,
          warning: 0
       }
    }

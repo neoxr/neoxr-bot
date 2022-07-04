@@ -12,7 +12,13 @@ exports.run = {
          if (extract) {
             const links = extract.filter(v => Func.igFixed(v).match(regex))
             if (links.length != 0) {
-               client.reply(m.chat, global.status.getdata, m)
+               if (users.limit > 0) {
+                  let limit = 1
+                  if (users.limit >= limit) {
+                     users.limit -= limit
+                  } else return client.reply(m.chat, Func.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
+               }
+               client.sendReact(m.chat, '🕒', m.key)
                let old = new Date()
                Func.hitstat('ig', m.sender)
                links.map(async link => {
@@ -29,5 +35,6 @@ exports.run = {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
+   limit: true,
    download: true
 }
