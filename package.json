@@ -21,6 +21,7 @@
    "license":"ISC",
    "dependencies":{
       "@adiwajshing/baileys":"git+ssh://git@github.com/adiwajshing/baileys.git#d00aed7ff5560e10d8224d7fb443243fecbbaee5",
+      "@adiwajshing/keyed-db": "^0.2.4",
       "@citoyasha/yt-search":"^1.0.1",
       "awesome-phonenumber":"~2.59.0",
       "axios":"~0.24.0",

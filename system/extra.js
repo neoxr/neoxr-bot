@@ -19,7 +19,8 @@ const {
    generateThumbnail,
    extractImageThumb,
    prepareWAMessageMedia,
-   WAMessageProto
+   WAMessageProto,
+   jidDecode
 } = require('@adiwajshing/baileys')
 const PhoneNumber = require('awesome-phonenumber')
 
@@ -31,6 +32,14 @@ Socket = (...args) => {
    })
 
    let parseMention = text => [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
+   
+   client.decodeJid = (jid) => {
+      if (!jid) return jid
+      if (/:\d+@/gi.test(jid)) {
+         let decode = jidDecode(jid) || {}
+         return decode.user && decode.server && decode.user + '@' + decode.server || jid
+      } else return jid
+   }
 
    client.groupAdmin = async (jid) => {
       let participant = await (await client.groupMetadata(jid)).participants

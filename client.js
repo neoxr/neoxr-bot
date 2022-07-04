@@ -1,5 +1,5 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@adiwajshing/baileys')
+const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe')
@@ -8,15 +8,19 @@ const { Socket, Serialize, Scandir } = require('./system/extra')
 global.neoxr = new (require('./system/map'))
 global.Func = new (require('./system/function'))
 global.scrap = new (require('./system/scraper'))
-const { NeoxrApi } = require('./system/neoxrApi')
-global.Api = new NeoxrApi(global.neoxr_key)
 global.sql = new (require('./system/sql'))
+global.store = makeInMemoryStore({
+   logger: pino().child({
+      level: 'silent',
+      stream: 'store'
+   })
+})
 
 const removeAuth = () => {
    try {
       fs.unlinkSync('./' + session)
-   } catch (e) {
-      console.log(colors.red('File already deleted!'))
+   } catch (err) {
+      console.log('File Already Deleted')
    }
 }
 
@@ -78,7 +82,7 @@ const connect = async () => {
          )
          state.creds = credentials.creds
       } else {
-         console.log(colors.red('Auth data no found!'))
+         console.log(colors.red('Auth not found!'))
       }
    } catch {
       sql.execute()
@@ -89,11 +93,13 @@ const connect = async () => {
          level: 'silent'
       }),
       printQRInTerminal: true,
+      markOnlineOnConnect: false,
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
       ...fetchLatestBaileysVersion()
    })
-
+  
+   store.bind(client.ev)
    client.ev.on('connection.update', async (update) => {
       const {
          connection,
@@ -150,6 +156,16 @@ const connect = async () => {
          require('./system/config'), require('./handler')(client, m)
       } catch (e) {
          console.log(e)
+      }
+   })
+   
+   client.ev.on('contacts.update', update => {
+      for (let contact of update) {
+         let id = client.decodeJid(contact.id)
+         if (store && store.contacts) store.contacts[id] = {
+            id,
+            name: contact.notify
+         }
       }
    })
 
