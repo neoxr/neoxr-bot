@@ -23,6 +23,7 @@
       "@adiwajshing/baileys":"git+ssh://git@github.com/adiwajshing/baileys.git#d00aed7ff5560e10d8224d7fb443243fecbbaee5",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@citoyasha/yt-search":"^1.0.1",
+      "@colors/colors":"1.5.0",
       "awesome-phonenumber":"~2.59.0",
       "axios":"~0.24.0",
       "cfonts":"~2.10.0",
@@ -30,7 +31,6 @@
       "cheerio":"~1.0.0-rc.5",
       "child_process":"~1.0.2",
       "colors":"1.4.0",
-      "@colors/colors":"1.5.0",
       "got":"^11.8.1",
       "fs":"0.0.1-security",
       "file-type":"~16.5.2",
@@ -45,7 +45,6 @@
       "path":"~0.12.7",
       "pg":"8.7.3",
       "pino":"~7.0.5",
-      "qs":"~6.5.2",
       "spinnies":"~0.5.1",
       "syntax-error":"~1.4.0",
       "util":"~0.12.4"
