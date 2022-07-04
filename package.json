@@ -48,8 +48,7 @@
       "qs":"~6.5.2",
       "spinnies":"~0.5.1",
       "syntax-error":"~1.4.0",
-      "util":"~0.12.4",
-      "youtube-search":"^1.1.6"
+      "util":"~0.12.4"
    },
    "bugs":{
       "url":"https://github.com/neoxr/neoxr-bot/issues"
