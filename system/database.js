@@ -7,6 +7,10 @@ module.exports = (m) => {
       if (!isNumber(user.banTimes)) user.banTimes = 0
       if (!isNumber(user.lastseen)) user.lastseen = 0
       if (!isNumber(user.spam)) user.spam = 0
+      if (!('gender' in user)) user.gender = ''
+      if (!isNumber(user.age)) user.age = 0
+      if (!('city' in user)) user.city= ''  
+      if (!('register' in user)) user.register = false
       if (!isNumber(user.warning)) user.warning = 0
    } else {
       global.db.users[m.sender] = {
@@ -16,6 +20,10 @@ module.exports = (m) => {
          lastseen: 0,
          hit: 0,
          spam: 0,
+         gender: '',
+         age: 0,
+         city: '',
+         register: false,
          warning: 0
       }
    }
@@ -75,6 +83,7 @@ module.exports = (m) => {
       if (!('mimic' in setting)) setting.mimic = []
       if (!('multiprefix' in setting)) setting.multiprefix = true
       if (!('prefix' in setting)) setting.prefix = ['.', '/', '!', '#']
+      if (!('toxic' in setting)) setting.toxic = ["ajg", "ajig", "anjas", "anjg", "anjim", "anjing", "anjrot", "anying", "asw", "autis", "babi", "bacod", "bacot", "bagong", "bajingan", "bangsad", "bangsat", "bastard", "bego", "bgsd", "biadab", "biadap", "bitch", "bngst", "bodoh", "bokep", "cocote", "coli", "colmek", "comli", "dajjal", "dancok", "dongo", "fuck", "gelay", "goblog", "goblok", "guoblog", "guoblok", "hairul", "henceut", "idiot", "itil", "jamet", "jancok", "jembut", "jingan", "kafir", "kanjut", "kanyut", "keparat", "kntl", "kontol", "lana", "loli", "lont", "lonte", "mancing", "meki", "memek", "ngentod", "ngentot", "ngewe", "ngocok", "ngtd", "njeng", "njing", "njinx", "oppai", "pantek", "pantek", "peler", "pepek", "pilat", "pler", "pornhub", "pucek", "puki", "pukimak", "redhub", "sange", "setan", "silit", "telaso", "tempek", "tete", "titit", "toket", "tolol", "tomlol", "tytyd", "wildan", "xnxx"]
       if (!('online' in setting)) setting.online = true
       if (!('onlyprefix' in setting)) setting.onlyprefix = '+'
       if (!('owners' in setting)) setting.owners = ['6285887776722', '994408364923']
@@ -90,6 +99,7 @@ module.exports = (m) => {
          mimic: [],
          multiprefix: true,
          prefix: ['.', '#', '!', '/'],
+         toxic: ["ajg", "ajig", "anjas", "anjg", "anjim", "anjing", "anjrot", "anying", "asw", "autis", "babi", "bacod", "bacot", "bagong", "bajingan", "bangsad", "bangsat", "bastard", "bego", "bgsd", "biadab", "biadap", "bitch", "bngst", "bodoh", "bokep", "cocote", "coli", "colmek", "comli", "dajjal", "dancok", "dongo", "fuck", "gelay", "goblog", "goblok", "guoblog", "guoblok", "hairul", "henceut", "idiot", "itil", "jamet", "jancok", "jembut", "jingan", "kafir", "kanjut", "kanyut", "keparat", "kntl", "kontol", "lana", "loli", "lont", "lonte", "mancing", "meki", "memek", "ngentod", "ngentot", "ngewe", "ngocok", "ngtd", "njeng", "njing", "njinx", "oppai", "pantek", "pantek", "peler", "pepek", "pilat", "pler", "pornhub", "pucek", "puki", "pukimak", "redhub", "sange", "setan", "silit", "telaso", "tempek", "tete", "titit", "toket", "tolol", "tomlol", "tytyd", "wildan", "xnxx"],
          online: true,
          onlyprefix: '+',
          owners: ['6285887776722', '994408364923'],
