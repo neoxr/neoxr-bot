@@ -15,6 +15,7 @@ exports.run = {
 
 const submenu1 = prefix => {
    return `◦  ${prefix}ava *mention or reply*
+◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*`
 }
