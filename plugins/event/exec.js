@@ -12,7 +12,7 @@ exports.run = {
          command = x[0].split` ` [0]
          y += x[0].split` `.slice`1`.join` `, y += x.slice`1`.join`\n`
          text = y.trim()
-         if (command == '<') {
+         if (command == '>') {
             if (!text) return
             try {
                evL = await eval(`(async () => { ${text} })()`)
@@ -21,7 +21,7 @@ exports.run = {
                let err = await syntax(text)
                client.reply(m.chat, typeof err != 'undefined' ? Func.texted('monospace', err) + '\n\n' : '' + Func.jsonFormat(e), m)
             }
-         } else if (command == '~>') {
+         } else if (command == '=>') {
             if (!text) return
             try {
                evL = await eval(`(async () => { return ${text} })()`)
