@@ -22,7 +22,6 @@
    "dependencies":{
       "@adiwajshing/baileys":"git+ssh://git@github.com/adiwajshing/baileys.git#d00aed7ff5560e10d8224d7fb443243fecbbaee5",
       "@adiwajshing/keyed-db": "^0.2.4",
-      "@citoyasha/yt-search":"^1.0.1",
       "@colors/colors":"1.5.0",
       "awesome-phonenumber":"~2.59.0",
       "axios":"~0.24.0",
@@ -47,7 +46,8 @@
       "pino":"~7.0.5",
       "spinnies":"~0.5.1",
       "syntax-error":"~1.4.0",
-      "util":"~0.12.4"
+      "util":"~0.12.4",
+      "youtube-sr": "^4.1.17"
    },
    "bugs":{
       "url":"https://github.com/neoxr/neoxr-bot/issues"
