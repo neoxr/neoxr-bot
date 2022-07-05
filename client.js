@@ -105,7 +105,6 @@ const connect = async () => {
          connection,
          lastDisconnect
       } = update
-      console.log(connection)
       if (connection === 'connecting') spinnies.add('start', {
          text: 'Connecting . . .'
       })
