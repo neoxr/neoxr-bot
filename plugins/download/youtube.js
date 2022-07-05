@@ -1,3 +1,5 @@
+const { decode } = require('html-entities')
+const { yta, ytv } = require('../../lib/y2mate')
 const yt = require('youtube-sr').default
 exports.run = {
    usage: ['yta', 'ytv', 'ytmp3', 'ytmp4'],
