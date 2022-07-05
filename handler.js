@@ -40,9 +40,6 @@ module.exports = async (client, m) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
-      setInterval(async () => {
-         client.setStatus(`Running for : ${Func.toTime(process.uptime() * 1000)}`)
-      }, 5_000)
       let getPrefix = body ? body.charAt(0) : ''
       let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
       require('./system/logs')(client, m, myPrefix)
