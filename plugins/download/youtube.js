@@ -1,5 +1,3 @@
-const { decode } = require('html-entities')
-const { yta, ytv } = require('../../lib/y2mate')
 const yt = require('youtube-sr').default
 exports.run = {
    usage: ['yta', 'ytv', 'ytmp3', 'ytmp4'],
@@ -49,7 +47,9 @@ exports.run = {
             let chSize = Func.sizeLimit(filesizeF, global.max_upload)
             if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
             let isSize = (filesizeF).replace(/MB/g, '').trim()
-            if (isSize > 99) return client.sendFile(m.chat, thumb, '', caption, m).then(async () => await client.sendFile(m.chat, dl_link, decode(title) + '.mp4', '', m))
+            if (isSize > 99) return client.sendFile(m.chat, thumb, '', caption, m).then(async () => await client.sendFile(m.chat, dl_link, decode(title) + '.mp4', '', m, {
+               document: true
+            }))
             client.sendFile(m.chat, dl_link, Func.filename('mp4'), caption, m)
          }
       } catch (e) {

@@ -9,6 +9,7 @@ exports.run = {
       if (option == 1) return client.reply(m.chat, submenu1(isPrefix), m)
       if (option == 2) return client.reply(m.chat, submenu2(isPrefix), m)
       if (option == 3) return client.reply(m.chat, submenu3(isPrefix), m)
+      if (option == 4) return client.reply(m.chat, submenu4(isPrefix), m)
    },
    error: false
 }

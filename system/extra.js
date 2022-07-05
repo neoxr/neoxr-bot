@@ -177,6 +177,23 @@ Socket = (...args) => {
       }
       return await client.sendMessage(jid, reactionMessage)
    }
+   
+   client.sendContact = async (jid, contact, quoted, opts = {}) => {
+      let list = []
+      contact.map(v => list.push({
+         displayName: v.name,
+         vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:${v.name}\nORG:Neoxr Nework\nTEL;type=CELL;type=VOICE;waid=${v.number}:${PhoneNumber('+' + v.number).getNumber('international')}\nEMAIL;type=Email:admin@neoxr.my.id\nURL;type=Website:https://neoxr.my.id\nADR;type=Location:;;Unknown;;\nOther:${v.about}\nEND:VCARD`
+      }))
+      return client.sendMessage(jid, {
+         contacts: {
+            displayName: `${list.length} Contact`,
+            contacts: list
+         },
+         ...opts
+      }, {
+         quoted
+      })
+   }
 
    client.sendFile = async (jid, url, name, caption = '', quoted, opts, options) => {
       let {

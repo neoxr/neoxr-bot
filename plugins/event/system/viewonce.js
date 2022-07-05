@@ -7,9 +7,9 @@ exports.run = {
          if (m.msg && m.msg.viewOnce) {
             let media = await client.downloadMediaMessage(m.msg)
             if (/image/.test(m.mtype)) {
-               client.sendImage(m.chat, media, body ? body : '', m)
+               client.sendFile(m.chat, media, Func.filename('jpg'), body ? body : '', m)
             } else if (/video/.test(m.mtype)) {
-               client.sendVideo(m.chat, media, body ? body : '', m)
+               client.sendFile(m.chat, media, Func.filename('mp4'), body ? body : '', m)
             }
          }
       } catch (e) {
