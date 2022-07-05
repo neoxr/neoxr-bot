@@ -27,7 +27,7 @@ module.exports = async (client, m) => {
       if (chats) {
          chats.lastseen = new Date() * 1
          chats.chat += 1
-      } 
+      }
       if (moment.tz('Asia/Jakarta').format('HH') == 00 && setting.online) Object.entries(global.db.users).filter(([jid, data]) => !data.premium).map(([jid, data]) => data.limit = global.limit)
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
@@ -40,6 +40,9 @@ module.exports = async (client, m) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
+      setInterval(async () => {
+         client.setStatus(`Running for : ${Func.toTime(process.uptime() * 1000)}`)
+      }, 5_000)
       let getPrefix = body ? body.charAt(0) : ''
       let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
       require('./system/logs')(client, m, myPrefix)
@@ -185,12 +188,12 @@ module.exports = async (client, m) => {
             if (!m.isGroup && ['chatAI'].includes(name) && chats && new Date() * 1 - chats.lastchat < global.timer) continue
             if (!['exec', 'restrict'].includes(name) && users && users.banned) continue
             if (!['anti_link', 'anti_tagall', 'anti_virtex', 'filter', 'exec'].includes(name) && users && (users.banned || new Date - users.banTemp < global.timer)) continue
-            if (!['anti_link', 'anti_tagall', 'anti_virtex', 'filter', 'exec'].includes(name) && groupSet && groupSet.mute) continue 
+            if (!['anti_link', 'anti_tagall', 'anti_virtex', 'filter', 'exec'].includes(name) && groupSet && groupSet.mute) continue
             if (event.error) continue
             if (event.owner && !isOwner) continue
             if (event.moderator && !isMod) continue
             if (event.group && !m.isGroup) continue
-            if (event.limit && users.limit < 1) continue 
+            if (event.limit && users.limit < 1) continue
             if (event.botAdmin && !isBotAdmin) continue
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue

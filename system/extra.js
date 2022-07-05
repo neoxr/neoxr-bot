@@ -32,13 +32,29 @@ Socket = (...args) => {
    })
 
    let parseMention = text => [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
-   
+
    client.decodeJid = (jid) => {
       if (!jid) return jid
       if (/:\d+@/gi.test(jid)) {
          let decode = jidDecode(jid) || {}
          return decode.user && decode.server && decode.user + '@' + decode.server || jid
       } else return jid
+   }
+
+   client.setStatus = str => {
+      client.query({
+         tag: 'iq',
+         attrs: {
+            to: '@s.whatsapp.net',
+            type: 'set',
+            xmlns: 'status',
+         },
+         content: [{
+            tag: 'status',
+            attrs: {},
+            content: Buffer.from(str, 'utf-8')
+         }]
+      })
    }
 
    client.groupAdmin = async (jid) => {
@@ -151,7 +167,7 @@ Socket = (...args) => {
          quoted
       })
    }
-   
+
    client.sendReact = async (jid, emoticon, keys = {}) => {
       let reactionMessage = {
          react: {
