@@ -21,7 +21,7 @@ exports.run = {
          try {
             pic = await client.profilePictureUrl(user, 'image')
          } catch {} finally {
-            if (!pic) return client.reply(m.chat, Func.texted('bold', `🚩 He/She did't `), m)
+            if (!pic) return client.reply(m.chat, Func.texted('bold', `🚩 He/She didn't put a profile picture.`), m)
             client.sendFile(m.chat, pic, '', '', m)
          }
       }
