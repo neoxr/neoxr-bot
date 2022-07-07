@@ -1,4 +1,4 @@
-const fs = require('fs')
+const { writeFileSync: create, readFileSync: read }= require('fs')
 exports.run = {
    usage: ['backup', 'save'],
    async: async (m, {
@@ -7,10 +7,9 @@ exports.run = {
    }) => {
       try {
          await sql.save()
-         let create = fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 3), 'utf-8')
-         let file = await Func.fetchBuffer('./database.json')
+         create('./database.json', JSON.stringify(global.db, null, 3), 'utf-8')
          client.reply(m.chat, global.status.wait, m)
-         await client.sendDocument(m.chat, file, 'database.json', m)
+         await client.sendFile(m.chat, read('./database.json'), 'database.json', '', m)
       } catch {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }

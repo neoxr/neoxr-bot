@@ -184,10 +184,14 @@ module.exports = class Function {
       return new Promise(async (resolve) => {
          try {
             if (Buffer.isBuffer(source)) {
-               const {
-                  ext,
-                  mime
-               } = await fromBuffer(source)
+               let ext, mime
+               try {
+                  mime = await (await fromBuffer(source)).mime
+                  ext = await (await fromBuffer(source)).ext        
+               } catch {
+                  mime = require('mime-types').lookup(filename ? filename.split`.` [filename.split`.`.length - 1] : 'txt')
+                  ext = require('mime-types').extension(mime)
+               }
                let extension = filename ? filename.split`.` [filename.split`.`.length - 1] : ext
                let size = Buffer.byteLength(source)
                let filepath = tmpdir() + '/' + (filename || Func.uuid() + '.' + ext)

@@ -28,7 +28,7 @@ exports.run = {
          rows
       }], m)
       let status = option != 'on' ? false : true
-      if (setting[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} hae been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
+      if (setting[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       setting[type] = status
       client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
    },
