@@ -10,7 +10,7 @@ exports.run = {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://fb.watch/7B5KBCgdO3'), m)
          if (!args[0].match(/(?:https?:\/\/(web\.|www\.|m\.)?(facebook|fb)\.(com|watch)\S+)?$/)) return client.reply(m.chat, global.status.invalid, m)
          client.reply(m.chat, global.status.getdata, m)
-         let json = await Api.fb(link)
+         let json = await Api.fb(args[0])
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
          let result = json.data.find(v => v.quality == 'HD')
          if (result) {
