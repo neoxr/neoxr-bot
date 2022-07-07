@@ -15,10 +15,17 @@ exports.run = {
 }
 
 const submenu1 = prefix => {
-   return `◦  ${prefix}ava *mention or reply*
-◦  ${prefix}q *reply chat*
-◦  ${prefix}run
-◦  ${prefix}response *url*`
+   return `◦  ${prefix}fb *link*
+◦  ${prefix}ig *link*
+◦  ${prefix}mediafire *link*
+◦  ${prefix}play *query*
+◦  ${prefix}pin *link*
+◦  ${prefix}tiktok *link*
+◦  ${prefix}tikmp3 *link*
+◦  ${prefix}tikwm *link*
+◦  ${prefix}twitter *link*
+◦  ${prefix}ytmp3 *link*
+◦  ${prefix}ytmp4 *link*`
 }
 
 const submenu2 = prefix => {
@@ -41,6 +48,13 @@ const submenu2 = prefix => {
 }
 
 const submenu3 = prefix => {
+   return `◦  ${prefix}ava *mention or reply*
+◦  ${prefix}q *reply chat*
+◦  ${prefix}run
+◦  ${prefix}response *url*`
+}
+
+const submenu4 = prefix => {
    return `◦  ${prefix}autodownload *on / off*
 ◦  ${prefix}autoread *on / off*
 ◦  ${prefix}backup
