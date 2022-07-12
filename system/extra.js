@@ -20,6 +20,7 @@ const {
    extractImageThumb,
    prepareWAMessageMedia,
    WAMessageProto,
+   delay,
    jidDecode
 } = require('@adiwajshing/baileys')
 const PhoneNumber = require('awesome-phonenumber')
