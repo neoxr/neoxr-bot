@@ -73,14 +73,17 @@ const submenu4 = prefix => {
 ◦  ${prefix}+cmdstic *reply sticker*  
 ◦  ${prefix}disable *command*
 ◦  ${prefix}enable *command*
+◦  ${prefix}-prem *mention or reply*
+◦  ${prefix}+prem *mention or reply*
 ◦  ${prefix}multiprefix *on / off*
 ◦  ${prefix}plugen *plugin*
 ◦  ${prefix}plugdis *plugin*
+◦  ${prefix}join *link*
 ◦  ${prefix}restart
 ◦  ${prefix}self *on / off*
 ◦  ${prefix}setpp *reply photo*
 ◦  ${prefix}setmsg *text*
-◦  ${prefix}-mimic *mention or reply*
+◦  ${prefix}-mimic *mention or reply
 ◦  ${prefix}+mimic *mention or reply*
 ◦  ${prefix}online *on / off*
 ◦  ${prefix}-owner *mention or reply*
