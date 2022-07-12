@@ -29,7 +29,8 @@ const submenu1 = prefix => {
 }
 
 const submenu2 = prefix => {
-   return `◦  ${prefix}antilink *on / off*
+   return `◦  ${prefix}antidelete *on / off*
+◦  ${prefix}antilink *on / off*
 ◦  ${prefix}antivirtex *on / off*
 ◦  ${prefix}filter *on / off*
 ◦  ${prefix}localonly *on / off*

@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['antilink', 'antivirtex', 'left', 'filter', 'localonly', 'welcome'],
+   usage: ['antidelete', 'antilink', 'antivirtex', 'left', 'filter', 'localonly', 'welcome'],
    async: async (m, {
       client,
       args,
