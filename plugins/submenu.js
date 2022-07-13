@@ -58,7 +58,7 @@ const submenu3 = prefix => {
 
 const submenu4 = prefix => {
    return `◦  ${prefix}limit
-◦  ${prefix}me
+◦  ${prefix}me`
 }
 
 const submenu5 = prefix => {
