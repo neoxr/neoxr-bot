@@ -59,7 +59,7 @@ const submenu4 = prefix => {
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*
-◦  ${prefix}sticker *mention or reply*`
+◦  ${prefix}sticker *reply media*`
 }
 
 const submenu5 = prefix => {
@@ -90,7 +90,8 @@ const submenu5 = prefix => {
 ◦  ${prefix}self *on / off*
 ◦  ${prefix}setpp *reply photo*
 ◦  ${prefix}setmsg *text*
-◦  ${prefix}-mimic *mention or reply
+◦  ${prefix}setwm *packname* | *author*
+◦  ${prefix}-mimic *mention or reply*
 ◦  ${prefix}+mimic *mention or reply*
 ◦  ${prefix}online *on / off*
 ◦  ${prefix}-owner *mention or reply*

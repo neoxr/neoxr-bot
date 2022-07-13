@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['setpp', 'setmsg'],
+   usage: ['setpp', 'setmsg', 'setwm'],
    async: async (m, {
       client,
       text,
@@ -22,6 +22,13 @@ exports.run = {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, `Hello, how are you we currently offline now.`), m)
          setting.msg = text
          client.reply(m.chat, Func.texted('bold', `🚩 Greeting Message successfully set.`), m)
+      } else if (command == 'setwm') {
+         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Sticker by | @neoxrs'), m)
+         let [packname, ...author] = text.split`|`
+         author = (author || []).join`|`
+         setting.sk_pack = packname || ''
+         setting.sk_author = author || ''
+         client.reply(m.chat, Func.texted('bold', `🚩 Sticker Watermark successfully set.`), m)
       }
    },
    owner: true,

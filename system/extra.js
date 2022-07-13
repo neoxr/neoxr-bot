@@ -93,18 +93,16 @@ Socket = (...args) => {
       return waMessage
    }
    
-   client.sendSticker = async (jid, path, quoted, options = {}) => {
+   client.sendSticker = async (jid, path, quoted, options = {}) => { 
+      const WSF = require('wa-sticker-formatter')
       let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : Buffer.alloc(0)
-      let {
-         mime
-      } = await FileType.fromBuffer(buffer)
-      let convert = (/image\/(jpe?g|png|gif)|octet/.test(mime)) ? (options && (options.packname || options.author)) ? await Exif.writeExifImg(buffer, options) : await Exif.imageToWebp(buffer) : (/video/.test(mime)) ? (options && (options.packname || options.author)) ? await Exif.writeExifVid(buffer, options) : await Exif.videoToWebp(buffer) : (/webp/.test(mime)) ? await Exif.writeExifWebp(buffer, options) : Buffer.alloc(0)
-      await client.sendPresenceUpdate('composing', jid)
-      return client.sendMessage(jid, {
-         sticker: {
-            url: convert
-         },
-         ...options
+      let img = new WSF.Sticker(buffer, {
+         ...options,
+         crop: false
+      })
+      await img.build()
+      await client.sendMessage(jid, {
+         sticker: await img.get()
       }, {
          quoted
       })

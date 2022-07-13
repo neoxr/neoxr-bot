@@ -6,7 +6,6 @@ const pino = require('pino'), path = require('path'), fs = require('fs'), colors
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
 global.neoxr = new (require('./system/map'))
-global.Exif = new (require('./system/exif'))
 global.Func = new (require('./system/function'))
 global.scrap = new (require('./system/scraper'))
 global.sql = new (require('./system/sql'))
