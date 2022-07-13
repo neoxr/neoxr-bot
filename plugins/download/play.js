@@ -35,7 +35,7 @@ exports.run = {
          client.sendMessageModify(m.chat, caption, m, {
             title: '© neoxr-bot v2.2.0 (Public Bot)',
             largeThumb: true,
-            thumbnail: thumb
+            thumbnail: await Func.fetchBuffer(thumb)
          }).then(() => {
             client.sendFile(m.chat, dl_link, decode(title) + '.mp3', '', m, {
                document: true
