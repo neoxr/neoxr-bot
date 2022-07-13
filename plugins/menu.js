@@ -13,15 +13,19 @@ exports.run = {
          rowId: `${isPrefix}menutype 2`,
          description: ``
       }, {
-         title: 'UTILITIES',
+         title: 'USER INFO',
          rowId: `${isPrefix}menutype 3`,
          description: ``
       }, {
-         title: 'OWNER TOOLS',
+         title: 'UTILITIES',
          rowId: `${isPrefix}menutype 4`,
          description: ``
+      }, {
+         title: 'OWNER TOOLS',
+         rowId: `${isPrefix}menutype 5`,
+         description: ``
       }]
-      let text = 'Automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n'
+      let text = 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n'
       text += '◦ *Database* : PostgreSQL\n'
       text += '◦ *Library* : Baileys v4.3.0\n'
       text += '◦ *Rest API* : https://api.nxr.my.id\n'
