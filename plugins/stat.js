@@ -44,10 +44,11 @@ const statistic = (stats, system) => {
 
 乂  *S Y S T E M*
 
-	◦  ${Func.switcher(system.chatbot, '🟢', '🔴')}  Chat AI
-	◦  ${Func.switcher(system.debug, '🟢', '🔴')}  Debug Mode
-	◦  ${Func.switcher(system.online, '🟢', '🔴')}  Always Online
-	◦  ${Func.switcher(system.self, '🟢', '🔴')}  Self Mode
+	◦  ${system.autodownload ? '🟢' : '🔴'}  Auto Download
+	◦  ${system.chatbot ? '🟢' : '🔴'}  Chat AI
+	◦  ${system.debug ? '🟢' : '🔴'}  Debug Mode
+	◦  ${system.online ? '🟢' : '🔴'}  Always Online
+	◦  ${system.self ? '🟢' : '🔴'}  Self Mode
 	◦  Prefix : ${Func.texted('bold', system.multiprefix ? '( ' + system.prefix.map(v => v).join(' ') + ' )' : '( ' + system.onlyprefix + ' )')}
 	◦  Uptime : ${Func.texted('bold', stats.uptime)}
 
