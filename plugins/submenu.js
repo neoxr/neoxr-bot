@@ -10,6 +10,7 @@ exports.run = {
       if (option == 2) return client.reply(m.chat, submenu2(isPrefix), m)
       if (option == 3) return client.reply(m.chat, submenu3(isPrefix), m)
       if (option == 4) return client.reply(m.chat, submenu4(isPrefix), m)
+      if (option == 5) return client.reply(m.chat, submenu5(isPrefix), m)
    },
    error: false
 }
@@ -56,6 +57,11 @@ const submenu3 = prefix => {
 }
 
 const submenu4 = prefix => {
+   return `◦  ${prefix}limit
+◦  ${prefix}me
+}
+
+const submenu5 = prefix => {
    return `◦  ${prefix}autodownload *on / off*
 ◦  ${prefix}autoread *on / off*
 ◦  ${prefix}backup
