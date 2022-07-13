@@ -50,15 +50,15 @@ const submenu2 = prefix => {
 }
 
 const submenu3 = prefix => {
+   return `◦  ${prefix}limit
+◦  ${prefix}me`
+}
+
+const submenu4 = prefix => {
    return `◦  ${prefix}ava *mention or reply*
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*`
-}
-
-const submenu4 = prefix => {
-   return `◦  ${prefix}limit
-◦  ${prefix}me`
 }
 
 const submenu5 = prefix => {
