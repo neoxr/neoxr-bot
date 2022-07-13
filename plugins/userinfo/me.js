@@ -29,7 +29,7 @@ exports.run = {
          client.sendMessageModify(m.chat, caption, m, {
          	title: '© neoxr-bot v2.2.0 (Public Bot)',
              largeThumb: true,
-             thumbnail: thumb
+             thumbnail: pic
          })
       }
    },
