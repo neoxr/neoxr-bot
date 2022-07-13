@@ -38,7 +38,7 @@ exports.run = {
                      title: '© neoxr-bot v2.2.0 (Public Bot)',
                      largeThumb: true,
                      thumbnail: await Func.fetchBuffer('https://telegra.ph/file/fcf56d646aa059af84126.jpg')
-                  })..then(async () => {
+                  }).then(async () => {
                      client.sendFile(m.chat, json.data.link, unescape(decode(json.data.filename)), '', m)
                   })
                })
