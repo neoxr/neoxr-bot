@@ -23,13 +23,19 @@ exports.run = {
                filesizeF
             } = await yta(args[0])
             if (!dl_link) return client.reply(m.chat, global.status.fail, m)
-            let caption = `◦  *Title* : ${decode(title)}\n`
-            caption += `◦  *Size* : ${filesizeF}\n`
-            caption += `◦  *Duration* : ${search.durationFormatted}\n`
-            caption += `◦  *Bitrate* : 128kbps`
+            let caption = `乂  *Y T - M P 3*\n\n`
+            caption += `	◦  *Title* : ${decode(title)}\n`
+            caption += `	◦  *Size* : ${filesizeF}\n`
+            caption += `	◦  *Duration* : ${search.durationFormatted}\n`
+            caption += `	◦  *Bitrate* : 128kbps\n\n`
+            caption += global.footer
             let chSize = Func.sizeLimit(filesizeF, global.max_upload)
             if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
-            client.sendFile(m.chat, thumb, '', caption, m).then(() => {
+            client.sendMessageModify(m.chat, caption, m, {
+               title: '© neoxr-bot v2.2.0 (Public Bot)',
+               largeThumb: true,
+               thumbnail: await Func.fetchBuffer(thumb)
+            }).then(() => {
                client.sendFile(m.chat, dl_link, decode(title) + '.mp3', '', m, {
                   document: true
                })
@@ -42,14 +48,20 @@ exports.run = {
                filesizeF
             } = await ytv(args[0])
             if (!dl_link) return client.reply(m.chat, global.status.fail, m)
-            let caption = `◦  *Title* : ${decode(title)}\n`
-            caption += `◦  *Size* : ${filesizeF}\n`
-            caption += `◦  *Duration* : ${search.durationFormatted}\n`
-            caption += `◦  *Quality* : 480p`
+            let caption = `乂  *Y T - M P 4*\n\n`
+            caption += `	◦  *Title* : ${decode(title)}\n`
+            caption += `	◦  *Size* : ${filesizeF}\n`
+            caption += `	◦  *Duration* : ${search.durationFormatted}\n`
+            caption += `	◦  *Quality* : 480p\n\n`
+            caption += global.footer
             let chSize = Func.sizeLimit(filesizeF, global.max_upload)
             if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
             let isSize = (filesizeF).replace(/MB/g, '').trim()
-            if (isSize > 99) return client.sendFile(m.chat, thumb, '', caption, m).then(async () => await client.sendFile(m.chat, dl_link, decode(title) + '.mp4', '', m, {
+            if (isSize > 99) return client.sendMessageModify(m.chat, caption, m, {
+               title: '© neoxr-bot v2.2.0 (Public Bot)',
+               largeThumb: true,
+               thumbnail: await Func.fetchBuffer(thumb)
+            }).then(async () => await client.sendFile(m.chat, dl_link, decode(title) + '.mp4', '', m, {
                document: true
             }))
             client.sendFile(m.chat, dl_link, Func.filename('mp4'), caption, m)
