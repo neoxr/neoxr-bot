@@ -19,7 +19,7 @@ exports.run = {
          caption += `	◦ *Name* : ${m.pushName}\n`
          caption += `	◦ *Limit* : ${Func.formatNumber(user.limit)}\n`
          caption += `	◦ *Hitstat** : ${Func.formatNumber(user.hit)}\n`
-         caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[m.sender] != 'undefined' ? global.db.groups[m.chat].member[m.sender].warning : 0)} / 5' : user.warning} / 5')}\n\n`
+         caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[m.sender] != 'undefined' ? global.db.groups[m.chat].member[m.sender].warning : 0) + ' / 5' : user.warning} / 5')}\n\n`
          caption += `乂  *U S E R - S T A T U S*\n\n`
          caption += `	◦ *Banned * : ${(user.banned ? '√' : '×')}\n`
          caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
