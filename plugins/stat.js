@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['stat'],
+   usage: ['botstat', 'stat'],
    async: async (m, {
       client
    }) => {
@@ -21,7 +21,7 @@ exports.run = {
             title: '© neoxr-bot v2.2.0 (Public Bot)',
             ads: false,
             largeThumb: true,
-            thumbnail: 'https://telegra.ph/file/d826ed4128ba873017479.jpg'
+            thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d826ed4128ba873017479.jpg')
          })
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
