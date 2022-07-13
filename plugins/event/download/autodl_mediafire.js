@@ -25,7 +25,7 @@ exports.run = {
                links.map(async link => {
                   let json = await Api.mediafire(link)
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-                  let caption = `乂  *M E D I A F I R E*\n\n`
+                  let text = `乂  *M E D I A F I R E*\n\n`
                   text += '	◦  *Name* : ' + unescape(decode(json.data.filename)) + '\n'
                   text += '	◦  *Size* : ' + json.data.size + '\n'
                   text += '	◦  *Extension* : ' + json.data.extension + '\n'
