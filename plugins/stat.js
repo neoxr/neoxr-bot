@@ -17,7 +17,7 @@ exports.run = {
             uptime: Func.toTime(process.uptime() * 1000)
          }
          const system = global.db.setting
-         client.sendMesssageModify(m.chat, statistic(stats, system), m, {
+         client.sendMessageModify(m.chat, statistic(stats, system), m, {
             title: '© neoxr-bot v2.2.0 (Public Bot)',
             ads: false,
             largeThumb: true,
