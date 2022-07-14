@@ -10,7 +10,7 @@ Create a heroku account, then go to the add-ons page and add Heroku Postgres.
 $ git clone https://github.com/neoxr/neoxr-bot
 ```
 
-And then go into the folder put the session.json in same folder and type this on your console.
+And then type this on your console.
 ```
 $ npm i
 $ node . <session_name>
