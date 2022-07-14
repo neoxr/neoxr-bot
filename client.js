@@ -107,7 +107,7 @@ const connect = async () => {
          lastDisconnect,
          qr
       } = update
-      if (qr != 'undefined') {
+      if (lastDisconnect == 'undefined' && qr != 'undefined') {
          qrcode.generate(qr, {
             small: true
          })
