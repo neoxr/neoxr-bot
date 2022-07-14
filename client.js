@@ -3,7 +3,7 @@ require('dotenv').config()
 const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
-const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe')
+const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
 global.neoxr = new (require('./system/map'))
@@ -99,13 +99,19 @@ const connect = async () => {
       auth: state,
       ...fetchLatestBaileysVersion()
    })
-  
+
    store.bind(client.ev)
    client.ev.on('connection.update', async (update) => {
       const {
          connection,
-         lastDisconnect
+         lastDisconnect,
+         qr
       } = update
+      if (qr != 'undefined') {
+         qrcode.generate(qr, {
+            small: true
+         })
+      }
       if (connection === 'connecting') spinnies.add('start', {
          text: 'Connecting . . .'
       })
@@ -159,7 +165,7 @@ const connect = async () => {
          console.log(e)
       }
    })
-   
+
    client.ev.on('contacts.update', update => {
       for (let contact of update) {
          let id = client.decodeJid(contact.id)
