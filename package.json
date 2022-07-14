@@ -7,7 +7,7 @@
       "start":"node ."
    },
    "engines":{
-      "node":"14.x",
+      "node":"16.x",
       "npm":"8.x"
    },
    "repository":{
@@ -46,6 +46,7 @@
       "path":"~0.12.7",
       "pg":"8.7.3",
       "pino":"~7.0.5",
+      "qrcode-terminal": "^0.12.0",
       "spinnies":"~0.5.1",
       "syntax-error":"~1.4.0",
       "util":"~0.12.4",
