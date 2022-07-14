@@ -1,4 +1,5 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+require('dotenv').config()
 const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
