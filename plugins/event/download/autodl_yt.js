@@ -32,10 +32,12 @@ exports.run = {
                      filesizeF
                   } = await ytv(link)
                   if (!dl_link) return client.reply(m.chat, `${global.status.fail} : [ ${link} ]`, m)
-                  let caption = `◦  *Title* : ${decode(title)}\n`
-                  caption += `◦  *Size* : ${filesizeF}\n`
-                  caption += `◦  *Duration* : ${duration}\n`
-                  caption += `◦  *Quality* : 480p`
+                  let caption = `乂  *Y T - M P 4*\n\n`
+                  caption = `	◦  *Title* : ${decode(title)}\n`
+                  caption += `	◦  *Size* : ${filesizeF}\n`
+                  caption += `	◦  *Duration* : ${duration}\n`
+                  caption += `	◦  *Quality* : 480p\n\n`
+                  caption += global.footer
                   let chSize = Func.sizeLimit(filesizeF, global.max_upload)
                   if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
                   let isSize = (filesizeF).replace(/MB/g, '').trim()
