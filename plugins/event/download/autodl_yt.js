@@ -24,8 +24,6 @@ exports.run = {
                let old = new Date()
                Func.hitstat('ytmp4', m.sender)
                links.map(async link => {
-                  let json = await yt.getVideo(link)
-                  if (!json) return client.reply(m.chat, `${global.status.fail} : [ ${link} ]`, m)
                   const {
                      dl_link,
                      thumb,
@@ -33,6 +31,7 @@ exports.run = {
                      duration,
                      filesizeF
                   } = await ytv(link)
+                  if (!dl_link) return client.reply(m.chat, `${global.status.fail} : [ ${link} ]`, m)
                   let caption = `◦  *Title* : ${decode(title)}\n`
                   caption += `◦  *Size* : ${filesizeF}\n`
                   caption += `◦  *Duration* : ${duration}\n`
