@@ -129,7 +129,7 @@ module.exports = async (client, m) => {
                continue
             }
             if (cmd.limit && users.limit < 1) {
-               return client.reply(m.chat, `🚩 Your bot usage has reached the limit and will be reset at 00.00\n\nTo get more limits, upgrade to a premium plan send *${prefixes[0]}premium*`, m)
+               return client.reply(m.chat, `🚩 Your bot usage has reached the limit and will be reset at 00.00\n\nTo get more limits, upgrade to a premium plan send *${prefixes[0]}premium*`, m).then(() => users.premium = false)
                continue
             }
             if (cmd.limit && users.limit > 0) {
