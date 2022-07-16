@@ -1,6 +1,5 @@
 const { decode } = require('html-entities')
 const { yta, ytv } = require('../../lib/y2mate')
-const yt = require('youtube-sr').default
 exports.run = {
    usage: ['yta', 'ytv', 'ytmp3', 'ytmp4'],
    async: async (m, {
@@ -13,20 +12,19 @@ exports.run = {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://youtu.be/zaRFmdtLhQ8'), m)
          if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
-         const search = await yt.getVideo(args[0])
-         if (!search) return client.reply(m.chat, global.status.fail, m)
          if (/yt?(a|mp3)/i.test(command)) {
             const {
                dl_link,
                thumb,
                title,
+               duration,
                filesizeF
             } = await yta(args[0])
             if (!dl_link) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - M P 3*\n\n`
             caption += `	◦  *Title* : ${decode(title)}\n`
             caption += `	◦  *Size* : ${filesizeF}\n`
-            caption += `	◦  *Duration* : ${search.durationFormatted}\n`
+            caption += `	◦  *Duration* : ${duration}\n`
             caption += `	◦  *Bitrate* : 128kbps\n\n`
             caption += global.footer
             let chSize = Func.sizeLimit(filesizeF, global.max_upload)
@@ -45,13 +43,14 @@ exports.run = {
                dl_link,
                thumb,
                title,
+               duration,
                filesizeF
             } = await ytv(args[0])
             if (!dl_link) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - M P 4*\n\n`
             caption += `	◦  *Title* : ${decode(title)}\n`
             caption += `	◦  *Size* : ${filesizeF}\n`
-            caption += `	◦  *Duration* : ${search.durationFormatted}\n`
+            caption += `	◦  *Duration* : ${duration}\n`
             caption += `	◦  *Quality* : 480p\n\n`
             caption += global.footer
             let chSize = Func.sizeLimit(filesizeF, global.max_upload)

@@ -1,6 +1,6 @@
 const { decode } = require('html-entities')
 const { yta } = require('../../lib/y2mate')
-const yt = require('youtube-sr').default
+const yt = require('usetube')
 exports.run = {
    usage: ['play'],
    async: async (m, {
@@ -12,22 +12,20 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const search = await yt.search(text, {
-            limit: 1,
-            safeSearch: true
-         })
+         const search = await yt.searchVideo(text)
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
          const {
             dl_link,
             thumb,
             title,
+            duration,
             filesizeF
          } = await yta('https://youtu.be/' + search[0].id)
          if (!dl_link) return client.reply(m.chat, global.status.fail, m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${decode(title)}\n`
          caption += `	◦  *Size* : ${filesizeF}\n`
-         caption += `	◦  *Duration* : ${search[0].durationFormatted}\n`
+         caption += `	◦  *Duration* : ${duration}\n`
          caption += `	◦  *Bitrate* : 128kbps\n\n`
          caption += global.footer
          let chSize = Func.sizeLimit(filesizeF, global.max_upload)
