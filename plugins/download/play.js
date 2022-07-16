@@ -12,7 +12,7 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const search = await yt.searchVideo(text)
+         const search = await (await yt.searchVideo(text)).videos
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
          const {
             dl_link,
