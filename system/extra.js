@@ -1,4 +1,5 @@
 const fs = require('fs')
+const { writeFile } = require('fs/promises')
 const mime = require('mime-types')
 const path = require('path')
 const { promisify } = require('util')
@@ -7,6 +8,7 @@ const readdir = promisify(fs.readdir)
 const stat = promisify(fs.stat)
 const fetch = require('node-fetch')
 const FileType = require('file-type')
+const ffmpeg = require('fluent-ffmpeg')
 const { tmpdir } = require('os')
 const {
    default: makeWASocket,
@@ -26,6 +28,7 @@ const {
    jidDecode
 } = require('@adiwajshing/baileys')
 const PhoneNumber = require('awesome-phonenumber')
+const WSF = require('wa-sticker-formatter')
 
 Socket = (...args) => {
    let client = makeWASocket(...args)
@@ -92,20 +95,40 @@ Socket = (...args) => {
       })
       return waMessage
    }
-   
-   client.sendSticker = async (jid, path, quoted, options = {}) => { 
-      const WSF = require('wa-sticker-formatter')
+
+   client.sendSticker = async (jid, path, quoted, options = {}) => {
       let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : Buffer.alloc(0)
-      let img = new WSF.Sticker(buffer, {
-         ...options,
-         crop: false
-      })
-      await img.build()
-      await client.sendMessage(jid, {
-         sticker: await img.get()
-      }, {
-         quoted
-      })
+      let {
+         extension
+      } = await Func.getFile(buffer)
+      const media = tmpdir() + '/' + Func.filename(extension)
+      const result = tmpdir() + '/' + Func.filename('webp')
+      ffmpeg(`${media}`)
+         .input(media)
+         .on('error', function(err) {
+            fs.unlinkSync(media)
+         })
+         .on('end', function() {
+            buildSticker()
+         })
+         .addOutputOptions([
+            `-vcodec`,
+            `libwebp`,
+            `-vf`,
+            `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`
+         ])
+         .toFormat('webp')
+         .save(result)
+      await writeFile(media, buffer)
+      const buildSticker = async () => {
+         await WSF.setMetadata(options.packname, options.author, result)
+         await client.sendMessage(jid, {
+            sticker: fs.readFileSync(result),
+            ...options
+         }, {
+            quoted
+         })
+      }
    }
 
    client.copyMsg = (jid, message, text = '', sender = client.user.id, options = {}) => {
@@ -180,7 +203,7 @@ Socket = (...args) => {
       }
       return await client.sendMessage(jid, reactionMessage)
    }
-   
+
    client.sendContact = async (jid, contact, quoted, opts = {}) => {
       let list = []
       contact.map(v => list.push({
