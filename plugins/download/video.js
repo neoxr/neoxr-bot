@@ -1,9 +1,5 @@
-const {
-   decode
-} = require('html-entities')
-const {
-   ytv
-} = require('../../lib/y2mate')
+const { decode } = require('html-entities')
+const { ytv } = require('../../lib/y2mate')
 const yt = require('usetube')
 exports.run = {
    usage: ['video'],
