@@ -41,7 +41,7 @@ const connect = async () => {
    let lastAccountSyncTimestamp = state.creds.lastAccountSyncTimestamp
    let myAppStateKeyId = state.creds.myAppStateKeyId
    try {
-      const creds = await (await this.sql.query('SELECT * FROM auth'))
+      const creds = await (await sql.execute('SELECT * FROM auth'))
       if (creds.rowCount != 0) {
          let data = creds.rowCount.rows[0]
          credentials = {
