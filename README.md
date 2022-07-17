@@ -28,6 +28,7 @@ Just like heroku must register first and do this steps :
 - Search **Provision PostgreSQL**
 - Click **PostgreSQL** on your project
 - Click **Variables**
+- Click **Copy all**
 - Paste on **.env** file
 - Done!
 
