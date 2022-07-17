@@ -37,7 +37,7 @@ exports.run = {
                if (!img) return client.reply(m.chat, global.status.wrong, m)
                var rand1 = tmpdir() + '/' + Func.filename('jpg')
                var rand2 = tmpdir() + '/' + Func.filename('webp')
-               fs.writeFileSync(`./${rand1}`, img)
+               fs.writeFileSync(`${rand1}`, img)
                ffmpeg(`${rand1}`)
                   .on("error", console.error)
                   .on("end", () => {
