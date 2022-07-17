@@ -57,7 +57,7 @@ exports.run = {
             .addOutputOptions(outputOptions)
             .toFormat("webp")
             .save(ran)
-            await writeFile(media, buffer)
+            await writeFile(media, img)
             async function buildSticker() {
             	await WSF.setMetadata(
                     exif.sk_pack,
