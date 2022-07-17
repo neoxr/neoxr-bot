@@ -2,6 +2,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const Exif = require('../../system/exif')
 const exif = new Exif()
+const { tmpdir } = require('os')
 const {
    exec
 } = require("child_process")
@@ -34,20 +35,20 @@ exports.run = {
             if (/image\/(jpe?g|png)/.test(mime)) {
                let img = await q.download()
                if (!img) return client.reply(m.chat, global.status.wrong, m)
-               var rand1 = '/tmp/' + Func.filename('.jpg')
-               var rand2 = '/tmp/' + Func.filename('.webp')
+               var rand1 = tmpdir() + '/' + Func.filename('jpg')
+               var rand2 = tmpdir() + '/' + Func.filename('webp')
                fs.writeFileSync(`./${rand1}`, img)
-               ffmpeg(`./${rand1}`)
+               ffmpeg(`${rand1}`)
                   .on("error", console.error)
                   .on("end", () => {
-                     exec(`webpmux -set exif ./media/data.exif ./${rand2} -o ./${rand2}`, async (error) => {
+                     exec(`webpmux -set exif ./media/data.exif ${rand2} -o ${rand2}`, async (error) => {
                         client.sendMessage(m.chat, {
-                           sticker: fs.readFileSync(`./${rand2}`)
+                           sticker: fs.readFileSync(`${rand2}`)
                         }, {
                            quoted: m
                         })
-                        fs.unlinkSync(`./${rand1}`)
-                        fs.unlinkSync(`./${rand2}`)
+                        fs.unlinkSync(`${rand1}`)
+                        fs.unlinkSync(`${rand2}`)
                      })
                   })
                   .addOutputOptions(["-vcodec", "libwebp", "-vf", "scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse"])
