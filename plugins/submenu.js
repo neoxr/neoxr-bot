@@ -66,6 +66,8 @@ const submenu4 = prefix => {
 const submenu5 = prefix => {
    return `◦  ${prefix}autodownload *on / off*
 ◦  ${prefix}autoread *on / off*
+◦  ${prefix}bc *text or reply media*
+◦  ${prefix}bcgc *text or reply media*
 ◦  ${prefix}backup
 ◦  ${prefix}ban *mention or reply*
 ◦  ${prefix}unban *mention or reply*
@@ -87,6 +89,7 @@ const submenu5 = prefix => {
 ◦  ${prefix}plugen *plugin*
 ◦  ${prefix}plugdis *plugin*
 ◦  ${prefix}join *link*
+◦  ${prefix}reset
 ◦  ${prefix}restart
 ◦  ${prefix}self *on / off*
 ◦  ${prefix}setpp *reply photo*

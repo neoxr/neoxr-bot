@@ -28,7 +28,7 @@ module.exports = async (client, m) => {
          chats.lastseen = new Date() * 1
          chats.chat += 1
       }
-      if (moment.tz('Asia/Jakarta').format('HH') == 00 && setting.online) Object.entries(global.db.users).filter(([jid, data]) => !data.premium).map(([jid, data]) => data.limit = global.limit)
+      if (moment.tz('Asia/Jakarta').format('HH') == 00) Object.entries(global.db.users).filter(([jid, data]) => !data.premium).map(([jid, data]) => data.limit = global.limit)
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
          if (!groupSet.member[m.sender]) {
