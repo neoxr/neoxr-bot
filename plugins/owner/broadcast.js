@@ -41,7 +41,7 @@ exports.run = {
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
          } else client.reply(m.chat, Func.texted('bold', `🚩 Media / text not found or media is not supported.`), m)
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Func.texted('bold', `🚩 Media / text not found or media is not supported.`), m)
       }
    },
    owner: true
