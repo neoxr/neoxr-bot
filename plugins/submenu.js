@@ -60,7 +60,9 @@ const submenu4 = prefix => {
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*
-◦  ${prefix}sticker *reply media*`
+◦  ${prefix}sticker *reply media*
+◦  ${prefix}swm *packname | author*
+◦  ${prefix}take *packname | author*`
 }
 
 const submenu5 = prefix => {

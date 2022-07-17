@@ -103,7 +103,7 @@ Socket = (...args) => {
       } = await Func.getFile(buffer)
       const media = tmpdir() + '/' + Func.filename(extension)
       const result = tmpdir() + '/' + Func.filename('webp')
-      if (extension == 'webp') {
+      if (extension === 'webp') {
          await writeFile(result, buffer)
          await WSF.setMetadata(options.packname, options.author, result)
          await client.sendMessage(jid, {
