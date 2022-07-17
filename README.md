@@ -6,16 +6,16 @@ This bot uses PostgreSQL database and it is very important to setup it first, yo
 
 If you want to get from heroku, register first and do this steps :
 
-- Go to ***add-ons*** page
-- Search ***Heroku Posgress***
-- Choose ***Hobby Dev*** and ***ADD**
-- Go to ***Setting***
-- Click ***Config Variables***
-- Then copy ***DATABASE_URL*** value
-- Paste on ***.env*** file
+- Go to **add-ons** page
+- Search **Heroku Posgress**
+- Choose **Hobby Dev** and **ADD**
+- Go to **Setting**
+- Click **Config Variables**
+- Then copy **DATABASE_URL** value
+- Paste on **.env** file
 - Done!
 
-***Example :***
+**Example :**
 ```.env
 DATABASE_URL = 'postgres://nmxbabrmewzxmy:d9651df4c26df9d9fdc447be36cf32349ffc3acad641dd3fb72b2bd682ace017@ec2-63-34-180-86.eu-west-1.compute.amazonaws.com:5432/d9atreqoeau273g'
 ```
@@ -25,13 +25,13 @@ DATABASE_URL = 'postgres://nmxbabrmewzxmy:d9651df4c26df9d9fdc447be36cf32349ffc3a
 Just like heroku must register first and do this steps :
 
 - Create New Project
-- Search ***Provision PostgreSQL***
-- Click ***PostgreSQL*** on your project
-- Click ***Variables***
-- Paste on ***.env*** file
+- Search **Provision PostgreSQL**
+- Click **PostgreSQL** on your project
+- Click **Variables**
+- Paste on **.env** file
 - Done!
 
-***Example :***
+**Example :**
 ```.env
 DATABASE_URL = 'postgresql://postgres:mWdv7uNGHddW183m@containers-us-west-71.railway.app:6917/railway'
 ```
