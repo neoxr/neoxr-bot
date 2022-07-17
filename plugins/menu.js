@@ -28,7 +28,7 @@ exports.run = {
       let text = 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n'
       text += '◦ *Database* : PostgreSQL\n'
       text += '◦ *Library* : Baileys v4.3.0\n'
-      text += '◦ *Rest API* : https://api.nxr.my.id\n'
+      text += '◦ *Rest API* : https://api.neoxr.my.id\n'
       text += '◦ *Source* : https://github.com/neoxr/neoxr-bot\n\n'
       text += 'If you find an error or want to upgrade premium plan contact the owner.'
       await client.sendList(m.chat, '', text, '© neoxr-bot v2.2.0', 'Tap!', [{
