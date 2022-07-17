@@ -95,7 +95,7 @@ Socket = (...args) => {
       })
       return waMessage
    }
-
+   
    client.sendSticker = async (jid, path, quoted, options = {}) => {
       let buffer = /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : Buffer.alloc(0)
       let {
@@ -103,24 +103,8 @@ Socket = (...args) => {
       } = await Func.getFile(buffer)
       const media = tmpdir() + '/' + Func.filename(extension)
       const result = tmpdir() + '/' + Func.filename('webp')
-      ffmpeg(`${media}`)
-         .input(media)
-         .on('error', function(err) {
-            fs.unlinkSync(media)
-         })
-         .on('end', function() {
-            buildSticker()
-         })
-         .addOutputOptions([
-            `-vcodec`,
-            `libwebp`,
-            `-vf`,
-            `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`
-         ])
-         .toFormat('webp')
-         .save(result)
-      await writeFile(media, buffer)
-      const buildSticker = async () => {
+      if (extension == 'webp') {
+         await writeFile(result, buffer)
          await WSF.setMetadata(options.packname, options.author, result)
          await client.sendMessage(jid, {
             sticker: fs.readFileSync(result),
@@ -128,6 +112,44 @@ Socket = (...args) => {
          }, {
             quoted
          })
+         try {
+            fs.unlinkSync(result)
+         } catch (e) {
+            console.log(e)
+         }
+      } else {
+         ffmpeg(`${media}`)
+            .input(media)
+            .on('error', function(err) {
+               fs.unlinkSync(media)
+            })
+            .on('end', function() {
+               buildSticker()
+            })
+            .addOutputOptions([
+               `-vcodec`,
+               `libwebp`,
+               `-vf`,
+               `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`
+            ])
+            .toFormat('webp')
+            .save(result)
+         await writeFile(media, buffer)
+         const buildSticker = async () => {
+            await WSF.setMetadata(options.packname, options.author, result)
+            await client.sendMessage(jid, {
+               sticker: fs.readFileSync(result),
+               ...options
+            }, {
+               quoted
+            })
+            try {
+               fs.unlinkSync(media)
+               fs.unlinkSync(result)
+            } catch (e) {
+               console.log(e)
+            }
+         }
       }
    }
 
