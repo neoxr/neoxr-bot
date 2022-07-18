@@ -11,6 +11,7 @@ exports.run = {
       if (option == 3) return client.reply(m.chat, submenu3(isPrefix), m)
       if (option == 4) return client.reply(m.chat, submenu4(isPrefix), m)
       if (option == 5) return client.reply(m.chat, submenu5(isPrefix), m)
+      if (option == 6) return client.reply(m.chat, submenu6(isPrefix), m)
    },
    error: false
 }
@@ -62,7 +63,10 @@ const submenu4 = prefix => {
 ◦  ${prefix}response *url*
 ◦  ${prefix}sticker *reply media*
 ◦  ${prefix}swm *packname | author*
-◦  ${prefix}take *packname | author*`
+◦  ${prefix}take *packname | author*
+◦  ${prefix}toimg *reply sticker*
+◦  ${prefix}tomp3 *reply video*
+◦  ${prefix}tovn *reply audio / video*`
 }
 
 const submenu5 = prefix => {
@@ -102,4 +106,11 @@ const submenu5 = prefix => {
 ◦  ${prefix}online *on / off*
 ◦  ${prefix}-owner *mention or reply*
 ◦  ${prefix}+owner *mention or reply*`
+}
+
+const submenu6 = prefix => {
+   return `◦  ${prefix}botstat
+◦  ${prefix}hitstat
+◦  ${prefix}owner
+◦  ${prefix}premium`
 }
