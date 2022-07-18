@@ -21,7 +21,7 @@ exports.run = {
       let teks = `乂  *H I T S T A T*\n\n`
       teks += Func.texted('bold', `“Command's total hit statistics are currently ${Func.formatNumber(sum.total('hitstat'))} hits.”`) + '\n\n'
       teks += sorted.slice(0, show).map(([cmd, prop], i) => (i + 1) + '. ' + Func.texted('bold', 'Command') + ' :  ' + Func.texted('monospace', isPrefix + cmd) + '\n    ' + Func.texted('bold', 'Hit') + ' : ' + Func.formatNumber(prop.hitstat) + 'x\n    ' + Func.texted('bold', 'Last Hit') + ' : ' + moment(prop.lasthit).format('DD/MM/YY HH:mm:ss')).join`\n`
-      teks += `\n\n${global.db.setting.footer}`
+      teks += `\n\n${global.footer}`
       client.sendMessageModify(m.chat, teks, m, {
          title: '© neoxr-bot v2.2.0 (Public Bot)',
          ads: false,

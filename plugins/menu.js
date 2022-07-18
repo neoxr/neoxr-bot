@@ -24,6 +24,10 @@ exports.run = {
          title: 'OWNER TOOLS',
          rowId: `${isPrefix}menutype 5`,
          description: ``
+      }, {
+         title: 'SPECIAL',
+         rowId: `${isPrefix}menutype 6`,
+         description: ``
       }]
       let text = 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n'
       text += '◦ *Database* : PostgreSQL\n'
