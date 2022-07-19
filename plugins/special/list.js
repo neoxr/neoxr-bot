@@ -82,7 +82,7 @@ exports.run = {
             const data = Object.entries(global.db.users).filter(([_, data]) => data.premium)
             if (data.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Empty data.`), m)
             let teks = `乂  *P R E M L I S T*\n\n`
-            teks += data.map(([jid, data]) => '	◦ @' + jid.replace(/@.+/, '') + '\n	*Limit* : ' + Func.formatNumber(data.limit)).join('\n') + '\n\n'
+            teks += data.map(([jid, data]) => '	◦ @' + jid.replace(/@.+/, '') + '\n	 *Limit* : ' + Func.formatNumber(data.limit)).join('\n') + '\n\n'
             teks += global.footer
             client.sendMessageModify(m.chat, teks, m, {
                title: '© neoxr-bot v2.2.0 (Public Bot)',

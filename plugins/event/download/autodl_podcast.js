@@ -23,11 +23,11 @@ exports.run = {
                links.map(async link => {
                   let json = await Api.podcast(link)
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-                  let text = `乂  *P O D C A S T*\n\n`
+                  let teks = `乂  *P O D C A S T*\n\n`
                   teks += `	◦  *Title* : ${json.data.title}\n`
                   teks += `	◦  *Author* : ${json.data.author}\n`
                   teks += `	◦  *Duration* : ${json.data.duration}\n\n`
-                  text += global.footer
+                  teks += global.footer
                   client.sendMessageModify(m.chat, teks, m, {
                      title: '© neoxr-bot v2.2.0 (Public Bot)',
                      ads: false,
