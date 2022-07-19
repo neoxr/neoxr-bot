@@ -76,6 +76,7 @@ const submenu5 = prefix => {
 ◦  ${prefix}bcgc *text or reply media*
 ◦  ${prefix}backup
 ◦  ${prefix}ban *mention or reply*
+◦  ${prefix}changename *text*
 ◦  ${prefix}unban *mention or reply*
 ◦  ${prefix}block *mention or reply*
 ◦  ${prefix}unblock *mention or reply*
