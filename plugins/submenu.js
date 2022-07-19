@@ -111,7 +111,9 @@ const submenu5 = prefix => {
 
 const submenu6 = prefix => {
    return `◦  ${prefix}botstat
+◦  ${prefix}checkapi
 ◦  ${prefix}hitstat
+◦  ${prefix}list
 ◦  ${prefix}owner
 ◦  ${prefix}premium`
 }
