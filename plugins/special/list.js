@@ -1,9 +1,12 @@
+const moment = require('moment-timezone')
+moment.tz.setDefault('Asia/Jakarta').locale('id')
 exports.run = {
    usage: ['list'],
    async: async (m, {
       client,
       args,
-      isPrefix
+      isPrefix,
+      isOwner
    }) => {
       try {
          let rows = [{
@@ -25,6 +28,10 @@ exports.run = {
          }, {
             title: 'PREMIUM',
             rowId: `${isPrefix}list 5`,
+            description: ``
+         }, {
+            title: 'PRIVATE CHAT',
+            rowId: `${isPrefix}list 6`,
             description: ``
          }]
          if (!args || !args[0]) return client.sendList(m.chat, '', '🚩 Choose data type you want to see.', '', 'Tap!', [{
@@ -83,6 +90,19 @@ exports.run = {
             if (data.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Empty data.`), m)
             let teks = `乂  *P R E M L I S T*\n\n`
             teks += data.map(([jid, data]) => '	◦ @' + jid.replace(/@.+/, '') + '\n	 *Limit* : ' + Func.formatNumber(data.limit)).join('\n') + '\n\n'
+            teks += global.footer
+            client.sendMessageModify(m.chat, teks, m, {
+               title: '© neoxr-bot v2.2.0 (Public Bot)',
+               ads: false,
+               largeThumb: true,
+               thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d826ed4128ba873017479.jpg')
+            })
+         } else if (args[0] == 6) {
+            if (!isOwner) return client.reply(m.chat, global.status.owner, m)
+            const data = Object.entries(global.db.chats).filter(([jid, _]) => jid.endsWith('.net'))
+            if (data.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Empty data.`), m)
+            let teks = `乂  *C H A T L I S T*\n\n`
+            teks += data.map(([jid, data]) => '	◦ @' + jid.replace(/@.+/, '') + '\n	     *Chat* : ' + Func.formatNumber(data.chat) + '\n	     *Lastchat* : ' + moment(data.lastseen).format('DD/MM/YY HH:mm:ss')).join('\n') + '\n\n'
             teks += global.footer
             client.sendMessageModify(m.chat, teks, m, {
                title: '© neoxr-bot v2.2.0 (Public Bot)',
