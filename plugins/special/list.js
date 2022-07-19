@@ -27,7 +27,9 @@ exports.run = {
             rowId: `${isPrefix}list 5`,
             description: ``
          }]
-         if (!args || !args[0]) return client.sendList(m.chat, '', '🚩 Choose data type you want to see.', '', 'Tap!', rows, m)
+         if (!args || !args[0]) return client.sendList(m.chat, '', '🚩 Choose data type you want to see.', '', 'Tap!', [{
+            rows
+         }], m)
          if (args[0] == 1) {
             const data = Object.entries(global.db.users).filter(([_, data]) => data.banned)
             if (data.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Empty data.`), m)

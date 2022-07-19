@@ -19,15 +19,21 @@ exports.run = {
                   } else return client.reply(m.chat, Func.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
                }
                client.sendReact(m.chat, '🕒', m.key)
-               let old = new Date()
-               Func.hitstat('pin', m.sender)
+               Func.hitstat('podcast', m.sender)
                links.map(async link => {
                   let json = await Api.podcast(link)
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-                  let teks = `◦  *Title* : ${json.data.title}\n`
-                  teks += `◦  *Author* : ${json.data.author}\n`
-                  teks += `◦  *Duration* : ${json.data.duration}`
-                  client.sendFile(m.chat, 'https://telegra.ph/file/92be727e349c3cf78c98a.jpg', '', teks, m).then(() => {
+                  let text = `乂  *P O D C A S T*\n\n`
+                  teks += `	◦  *Title* : ${json.data.title}\n`
+                  teks += `	◦  *Author* : ${json.data.author}\n`
+                  teks += `	◦  *Duration* : ${json.data.duration}\n\n`
+                  text += global.footer
+                  client.sendMessageModify(m.chat, teks, m, {
+                     title: '© neoxr-bot v2.2.0 (Public Bot)',
+                     ads: false,
+                     largeThumb: true,
+                     thumbnail: await Func.fetchBuffer('https://telegra.ph/file/92be727e349c3cf78c98a.jpg')
+                  }).then(() => {
                      client.sendFile(m.chat, json.data.audio, json.data.title + '.mp3', '', m, {
                         document: true
                      })

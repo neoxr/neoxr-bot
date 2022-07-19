@@ -22,6 +22,7 @@ const submenu1 = prefix => {
 ◦  ${prefix}mediafire *link*
 ◦  ${prefix}play *query*
 ◦  ${prefix}pin *link*
+◦  ${prefix}podcast *link*
 ◦  ${prefix}tiktok *link*
 ◦  ${prefix}tikmp3 *link*
 ◦  ${prefix}tikwm *link*
