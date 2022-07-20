@@ -153,7 +153,6 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      await sql.updateAuth(state.creds)
       if (global.db) await sql.save()
    }, 10_000)
 
