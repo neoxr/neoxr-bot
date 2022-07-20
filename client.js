@@ -28,7 +28,6 @@ const connect = async () => {
    try {
       const creds = await sql.fetchAuth()
       if (creds) {
-         if (fs.existsSync('./' + session)) fs.unlinkSync('./' + session)
          credentials = {
             creds: creds.auth
          }

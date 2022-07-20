@@ -1,3 +1,7 @@
+### 乂  Description
+
+An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.
+
 ### 乂  Database Setup
 
 This bot uses PostgreSQL database and it is very important to setup it first, you can get PostgreSQL database service from 2 providers Heroku and Railway.
@@ -24,7 +28,7 @@ DATABASE_URL = 'postgres://nmxbabrmewzxmy:d9651df4c26df9d9fdc447be36cf32349ffc3a
 
 Just like heroku must register first and do this steps :
 
-- Create New Project
+- Create **New Project**
 - Search **Provision PostgreSQL**
 - Click **PostgreSQL** on your project
 - Click **Variables**
@@ -49,9 +53,13 @@ $ npm i
 $ node . <session_name>
 ```
 
-**NOTE :** Use node version **14.x** to avoid errors.
+**NOTE :** 
+
+1. Use node version **14.x** to avoid errors.
+2. If you find an error you can create an issue on this repo, don't ask me on whatsapp it's very annoying.
+3. This script is free and semi open source, you can get more apikey limit in **[Here](https://api.neoxr.my.id)**.
 
 <p align="center"><img src="https://profile-counter.glitch.me/{neoxr}/count.svg" alt="neoxr :: Visitor's Count" /></p>
 
-## License
+### 乂  License
 Copyright (c) 2022 Neoxr . Licensed under the [GNU GPLv3](https://github.com/neoxr/neoxr-bot/blob/master/LICENSE)
