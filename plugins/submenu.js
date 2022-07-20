@@ -30,7 +30,7 @@ const submenu1 = prefix => {
 ◦  ${prefix}video *query*
 ◦  ${prefix}ytmp3 *link*
 ◦  ${prefix}ytmp4 *link*
-◦  ${prefix}yts *query*
+◦  ${prefix}yts *query*`
 }
 
 const submenu2 = prefix => {
