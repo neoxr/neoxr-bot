@@ -20,73 +20,31 @@ global.store = makeInMemoryStore({
 const removeAuth = () => {
    try {
       fs.unlinkSync('./' + session)
-   } catch (err) {
-      console.log('File Already Deleted')
-   }
+   } catch {}
 }
 
 const connect = async () => {
    setInterval(removeAuth, 1000 * 60 * 30)
-   let noiseKey = JSON.stringify(state.creds.noiseKey)
-   let signedIdentityKey = JSON.stringify(state.creds.signedIdentityKey)
-   let signedPreKey = JSON.stringify(state.creds.signedPreKey)
-   let registrationId = state.creds.registrationId
-   let advSecretKey = state.creds.advSecretKey
-   let nextPreKeyId = state.creds.nextPreKeyId
-   let firstUnuploadedPreKeyId = state.creds.firstUnuploadedPreKeyI
-   let serverHasPreKeys = state.creds.serverHasPreKeys
-   let account = JSON.stringify(state.creds.account)
-   let me = JSON.stringify(state.creds.me)
-   let signalIdentities = JSON.stringify(state.creds.signalIdentities)
-   let lastAccountSyncTimestamp = state.creds.lastAccountSyncTimestamp
-   let myAppStateKeyId = state.creds.myAppStateKeyId
    try {
-      const creds = await (await sql.execute('SELECT * FROM auth'))
-      if (creds.rowCount != 0) {
-         let data = creds.rowCount.rows[0]
+      const creds = await sql.fetchAuth()
+      if (creds) {
          credentials = {
-            creds: {
-               noiseKey: JSON.parse(data.noisekey),
-               signedIdentityKey: JSON.parse(data.signedidentitykey),
-               signedPreKey: JSON.parse(data.signedprekey),
-               registrationId: Number(data.registrationid),
-               advSecretKey: data.advsecretkey,
-               nextPreKeyId: Number(data.nextprekeyid),
-               firstUnuploadedPreKeyId: Number(data.firstunuploadedprekeyid),
-               serverHasPreKeys: Boolean(data.serverhasprekeys),
-               account: JSON.parse(data.account),
-               me: JSON.parse(data.me),
-               signalIdentities: JSON.parse(data.signalidentities),
-               lastAccountSyncTimestamp: 0,
-               myAppStateKeyId: data.myappstatekeyid,
-            }
+            creds: creds.auth
          }
          credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
          credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
-         credentials.creds.signedIdentityKey.private = Buffer.from(
-            credentials.creds.signedIdentityKey.private
-         )
-         credentials.creds.signedIdentityKey.public = Buffer.from(
-            credentials.creds.signedIdentityKey.public
-         )
-         credentials.creds.signedPreKey.keyPair.private = Buffer.from(
-            credentials.creds.signedPreKey.keyPair.private
-         )
-         credentials.creds.signedPreKey.keyPair.public = Buffer.from(
-            credentials.creds.signedPreKey.keyPair.public
-         )
-         credentials.creds.signedPreKey.signature = Buffer.from(
-            credentials.creds.signedPreKey.signature
-         )
-         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(
-            credentials.creds.signalIdentities[0].identifierKey
-         )
+         credentials.creds.signedIdentityKey.private = Buffer.from(credentials.creds.signedIdentityKey.private)
+         credentials.creds.signedIdentityKey.public = Buffer.from(credentials.creds.signedIdentityKey.public)
+         credentials.creds.signedPreKey.keyPair.private = Buffer.from(credentials.creds.signedPreKey.keyPair.private)
+         credentials.creds.signedPreKey.keyPair.public = Buffer.from(credentials.creds.signedPreKey.keyPair.public)
+         credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
+         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
       } else {
-         console.log(colors.red('Auth not found!'))
+         console.log(colors.red('Authentication data not found!'))
       }
    } catch {
-      sql.execute()
+      await sql.execute()
    }
 
    global.client = Socket({
@@ -94,7 +52,7 @@ const connect = async () => {
          level: 'silent'
       }),
       printQRInTerminal: true,
-      markOnlineOnConnect: false,
+      markOnlineOnConnect: true,
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
       ...fetchLatestBaileysVersion()
@@ -116,19 +74,7 @@ const connect = async () => {
          text: 'Connecting . . .'
       })
       if (connection === 'open') {
-         sql.updateAuth(noiseKey,
-            signedIdentityKey,
-            signedPreKey,
-            registrationId,
-            advSecretKey,
-            nextPreKeyId,
-            firstUnuploadedPreKeyId,
-            serverHasPreKeys,
-            account,
-            me,
-            signalIdentities,
-            lastAccountSyncTimestamp,
-            myAppStateKeyId)
+         await sql.updateAuth(state.creds)
          const rows = await sql.fetch()
          if (rows) {
             global.db = rows.data
@@ -201,8 +147,8 @@ const connect = async () => {
    client.ws.on('CB:call', async json => {
       if (json.content[0].tag == 'offer') {
          let object = json.content[0].attrs['call-creator']
-         // await Func.delay(2000)
-         // await client.updateBlockStatus(object, 'block')
+         await Func.delay(2000)
+         await client.updateBlockStatus(object, 'block')
       }
    })
 
