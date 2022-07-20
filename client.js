@@ -17,17 +17,11 @@ global.store = makeInMemoryStore({
    })
 })
 
-const removeAuth = () => {
-   try {
-      fs.unlinkSync('./' + session)
-   } catch {}
-}
-
 const connect = async () => {
-   setInterval(removeAuth, 1000 * 60 * 30)
    try {
       const creds = await sql.fetchAuth()
       if (creds) {
+         if (fs.existsSync('./' + session)) fs.unlinkSync('./' + session)
          credentials = {
             creds: creds.auth
          }
@@ -40,6 +34,9 @@ const connect = async () => {
          credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
          credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
+         let loadAuth = JSON.parse(fs.readFileSync('./' + session, 'utf-8'))
+         loadAuth.creds = credentials.creds
+         fs.writeFileSync('./' + session, JSON.stringify(loadAuth, null, 3)) 
       } else {
          console.log(colors.red('Authentication data not found!'))
       }
