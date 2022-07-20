@@ -27,9 +27,10 @@ const submenu1 = prefix => {
 ◦  ${prefix}tikmp3 *link*
 ◦  ${prefix}tikwm *link*
 ◦  ${prefix}twitter *link*
+◦  ${prefix}video *query*
 ◦  ${prefix}ytmp3 *link*
 ◦  ${prefix}ytmp4 *link*
-◦  ${prefix}video *query*`
+◦  ${prefix}yts *query*
 }
 
 const submenu2 = prefix => {

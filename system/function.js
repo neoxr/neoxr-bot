@@ -13,18 +13,18 @@ const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
 
 module.exports = class Function {
-	/* Delay
+   /* Delay
     * @param {Integer} time
     */
    delay = time => new Promise(res => setTimeout(res, time))
-   
+
    /* URL Validator
     * @param {String} url
     */
    isUrl = (url) => {
       return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&/=]*)/, 'gi'))
    }
-   
+
    /* Fetching JSON
     * @param {String} url
     * @param {Object} head
@@ -35,7 +35,7 @@ module.exports = class Function {
       })).json()
       return result
    }
-   
+
    /* Converting to Buffer
     * @param {String|Buffer} file
     */
@@ -50,7 +50,7 @@ module.exports = class Function {
          }
       })
    }
-   
+
    /* Text Style
     * @param {String} type
     * @param {String} text
@@ -67,7 +67,7 @@ module.exports = class Function {
             return '```' + text + '```'
       }
    }
-   
+
    /* Example Format
     * @param {String} isPrefix
     * @param {String} command
@@ -76,7 +76,7 @@ module.exports = class Function {
    example = (isPrefix, command, args) => {
       return `• ${this.texted('bold', 'Example')} : ${isPrefix + command} ${args}`
    }
-   
+
    /* Fix Instagram URL
     * @param {String} url
     */
@@ -88,7 +88,7 @@ module.exports = class Function {
          return destruct.map(v => v).join('/')
       } else return url
    }
-   
+
    /* Fix Tiktok URL
     * @param {String} url
     */
@@ -97,7 +97,7 @@ module.exports = class Function {
       let id = url.split('/t/')[1]
       return 'https://vm.tiktok.com/' + id
    }
-   
+
    /* Time Format
     * @param {Integer} ms
     */
@@ -107,14 +107,14 @@ module.exports = class Function {
       let s = Math.floor(ms / 1000) % 60
       return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':')
    }
-   
+
    /* Random Filename
     * @param {String} extension
     */
    filename = (extension) => {
       return `${Math.floor(Math.random() * 10000)}.${extension}`
    }
-   
+
    /* Create UUID */
    uuid = () => {
       var dt = new Date().getTime()
@@ -125,14 +125,14 @@ module.exports = class Function {
       });
       return uuid
    }
-   
+
    /* Random Element From Array
     * @param {Array} list
     */
    random = (list) => {
       return list[Math.floor(Math.random() * list.length)]
    }
-   
+
    /* Format Number \w Dot
     * @param {Integer} integer
     */
@@ -140,7 +140,7 @@ module.exports = class Function {
       let numb = parseInt(integer)
       return Number(numb).toLocaleString().replace(/,/g, '.')
    }
-   
+
    /* To Readable Size
     * @param {Integer} size
     */
@@ -165,7 +165,7 @@ module.exports = class Function {
       }
       return ''
    }
-   
+
    /* Fix Instagram URL
     * @param {String|Integer} str
     */
@@ -174,7 +174,7 @@ module.exports = class Function {
       let header = await (await axios.get(str)).headers
       return this.formatSize(header['content-length'])
    }
-   
+
    /* Download File To /tmp Folder
     * @param {String|Buffer} source
     * @param {String} filename
@@ -187,7 +187,7 @@ module.exports = class Function {
                let ext, mime
                try {
                   mime = await (await fromBuffer(source)).mime
-                  ext = await (await fromBuffer(source)).ext        
+                  ext = await (await fromBuffer(source)).ext
                } catch {
                   mime = require('mime-types').lookup(filename ? filename.split`.` [filename.split`.`.length - 1] : 'txt')
                   ext = require('mime-types').extension(mime)
@@ -239,7 +239,7 @@ module.exports = class Function {
          }
       })
    }
-   
+
    /* Generate Color
     * @param {String} text
     * @param {String} color
@@ -247,7 +247,7 @@ module.exports = class Function {
    color = (text, color) => {
       return chalk.keyword(color || 'green').bold(text)
    }
-   
+
    /* Get Message Type
     * @param {String|Object} data
     */
@@ -261,7 +261,7 @@ module.exports = class Function {
       let type = (typeof data.text !== 'object') ? replaceAll(data.text) : ''
       return type
    }
-   
+
    /* Size Limitation
     * @param {String} str
     * @param {Integer} max
@@ -288,7 +288,7 @@ module.exports = class Function {
          }
       }
    }
-   
+
    /* Link Extractor
     * @param {String} text
     */
@@ -296,7 +296,7 @@ module.exports = class Function {
       let regex = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
       return text.match(regex)
    }
-   
+
    /* File Reloader
     * @param {String} file
     */
@@ -308,14 +308,14 @@ module.exports = class Function {
          require(file)
       })
    }
-   
+
    /* Print JSON
     * @param {Object} obj
     */
    jsonFormat = (obj) => {
       return require('util').format(obj)
    }
-   
+
    /* Ucword Format
     * @param {String} str
     */
@@ -324,7 +324,7 @@ module.exports = class Function {
          return $1.toUpperCase();
       })
    }
-   
+
    /* Next Level Array Concat 
     * @param {Array} arr
     */
@@ -333,7 +333,7 @@ module.exports = class Function {
       for (var i = 0; i < arr.length; i++) construct = construct.concat(arr[i])
       return construct
    }
-   
+
    /* Remove Element Form Array
     * @param {Array} arr
     * @param {String} value
@@ -343,7 +343,7 @@ module.exports = class Function {
       if (index > -1) arr.splice(index, 1)
       return arr
    }
-   
+
    /* Hitstat
     * @param {String} cmd
     * @param {String} who
@@ -361,7 +361,7 @@ module.exports = class Function {
          global.db.statistic[cmd].sender = who.split`@` [0]
       }
    }
-   
+
    /* Socmed Link Validator
     * @param {String} url
     */
@@ -379,12 +379,12 @@ module.exports = class Function {
       ]
       return regex.some(v => url.match(v))
    }
-   
+
    /* Did You Mean ??
     * @param {String} string
     * @param {Array} array
     * @param {String|Object} options
-    */  
+    */
    matcher = (string, array, options) => {
       function levenshtein(value, other, insensitive) {
          var cache = []
@@ -466,10 +466,10 @@ module.exports = class Function {
       }))
       return data
    }
-   
+
    /* Miliseconds to Date
     * @param {Integer} ms
-    */ 
+    */
    toDate = (ms) => {
       let temp = ms
       let days = Math.floor(ms / (24 * 60 * 60 * 1000));
@@ -484,5 +484,20 @@ module.exports = class Function {
       } else {
          return days + "D " + hours + "H " + minutes + "M";
       }
+   }
+
+   /* Time Formater
+    * @param {Integer} value
+    */
+   timeFormat = (value) => {
+      const sec = parseInt(value, 10)
+      let hours = Math.floor(sec / 3600)
+      let minutes = Math.floor((sec - (hours * 3600)) / 60)
+      let seconds = sec - (hours * 3600) - (minutes * 60)
+      if (hours < 10) hours = '0' + hours
+      if (minutes < 10) minutes = '0' + minutes
+      if (seconds < 10) seconds = '0' + seconds
+      if (hours == 00) return minutes + ':' + seconds
+      return hours + ':' + minutes + ':' + seconds
    }
 }
