@@ -352,11 +352,13 @@ module.exports = class Function {
       if (!global.db.statistic[cmd]) {
          global.db.statistic[cmd] = {
             hitstat: 1,
+            today: 1,
             lasthit: new Date * 1,
             sender: who.split`@` [0]
          }
       } else {
          global.db.statistic[cmd].hitstat += 1
+         global.db.statistic[cmd].today += 1
          global.db.statistic[cmd].lasthit = new Date * 1
          global.db.statistic[cmd].sender = who.split`@` [0]
       }

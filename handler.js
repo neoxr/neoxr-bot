@@ -28,7 +28,10 @@ module.exports = async (client, m) => {
          chats.lastseen = new Date() * 1
          chats.chat += 1
       }
-      if (moment.tz('Asia/Jakarta').format('HH') == 00) Object.entries(global.db.users).filter(([jid, data]) => !data.premium).map(([jid, data]) => data.limit = global.limit)
+      if (moment(new Date).format('HH:mm') == '00:00') {
+         Object.entries(global.db.users).filter(([_, data]) => !data.limit < 10 && !data.premium).map(([_, data]) => data.limit = global.limit)
+         Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
+      }
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
          if (!groupSet.member[m.sender]) {
@@ -91,12 +94,14 @@ module.exports = async (client, m) => {
             if (!global.db.statistic[command]) {
                global.db.statistic[command] = {
                   hitstat: 1,
+                  today: 1,
                   lasthit: new Date * 1,
                   sender: m.sender.split`@` [0]
                }
             } else {
-               if (!/bot|help|menu|stat|gc/.test(command)) {
+               if (!/bot|help|menu|stat|hitstat|hitdaily/.test(command)) {
                   global.db.statistic[command].hitstat += 1
+                  global.db.statistic[command].today += 1
                   global.db.statistic[command].lasthit = new Date * 1
                   global.db.statistic[command].sender = m.sender.split`@` [0]
                }
