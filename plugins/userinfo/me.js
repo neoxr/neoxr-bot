@@ -22,8 +22,7 @@ exports.run = {
          caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[m.sender] != 'undefined' ? global.db.groups[m.chat].member[m.sender].warning : 0) + ' / 5' : user.warning + ' / 5')}\n\n`
          caption += `乂  *U S E R - S T A T U S*\n\n`
          caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
-         caption += `	◦ *Banned* : ${(user.banned ? '√' : '×')}\n`
-         caption += `	◦ *Temp Banned* : ${(new Date - user.banTemp < global.timer) ? Func.toTime(new Date(user.banTemp + global.timer) - new Date()) : '×'}\n`
+         caption += `	◦ *Banned* : ${(new Date - user.banTemp < global.timer) ? Func.toTime(new Date(user.banTemp + global.timer) - new Date()) + ' (' + ((global.timer / 1000) / 60) + 'min)' : user.banned ? '√' : '×'}\n`
          caption += `	◦ *Use In Private* : ${(Object.keys(global.db.chats).includes(m.sender) ? '√' : '×')}\n`
          caption += `	◦ *Premium* : ${(user.premium ? '√' : '×')}\n\n`
          caption += global.footer
