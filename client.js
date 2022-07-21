@@ -73,6 +73,12 @@ const connect = async () => {
       if (connection === 'connecting') spinnies.add('start', {
          text: 'Connecting . . .'
       })
+      if (!process.env.DATABASE_URL) {
+         spinnies.fail('start', {
+            text: `You have to setup the database first.`
+         })
+         process.exit(1)
+      }
       if (connection === 'open') {
          await sql.updateAuth(state.creds)
          const rows = await sql.fetch()
