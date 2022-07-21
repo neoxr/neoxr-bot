@@ -1,6 +1,6 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('dotenv').config()
-const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore } = require('@adiwajshing/baileys')
+const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
@@ -53,9 +53,13 @@ const connect = async () => {
       }),
       printQRInTerminal: true,
       markOnlineOnConnect: true,
+      msgRetryCounterMap,
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
-      ...fetchLatestBaileysVersion()
+      ...fetchLatestBaileysVersion(),
+      getMessage: async (key) => {
+         return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
+      }
    })
 
    store.bind(client.ev)
@@ -157,6 +161,10 @@ const connect = async () => {
          await client.updateBlockStatus(object, 'block')
       }
    })
+
+   setInterval(async () => {
+      await sql.updateAuth(client.authState.creds)
+   }, 60_000)
 
    setInterval(async () => {
       if (global.db) await sql.save()
