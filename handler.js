@@ -110,8 +110,8 @@ module.exports = async (client, m) => {
             if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
             if (setting.self && !isOwner && !m.fromMe) return
             if (setting.pluginDisable.includes(name)) return client.reply(m.chat, Func.texted('bold', `🚩 Plugin disabled by Owner.`), m)
+            if (!['me', 'owner'].includes(name) && users && (users.banned || new Date - users.banTemp < global.timer)) return
             if (!['owner', 'information'].includes(name) && setting.groupmode) return client.reply(m.chat, Func.texted('bold', `🚩 System is in "group only" mode and can only be used in groups.`), m)
-            if (!['me', 'owner'].includes(name) && users && users.banned) return
             if (cmd.cache && cmd.location) {
                let file = require.resolve(cmd.location)
                Func.reload(file)
