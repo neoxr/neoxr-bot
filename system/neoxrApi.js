@@ -7,7 +7,7 @@ module.exports = class NeoxrApi {
    }
    
    check = async () => {
-  	let json = await Func.fetchJson(this.baseUrl + '/check/' + this.apiKey)
+      let json = await Func.fetchJson(this.baseUrl + '/check/' + this.apiKey)
       return json
    }
    

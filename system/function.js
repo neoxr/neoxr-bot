@@ -349,6 +349,7 @@ module.exports = class Function {
     * @param {String} who
     */
    hitstat = (cmd, who) => {
+      if (/bot|help|menu|stat|hitstat|hitdaily/.test(cmd)) return
       if (!global.db.statistic[cmd]) {
          global.db.statistic[cmd] = {
             hitstat: 1,

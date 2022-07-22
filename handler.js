@@ -91,21 +91,7 @@ module.exports = async (client, m) => {
          if (commands.includes(command)) {
             users.hit += 1
             users.usebot = new Date() * 1
-            if (!global.db.statistic[command]) {
-               global.db.statistic[command] = {
-                  hitstat: 1,
-                  today: 1,
-                  lasthit: new Date * 1,
-                  sender: m.sender.split`@` [0]
-               }
-            } else {
-               if (!/bot|help|menu|stat|hitstat|hitdaily/.test(command)) {
-                  global.db.statistic[command].hitstat += 1
-                  global.db.statistic[command].today += 1
-                  global.db.statistic[command].lasthit = new Date * 1
-                  global.db.statistic[command].sender = m.sender.split`@` [0]
-               }
-            }
+            Func.hitstat(command, m.sender)
          }
          for (let name in is_commands) {
             let cmd = is_commands[name].run
