@@ -8,7 +8,7 @@ An automated system (WhatsApp Bot) that can help to do something, search and get
 
 ### 乂  Database Setup
 
-This bot script can use 2 types of database types, NoSQL and SQL, for NoSQL types using MongoDB and SQL using PostgreSQL. 
+This script can use 2 types of database types NoSQL and SQL, for NoSQL types using MongoDB and SQL using PostgreSQL. 
 
 You can get free MongoDB database service at MongoDB Atlas while you can get PostgreSQL on Heroku and Railway.
 
@@ -47,7 +47,7 @@ Just like heroku must register first and do this steps :
 DATABASE_URL = 'postgresql://postgres:mWdv7uNGHddW183m@containers-us-west-71.railway.app:6917/railway'
 ```
 
-### 3. MongoDB Atlas
+#### 3. MongoDB Atlas
 
 Sorry, I can't write the tutorial here because it's a bit complicated so you can watch this **[Video](https://m.youtube.com/watch?v=4-fRVd1yzr0)**
 
