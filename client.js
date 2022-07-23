@@ -10,7 +10,6 @@ if (!process.env.DATABASE_URL) {
    console.log(colors.red(`You have to setup the database first.`))
    process.exit(1)
 }
-const dataset = /mongo/.test(process.env.DATABASE_URL) ? 'nosql' : 'sql'
 global.props = new (require('./system/dataset'))
 global.neoxr = new (require('./system/map'))
 global.Func = new (require('./system/function'))
@@ -34,7 +33,7 @@ const connect = async () => {
       const creds = await props.fetchAuth()
       if (creds) {
          credentials = {
-            creds: creds.auth
+            creds
          }
          credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
          credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
