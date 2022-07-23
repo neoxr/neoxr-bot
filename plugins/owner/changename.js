@@ -10,7 +10,7 @@ exports.run = {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'neoxr bot'), m)
          if (text.length > 25) return client.reply(m.chat, `🚩 Text is too long, maximum 25 characters.`, m)
          client.authState.creds.me.name = text
-         await sql.updateAuth(client.authState.creds)
+         await props.updateAuth(client.authState.creds)
          return client.reply(m.chat, `🚩 Name successfully changed.`, m)
       } catch {
          return client.reply(m.chat, Func.texted('bold', `🚩 Name failed to change.`), m)

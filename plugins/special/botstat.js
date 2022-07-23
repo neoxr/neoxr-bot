@@ -53,16 +53,16 @@ const statistic = (stats, system) => {
 	◦  ${Func.texted('bold', stats.mimic)} Mimics Target
 	◦  ${Func.texted('bold', stats.premium)} Premium Users
 	◦  ${Func.texted('bold', stats.hitstat)} Commands Hit
+	◦  Runtime : ${Func.texted('bold', stats.uptime)}
 
 乂  *S Y S T E M*
 
-	◦  ${system.autodownload ? '🟢' : '🔴'}  Auto Download
-	◦  ${system.chatbot ? '🟢' : '🔴'}  Chat AI
-	◦  ${system.debug ? '🟢' : '🔴'}  Debug Mode
-	◦  ${system.online ? '🟢' : '🔴'}  Always Online
-	◦  ${system.self ? '🟢' : '🔴'}  Self Mode
+	◦  ${Func.texted('bold', system.autodownload ? '[ √ ]' : '[ × ]')}  Auto Download
+	◦  ${Func.texted('bold', system.chatbot ? '[ √ ]' : '[ × ]')}  Chat AI
+	◦  ${Func.texted('bold', system.debug ? '[ √ ]' : '[ × ]')}  Debug Mode
+	◦  ${Func.texted('bold', system.online ? '[ √ ]' : '[ × ]')}  Always Online
+	◦  $${Func.texted('bold', system.self ? '[ √ ]' : '[ × ]')}  Self Mode
 	◦  Prefix : ${Func.texted('bold', system.multiprefix ? '( ' + system.prefix.map(v => v).join(' ') + ' )' : '( ' + system.onlyprefix + ' )')}
-	◦  Uptime : ${Func.texted('bold', stats.uptime)}
 
 ${global.footer}`
 }

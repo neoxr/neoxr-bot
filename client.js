@@ -6,10 +6,15 @@ const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
+if (!process.env.DATABASE_URL) {
+   console.log(colors.red(`You have to setup the database first.`))
+   process.exit(1)
+}
+const dataset = /mongo/.test(process.env.DATABASE_URL) ? 'nosql' : 'sql'
+global.props = new (require('./system/dataset'))
 global.neoxr = new (require('./system/map'))
 global.Func = new (require('./system/function'))
 global.scrap = new (require('./system/scraper'))
-global.sql = new (require('./system/sql'))
 global.store = makeInMemoryStore({
    logger: pino().child({
       level: 'silent',
@@ -26,7 +31,7 @@ const removeAuth = () => {
 const connect = async () => {
    setInterval(removeAuth, 1000 * 60 * 30)
    try {
-      const creds = await sql.fetchAuth()
+      const creds = await props.fetchAuth()
       if (creds) {
          credentials = {
             creds: creds.auth
@@ -44,7 +49,7 @@ const connect = async () => {
          console.log(colors.red('Authentication data not found!'))
       }
    } catch {
-      await sql.execute()
+      await props.fetchAuth()
    }
 
    global.client = Socket({
@@ -77,18 +82,10 @@ const connect = async () => {
       if (connection === 'connecting') spinnies.add('start', {
          text: 'Connecting . . .'
       })
-      if (!process.env.DATABASE_URL) {
-         spinnies.fail('start', {
-            text: `You have to setup the database first.`
-         })
-         process.exit(1)
-      }
       if (connection === 'open') {
-         await sql.updateAuth(state.creds)
-         const rows = await sql.fetch()
-         if (rows) {
-            global.db = rows.data
-         } else {
+         await props.updateAuth(state.creds)
+         global.db = await props.fetch()
+         if (!global.db || Object.keys(global.db).length === 0) {
             global.db = {
                users: {},
                chats: {},
@@ -97,7 +94,7 @@ const connect = async () => {
                sticker: {},
                setting: {}
             }
-            await sql.save(global.db)
+            await props.save()
          }
          spinnies.succeed('start', {
             text: `Connected, you login as ${client.user.name}`
@@ -163,11 +160,11 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      await sql.updateAuth(client.authState.creds)
+      await props.updateAuth(client.authState.creds)
    }, 60_000)
 
    setInterval(async () => {
-      if (global.db) await sql.save()
+      if (global.db) await props.save()
    }, 10_000)
 
    return client

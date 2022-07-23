@@ -8,7 +8,9 @@ An automated system (WhatsApp Bot) that can help to do something, search and get
 
 ### 乂  Database Setup
 
-This bot uses PostgreSQL database and it is very important to setup it first, you can get PostgreSQL database service from 2 providers Heroku and Railway.
+This bot script can use 2 types of database types, NoSQL and SQL, for NoSQL types using MongoDB and SQL using PostgreSQL. 
+
+You can get free MongoDB database service at MongoDB Atlas while you can get PostgreSQL on Heroku and Railway.
 
 #### 1. Heroku
 
@@ -43,6 +45,15 @@ Just like heroku must register first and do this steps :
 **Example :**
 ```.env
 DATABASE_URL = 'postgresql://postgres:mWdv7uNGHddW183m@containers-us-west-71.railway.app:6917/railway'
+```
+
+### 3. MongoDB Atlas
+
+Sorry, I can't write the tutorial here because it's a bit complicated so you can watch this **[Video](https://m.youtube.com/watch?v=4-fRVd1yzr0)**
+
+**Example :**
+```.env
+DATABASE_URL = 'mongodb+srv://neoxrbot:yntkts@cluster0.kontol.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 ```
 
 ### 乂  Installation

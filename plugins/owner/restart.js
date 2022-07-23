@@ -4,7 +4,7 @@ exports.run = {
       client
    }) => {
       await client.reply(m.chat, Func.texted('bold', 'Restarting . . .'), m).then(async () => {
-         await sql.save()
+         await props.save()
          process.send('reset')
       })
    },
