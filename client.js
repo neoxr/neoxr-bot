@@ -1,6 +1,6 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('dotenv').config()
-const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap } = require('@adiwajshing/baileys')
+const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
@@ -82,7 +82,7 @@ const connect = async () => {
          text: 'Connecting . . .'
       })
       if (connection === 'open') {
-         await props.updateAuth(state.creds)
+         await props.updateAuth(client.authState.creds)
          global.db = await props.fetch()
          if (!global.db || Object.keys(global.db).length === 0) {
             global.db = {
@@ -99,9 +99,14 @@ const connect = async () => {
             text: `Connected, you login as ${client.user.name}`
          })
       }
-      if (connection === 'close') lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
-         text: `Can't connect to Web Socket`
-      })
+      if (connection === 'close') {
+         await props.drop()
+         lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
+            text: `Can't connect to Web Socket`
+         })
+         await delay(1500)
+         process.exit(1)
+      }
    })
 
    client.ev.on('messages.upsert', async chatUpdate => {
