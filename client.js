@@ -6,10 +6,7 @@ const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
-if (!process.env.DATABASE_URL) {
-   console.log(colors.red(`You have to setup the database first.`))
-   process.exit(1)
-}
+if (!process.env.DATABASE_URL) return console.log(colors.red(`You have to setup the database first.`))
 global.props = new (require('./system/dataset'))
 global.neoxr = new (require('./system/map'))
 global.Func = new (require('./system/function'))
@@ -35,18 +32,16 @@ const connect = async () => {
          credentials = {
             creds
          }
-         credentials.creds.noiseKey.private = new Buffer(credentials.creds.noiseKey.private)
-         credentials.creds.noiseKey.public = new Buffer(credentials.creds.noiseKey.public)
-         credentials.creds.signedIdentityKey.private = new Buffer(credentials.creds.signedIdentityKey.private)
-         credentials.creds.signedIdentityKey.public = new Buffer(credentials.creds.signedIdentityKey.public)
-         credentials.creds.signedPreKey.keyPair.private = new Buffer(credentials.creds.signedPreKey.keyPair.private)
-         credentials.creds.signedPreKey.keyPair.public = new Buffer(credentials.creds.signedPreKey.keyPair.public)
-         credentials.creds.signedPreKey.signature = new Buffer(credentials.creds.signedPreKey.signature)
-         credentials.creds.signalIdentities[0].identifierKey = new Buffer(credentials.creds.signalIdentities[0].identifierKey)
+         credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
+         credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
+         credentials.creds.signedIdentityKey.private = Buffer.from(credentials.creds.signedIdentityKey.private)
+         credentials.creds.signedIdentityKey.public = Buffer.from(credentials.creds.signedIdentityKey.public)
+         credentials.creds.signedPreKey.keyPair.private = Buffer.from(credentials.creds.signedPreKey.keyPair.private)
+         credentials.creds.signedPreKey.keyPair.public = Buffer.from(credentials.creds.signedPreKey.keyPair.public)
+         credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
+         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
-      } else {
-         console.log(colors.red('Authentication data not found!'))
-      }
+      } else {}
    } catch {
       await props.fetchAuth()
    }
@@ -104,8 +99,6 @@ const connect = async () => {
          lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
             text: `Can't connect to Web Socket`
          })
-         await delay(1500)
-         process.exit(1)
       }
    })
 
