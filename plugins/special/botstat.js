@@ -6,7 +6,7 @@ exports.run = {
       try {
          let users = Object.entries(global.db.users).length
          let chats = Object.keys(global.db.chats).filter(v => v.endsWith('.net')).length
-         let groups = Object.entries(global.db.groups).length
+         let groups = await (await client.groupList()).map(v => v.id).length
          let banned = Object.entries(global.db.users).filter(([jid, data]) => data.banned).length
          let premium = Object.entries(global.db.users).filter(([jid, data]) => data.premium).length
          class Hit extends Array {
