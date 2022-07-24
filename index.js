@@ -1,11 +1,8 @@
 console.log('Starting . . .')
-let {
-    spawn: spawn
-} = require('child_process'), path = require('path'), CFonts = require('cfonts')
+const { spawn: spawn } = require('child_process'), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts')
 
 function start() {
 	let args = [path.join(__dirname, 'client.js'), ...process.argv.slice(2)]
-	// console.log([process.argv[0], ...args].join('\n'))
 	let p = spawn(process.argv[0], args, { stdio: ['inherit', 'inherit', 'inherit', 'ipc'] })
 	.on('message', data => {
 		if (data == 'reset') {
@@ -21,12 +18,16 @@ function start() {
 	})
 }
 
-CFonts.say('NEOXR BOT', {
-    font: 'tiny',
-    align: 'center',
-    colors: ['system']
-}), CFonts.say('Github : https://github.com/neoxr/neoxr-bot-md', {
-    colors: ['system'],
-    font: 'console',
-    align: 'center'
-}), start()
+if (!process.env.DATABASE_URL) {
+   console.log(colors.red(`You have to setup the database first.`))
+} else {
+   CFonts.say('NEOXR BOT', {
+      font: 'tiny',
+      align: 'center',
+      colors: ['system']
+   }), CFonts.say('Github : https://github.com/neoxr/neoxr-bot-md', {
+      colors: ['system'],
+      font: 'console',
+      align: 'center'
+   }), start()
+}
