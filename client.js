@@ -6,7 +6,7 @@ const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
-global.props = new (require('./system/dataset'))
+global.git = new (require('./system/git'))
 global.neoxr = new (require('./system/map'))
 global.Func = new (require('./system/function'))
 global.scrap = new (require('./system/scraper'))
@@ -25,11 +25,22 @@ const removeAuth = () => {
 
 const connect = async () => {
    setInterval(removeAuth, 1000 * 60 * 30)
-   try {
-      const creds = await props.fetchAuth()
-      if (creds) {
+   const { content } = await git.fetch()
+   if (!content && Object.keys(content).length === 0) {
+      global.db = {
+         users: {},
+         chats: {},
+         groups: {},
+         statistic: {},
+         sticker: {},
+         setting: {}
+      }
+      git.save(global.db)
+   } else {
+      global.db = content
+      if (global.db.creds) {
          credentials = {
-            creds
+            creds: global.db.creds
          }
          credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
          credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
@@ -40,9 +51,9 @@ const connect = async () => {
          credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
          credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
-      } else {}
-   } catch {
-      await props.fetchAuth()
+      } else {
+         global.db.creds = {}
+      }
    }
 
    global.client = Socket({
@@ -76,25 +87,14 @@ const connect = async () => {
          text: 'Connecting . . .'
       })
       if (connection === 'open') {
-         await props.updateAuth(client.authState.creds)
-         global.db = await props.fetch()
-         if (!global.db || Object.keys(global.db).length === 0) {
-            global.db = {
-               users: {},
-               chats: {},
-               groups: {},
-               statistic: {},
-               sticker: {},
-               setting: {}
-            }
-            await props.save()
-         }
+         global.db.creds = client.authState.creds
          spinnies.succeed('start', {
             text: `Connected, you login as ${client.user.name}`
          })
       }
       if (connection === 'close') {
-         await props.drop()
+         delete global.db.creds
+         await git.save()
          lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
             text: `Can't connect to Web Socket`
          })
@@ -156,12 +156,8 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      await props.updateAuth(client.authState.creds)
-   }, 60_000)
-
-   setInterval(async () => {
-      if (global.db) await props.save()
-   }, 10_000)
+      await git.save()
+   }, 60_000) // save data every 1 minutes
 
    return client
 }

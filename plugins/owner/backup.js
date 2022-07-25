@@ -6,7 +6,7 @@ exports.run = {
       command
    }) => {
       try {
-         await props.save()
+         await git.save()
          create('./database.json', JSON.stringify(global.db, null, 3), 'utf-8')
          client.reply(m.chat, global.status.wait, m)
          await client.sendFile(m.chat, read('./database.json'), 'database.json', '', m)
