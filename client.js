@@ -1,5 +1,4 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-require('dotenv').config()
 const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
@@ -25,24 +24,36 @@ const removeAuth = () => {
 
 const connect = async () => {
    setInterval(removeAuth, 1000 * 60 * 30)
-   try {
-      const creds = await props.fetchAuth()
-      if (creds) {
+   let content = await props.fetch()
+   if (!content || Object.keys(content).length === 0) {
+      global.db = {
+         users: {},
+         chats: {},
+         groups: {},
+         statistic: {},
+         sticker: {},
+         setting: {}
+      }
+      await props.save()
+   } else {
+      global.db = content
+      if (global.db.creds) {
          credentials = {
-            creds
+            creds: content.creds
          }
-         credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
-         credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
-         credentials.creds.signedIdentityKey.private = Buffer.from(credentials.creds.signedIdentityKey.private)
-         credentials.creds.signedIdentityKey.public = Buffer.from(credentials.creds.signedIdentityKey.public)
-         credentials.creds.signedPreKey.keyPair.private = Buffer.from(credentials.creds.signedPreKey.keyPair.private)
-         credentials.creds.signedPreKey.keyPair.public = Buffer.from(credentials.creds.signedPreKey.keyPair.public)
-         credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
-         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
+         credentials.creds.noiseKey.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.noiseKey.private.buffer) : Buffer.from(credentials.creds.noiseKey.private)
+         credentials.creds.noiseKey.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.noiseKey.public.buffer) : Buffer.from(credentials.creds.noiseKey.public)
+         credentials.creds.signedIdentityKey.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedIdentityKey.private.buffer) : Buffer.from(credentials.creds.signedIdentityKey.private)
+         credentials.creds.signedIdentityKey.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedIdentityKey.public.buffer) : Buffer.from(credentials.creds.signedIdentityKey.public)
+         credentials.creds.signedPreKey.keyPair.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.keyPair.private.buffer) : Buffer.from(credentials.creds.signedPreKey.keyPair.private)
+         credentials.creds.signedPreKey.keyPair.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.keyPair.public.buffer) : Buffer.from(credentials.creds.signedPreKey.keyPair.public)
+         credentials.creds.signedPreKey.signature = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.signature.buffer) : Buffer.from(credentials.creds.signedPreKey.signature)
+         credentials.creds.signalIdentities[0].identifierKey = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signalIdentities[0].identifierKey.buffer) : Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
-      } else {}
-   } catch {
-      await props.fetchAuth()
+      } else {
+         global.db.creds = {}
+         global.db.creds = state.creds
+      }
    }
 
    global.client = Socket({
@@ -76,28 +87,18 @@ const connect = async () => {
          text: 'Connecting . . .'
       })
       if (connection === 'open') {
-         await props.updateAuth(client.authState.creds)
-         global.db = await props.fetch()
-         if (!global.db || Object.keys(global.db).length === 0) {
-            global.db = {
-               users: {},
-               chats: {},
-               groups: {},
-               statistic: {},
-               sticker: {},
-               setting: {}
-            }
-            await props.save()
-         }
+         global.db.creds = client.authState.creds
          spinnies.succeed('start', {
             text: `Connected, you login as ${client.user.name}`
          })
       }
       if (connection === 'close') {
-         await props.drop()
          lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
             text: `Can't connect to Web Socket`
          })
+         delete global.db.creds
+         await props.save()
+         process.exit(0)
       }
    })
 
@@ -156,10 +157,7 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      await props.updateAuth(client.authState.creds)
-   }, 60_000)
-
-   setInterval(async () => {
+      global.db.creds = client.authState.creds
       if (global.db) await props.save()
    }, 10_000)
 
