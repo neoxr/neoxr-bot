@@ -1,4 +1,5 @@
 console.log('Starting . . .')
+require('dotenv').config()
 const { spawn: spawn } = require('child_process'), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts')
 
 function start() {
@@ -18,7 +19,7 @@ function start() {
 	})
 }
 
-if (!process.env.DATABASE_URL) {
+if (!process.env.GIT_TOKEN) {
    console.log(colors.red(`You have to setup the database first.`))
 } else {
    CFonts.say('NEOXR BOT', {

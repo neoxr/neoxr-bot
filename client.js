@@ -1,5 +1,4 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-require('dotenv').config()
 const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
@@ -26,7 +25,7 @@ const removeAuth = () => {
 const connect = async () => {
    setInterval(removeAuth, 1000 * 60 * 30)
    const { content } = await git.fetch()
-   if (!content && Object.keys(content).length === 0) {
+   if (!content || Object.keys(content).length === 0) {
       global.db = {
          users: {},
          chats: {},
@@ -40,19 +39,20 @@ const connect = async () => {
       global.db = content
       if (global.db.creds) {
          credentials = {
-            creds: global.db.creds
+            creds: content.creds
          }
-         credentials.creds.noiseKey.private = Buffer.from(credentials.creds.noiseKey.private)
-         credentials.creds.noiseKey.public = Buffer.from(credentials.creds.noiseKey.public)
-         credentials.creds.signedIdentityKey.private = Buffer.from(credentials.creds.signedIdentityKey.private)
-         credentials.creds.signedIdentityKey.public = Buffer.from(credentials.creds.signedIdentityKey.public)
-         credentials.creds.signedPreKey.keyPair.private = Buffer.from(credentials.creds.signedPreKey.keyPair.private)
-         credentials.creds.signedPreKey.keyPair.public = Buffer.from(credentials.creds.signedPreKey.keyPair.public)
-         credentials.creds.signedPreKey.signature = Buffer.from(credentials.creds.signedPreKey.signature)
-         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
+         credentials.creds.noiseKey.private = Buffer.from(content.creds.noiseKey.private)
+         credentials.creds.noiseKey.public = Buffer.from(content.creds.noiseKey.public)
+         credentials.creds.signedIdentityKey.private = Buffer.from(content.creds.signedIdentityKey.private)
+         credentials.creds.signedIdentityKey.public = Buffer.from(content.creds.signedIdentityKey.public)
+         credentials.creds.signedPreKey.keyPair.private = Buffer.from(content.creds.signedPreKey.keyPair.private)
+         credentials.creds.signedPreKey.keyPair.public = Buffer.from(content.creds.signedPreKey.keyPair.public)
+         credentials.creds.signedPreKey.signature = Buffer.from(content.creds.signedPreKey.signature)
+         credentials.creds.signalIdentities[0].identifierKey = Buffer.from(content.creds.signalIdentities[0].identifierKey)
          state.creds = credentials.creds
       } else {
          global.db.creds = {}
+         global.db.creds = state.creds
       }
    }
 
@@ -157,7 +157,7 @@ const connect = async () => {
 
    setInterval(async () => {
       await git.save()
-   }, 60_000) // save data every 1 minutes
+   }, 300_000) // save data every 5 minutes
 
    return client
 }
