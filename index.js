@@ -26,7 +26,7 @@ if (!process.env.GIT_TOKEN) {
       font: 'tiny',
       align: 'center',
       colors: ['system']
-   }), CFonts.say('Github : https://github.com/neoxr/neoxr-bot-md', {
+   }), CFonts.say('Github : https://github.com/neoxr/neoxr-bot', {
       colors: ['system'],
       font: 'console',
       align: 'center'
