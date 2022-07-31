@@ -5,6 +5,7 @@ exports.run = {
       chats,
       isAdmin,
       isBotAdmin,
+      isOwner,
       groupSet
    }) => {
       try {

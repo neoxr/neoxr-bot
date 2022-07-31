@@ -46,13 +46,13 @@ exports.run = {
 const statistic = (stats, system) => {
    return `乂  *B O T S T A T*
 
-	◦  ${Func.texted('bold', stats.groups)} Groups Joined
-	◦  ${Func.texted('bold', stats.chats)} Personal Chats
-	◦  ${Func.texted('bold', stats.users)} Users In Database
-	◦  ${Func.texted('bold', stats.banned)} Users Banned
-	◦  ${Func.texted('bold', stats.mimic)} Mimics Target
-	◦  ${Func.texted('bold', stats.premium)} Premium Users
-	◦  ${Func.texted('bold', stats.hitstat)} Commands Hit
+	◦  ${Func.texted('bold', Func.formatNumber(stats.groups))} Groups Joined
+	◦  ${Func.texted('bold', Func.formatNumberstats.chats))} Personal Chats
+	◦  ${Func.texted('bold', Func.formatNumber(stats.users))} Users In Database
+	◦  ${Func.texted('bold', Func.formatNumber(stats.banned))} Users Banned
+	◦  ${Func.texted('bold', Func.formatNumber(stats.mimic))} Mimics Target
+	◦  ${Func.texted('bold', Func.formatNumber(stats.premium))} Premium Users
+	◦  ${Func.texted('bold', Func.formatNumber(stats.hitstat))} Commands Hit
 	◦  Runtime : ${Func.texted('bold', stats.uptime)}
 
 乂  *S Y S T E M*
