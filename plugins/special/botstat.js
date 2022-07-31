@@ -47,7 +47,7 @@ const statistic = (stats, system) => {
    return `乂  *B O T S T A T*
 
 	◦  ${Func.texted('bold', Func.formatNumber(stats.groups))} Groups Joined
-	◦  ${Func.texted('bold', Func.formatNumberstats.chats))} Personal Chats
+	◦  ${Func.texted('bold', Func.formatNumber(stats.chats))} Personal Chats
 	◦  ${Func.texted('bold', Func.formatNumber(stats.users))} Users In Database
 	◦  ${Func.texted('bold', Func.formatNumber(stats.banned))} Users Banned
 	◦  ${Func.texted('bold', Func.formatNumber(stats.mimic))} Mimics Target
