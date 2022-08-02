@@ -11,7 +11,7 @@ exports.run = {
          if (text.length > 10) return client.reply(m.chat, Func.texted('bold', `🚩 Text is too long max 10 characters.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          let old = new Date()
-         let result = await Api.textMaker(command.toLowerCase(), text)
+         let result = Api.textMaker(command.toLowerCase(), text)
          if (!result || result.constructor.name != 'String') return client.reply(m.chat, global.status.fail, m)
          client.sendFile(m.chat, result, Func.filename('jpg'), `🍟 *Processed* : ${((new Date - old) * 1)} ms`, m)
       } catch (e) {

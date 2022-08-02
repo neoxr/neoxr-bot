@@ -106,8 +106,8 @@ module.exports = class NeoxrApi {
       return json
    }
    
-   textMaker = async (style, text) => {  
-      return this.baseUrl + '/api/' + style + '?text=' + text + '&apikey=' + this.apikey
+   textMaker = (style, text) => {  
+      return this.baseUrl + '/' + style + '?text=' + text + '&apikey=' + this.apikey
    }
    
    soundcloud = async (str) => {
