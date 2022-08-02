@@ -12,6 +12,7 @@ exports.run = {
       if (option == 4) return client.reply(m.chat, submenu4(isPrefix), m)
       if (option == 5) return client.reply(m.chat, submenu5(isPrefix), m)
       if (option == 6) return client.reply(m.chat, submenu6(isPrefix), m)
+      if (option == 7) return client.reply(m.chat, submenu7(isPrefix), m)
    },
    error: false
 }
@@ -23,6 +24,7 @@ const submenu1 = prefix => {
 ◦  ${prefix}play *query*
 ◦  ${prefix}pin *link*
 ◦  ${prefix}podcast *link*
+◦  ${prefix}soundcloud *query / link*
 ◦  ${prefix}tiktok *link*
 ◦  ${prefix}tikmp3 *link*
 ◦  ${prefix}tikwm *link*
@@ -54,11 +56,25 @@ const submenu2 = prefix => {
 }
 
 const submenu3 = prefix => {
+   return `◦  ${prefix}blackpink *text*
+◦  ${prefix}blood *text*
+◦  ${prefix}breakwall *text*
+◦  ${prefix}glow *text*
+◦  ${prefix}joker *text*
+◦  ${prefix}magma *text*
+◦  ${prefix}matrix *text*
+◦  ${prefix}multicolor *text*
+◦  ${prefix}neon *text*
+◦  ${prefix}papercut *text*
+◦  ${prefix}slice *text*`
+}
+
+const submenu4 = prefix => {
    return `◦  ${prefix}limit
 ◦  ${prefix}me`
 }
 
-const submenu4 = prefix => {
+const submenu5 = prefix => {
    return `◦  ${prefix}ava *mention or reply*
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
@@ -71,7 +87,7 @@ const submenu4 = prefix => {
 ◦  ${prefix}tovn *reply audio / video*`
 }
 
-const submenu5 = prefix => {
+const submenu6 = prefix => {
    return `◦  ${prefix}autodownload *on / off*
 ◦  ${prefix}autoread *on / off*
 ◦  ${prefix}bc *text or reply media*
@@ -111,7 +127,7 @@ const submenu5 = prefix => {
 ◦  ${prefix}+owner *mention or reply*`
 }
 
-const submenu6 = prefix => {
+const submenu7 = prefix => {
    return `◦  ${prefix}botstat
 ◦  ${prefix}checkapi
 ◦  ${prefix}hitdaily

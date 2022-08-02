@@ -13,20 +13,24 @@ exports.run = {
          rowId: `${isPrefix}menutype 2`,
          description: ``
       }, {
-         title: 'USER INFO',
+         title: 'TEXT MAKER',
          rowId: `${isPrefix}menutype 3`,
          description: ``
       }, {
-         title: 'UTILITIES',
+         title: 'USER INFO',
          rowId: `${isPrefix}menutype 4`,
          description: ``
       }, {
-         title: 'OWNER TOOLS',
+         title: 'UTILITIES',
          rowId: `${isPrefix}menutype 5`,
          description: ``
       }, {
-         title: 'SPECIAL',
+         title: 'OWNER TOOLS',
          rowId: `${isPrefix}menutype 6`,
+         description: ``
+      }, {
+         title: 'SPECIAL',
+         rowId: `${isPrefix}menutype 7`,
          description: ``
       }]
       await client.sendList(m.chat, '', global.db.setting.msg, '© neoxr-bot v2.2.0', 'Tap!', [{

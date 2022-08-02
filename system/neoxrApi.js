@@ -106,8 +106,12 @@ module.exports = class NeoxrApi {
       return json
    }
    
-   artinama = async (query) => {
-      let json = await Func.fetchJson(this.baseUrl + '/artinama?nama=' + query + '&apikey=' + this.apiKey)
+   textMaker = async (style, text) => {  
+      return this.baseUrl + '/api/' + style + '?text=' + text + '&apikey=' + this.apikey
+   }
+   
+   soundcloud = async (str) => {
+      let json = str.match('soundcloud.com') ? await Func.fetchJson(this.baseUrl + '/soundcloud?url=' + str + '&apikey=' + this.apiKey) : await Func.fetchJson(this.baseUrl + '/soundcloud-search?q=' + str + '&apikey=' + this.apiKey)
       return json
    }
 }
