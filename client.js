@@ -36,8 +36,8 @@ const connect = async () => {
       }
       await props.save()
    } else {
+  	global.db = content
       try {
-         global.db = content
          if (global.db.creds) {
             credentials = {
                creds: content.creds
