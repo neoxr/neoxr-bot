@@ -433,7 +433,8 @@ Socket = (...args) => {
          caption: text,
          footerText: footer,
          buttons: buttons,
-         ...options
+         ...options,
+         mentions: parseMention(text)
       }
       await client.sendPresenceUpdate('composing', jid)
       return client.sendMessage(jid, buttonMessage, {
@@ -447,7 +448,8 @@ Socket = (...args) => {
          text: text,
          footer: footer,
          buttonText: btnText,
-         sections
+         sections,
+         mentions: parseMention(text)
       }
       await client.sendPresenceUpdate('composing', jid)
       return client.sendMessage(jid, listMessage, {
