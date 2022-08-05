@@ -20,7 +20,7 @@
    "author":"Wildan Izzudin",
    "license":"ISC",
    "dependencies":{
-      "@adiwajshing/baileys":"git+https://github.com/neoxr/Bails.git,
+      "@adiwajshing/baileys":"git+https://github.com/neoxr/Bails.git",
       "@adiwajshing/keyed-db": "0.2.4",
       "@colors/colors":"1.5.0",
       "awesome-phonenumber":"~2.59.0",
