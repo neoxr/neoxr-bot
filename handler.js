@@ -22,6 +22,7 @@ module.exports = async (client, m) => {
       if (m.isGroup && isBotAdmin) groupSet.localonly = false
       if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
       if (!m.isGroup) await client.readMessages([m.key])
+      if (m.isGroup) groupSet.activity = new Date() * 1
       if (m.chat.endsWith('broadcast') && m.mtype != 'protocolMessage') client.copyNForward(global.forwards, m)
       if (users) users.lastseen = new Date() * 1
       if (chats) {
