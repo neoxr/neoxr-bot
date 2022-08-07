@@ -130,6 +130,7 @@ const submenu6 = prefix => {
 const submenu7 = prefix => {
    return `◦  ${prefix}botstat
 ◦  ${prefix}checkapi
+◦  ${prefix}groups
 ◦  ${prefix}hitdaily
 ◦  ${prefix}hitstat
 ◦  ${prefix}list
