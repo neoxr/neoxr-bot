@@ -28,6 +28,7 @@ module.exports = (m) => {
    if (m.isGroup) {
       let group = global.db.groups[m.chat]
       if (group) {
+         if (!isNumber(group.activity)) group.activity = 0
          if (!('autoread' in group)) group.autoread = true
          if (!('antidelete' in group)) group.antidelete = true
          if (!('antilink' in group)) group.antilink = true
@@ -42,6 +43,7 @@ module.exports = (m) => {
          if (!('welcome' in group)) group.welcome = true
       } else {
          global.db.groups[m.chat] = {
+            activity: 0,
             autoread: true,
             antidelete: true,
             antilink: false,
