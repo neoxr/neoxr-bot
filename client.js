@@ -104,6 +104,7 @@ const connect = async () => {
          })
          delete global.db.creds
          await props.save()
+         await Func.delay(1500)
          process.exit(0)
       }
    })
