@@ -80,6 +80,7 @@ module.exports = (m) => {
       if (!('chatbot' in setting)) setting.chatbot = true
       if (!('error' in setting)) setting.error = []
       if (!('pluginDisable' in setting)) setting.pluginDisable = []
+      if (!('groupmode' in setting)) setting.groupmode = false
       if (!('sk_pack' in setting)) setting.sk_pack = 'Sticker'
       if (!('sk_author' in setting)) setting.sk_author = '@neoxrs'
       if (!('self' in setting)) setting.self = false
@@ -98,6 +99,7 @@ module.exports = (m) => {
          debug: false,
          error: [],
          pluginDisable: [],
+         groupmode: false,
          sk_pack: 'Sticker',
          sk_author: '@neoxrs',
          self: false,

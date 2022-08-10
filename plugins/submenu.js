@@ -100,6 +100,7 @@ const submenu6 = prefix => {
 ◦  ${prefix}unblock *mention or reply*
 ◦  ${prefix}chatbot *on / off*
 ◦  ${prefix}debug *on / off*
+◦  ${prefix}groupmode *on / off*
 ◦  ${prefix}prefix *symbol*
 ◦  ${prefix}-prefix *symbol*
 ◦  ${prefix}+prefix *symbol*

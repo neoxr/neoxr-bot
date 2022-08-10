@@ -60,6 +60,7 @@ const statistic = (stats, system) => {
 	◦  ${Func.texted('bold', system.autodownload ? '[ √ ]' : '[ × ]')}  Auto Download
 	◦  ${Func.texted('bold', system.chatbot ? '[ √ ]' : '[ × ]')}  Chat AI
 	◦  ${Func.texted('bold', system.debug ? '[ √ ]' : '[ × ]')}  Debug Mode
+	◦  ${Func.texted('bold', system.groupmode ? '[ √ ]' : '[ × ]')}  Group Mode
 	◦  ${Func.texted('bold', system.online ? '[ √ ]' : '[ × ]')}  Always Online
 	◦  ${Func.texted('bold', system.self ? '[ √ ]' : '[ × ]')}  Self Mode
 	◦  Prefix : ${Func.texted('bold', system.multiprefix ? '( ' + system.prefix.map(v => v).join(' ') + ' )' : '( ' + system.onlyprefix + ' )')}
