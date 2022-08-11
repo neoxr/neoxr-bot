@@ -76,6 +76,7 @@ const submenu4 = prefix => {
 
 const submenu5 = prefix => {
    return `◦  ${prefix}ava *mention or reply*
+◦  ${prefix}del *reply chat*
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*

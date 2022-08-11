@@ -1,7 +1,7 @@
 // Owner number
-global.owner = '6285221100126'
+global.owner = '6281390225803'
 // Owner name
-global.owner_name = 'Wildan Izzudin'
+global.owner_name = 'Customer Service'
 // Maximum upload file size limit (Default : 250 MB)
 global.max_upload = 250
 // Delay for spamming protection (Default : 3 seconds)
