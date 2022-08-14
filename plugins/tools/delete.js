@@ -2,13 +2,13 @@ exports.run = {
    usage: ['del', 'delete'],
    async: async (m, {
       client,
-      isOwner
+      isBotAdmin
    }) => {
       if (!m.quoted) return
       client.sendMessage(m.chat, {
          delete: {
             remoteJid: m.chat,
-            fromMe: false,
+            fromMe: isBotAdmin ? false : true,
             id: m.quoted.id,
             participant: m.quoted.sender
          }
