@@ -503,4 +503,8 @@ module.exports = class Function {
       if (hours == parseInt('00')) return minutes + ':' + seconds
       return hours + ':' + minutes + ':' + seconds
    }
+   
+   switcher = (status, isTrue, isFalse) => {
+      return (status) ? this.texted('bold', isTrue) : this.texted('bold', isFalse)
+   }
 }
