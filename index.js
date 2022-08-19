@@ -1,5 +1,5 @@
 console.log('Starting . . .')
-require('dotenv').config()
+require('dotenv').config(), require('rootpath')()
 const { spawn: spawn } = require('child_process'), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts')
 
 function start() {
