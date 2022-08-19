@@ -3,7 +3,7 @@ moment.tz.setDefault('Asia/Jakarta').locale('id')
 module.exports = async (client, m) => {
    try {
       require('./system/database')(m)
-      const isOwner = [client.user.id.split`:` [0], global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      const isOwner = [global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const isPrem = (typeof global.db.users[m.sender] != 'undefined' && global.db.users[m.sender].premium) || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []

@@ -80,6 +80,7 @@ const submenu5 = prefix => {
 ◦  ${prefix}q *reply chat*
 ◦  ${prefix}run
 ◦  ${prefix}response *url*
+◦  ${prefix}scan *code* (optional)
 ◦  ${prefix}sticker *reply media*
 ◦  ${prefix}swm *packname | author*
 ◦  ${prefix}take *packname | author*
