@@ -150,6 +150,7 @@ module.exports = async (client, m) => {
                continue
             }
             if (cmd.private && m.isGroup) {
+           	client.reply(m.chat, global.status.private, m)
                continue
             }
             cmd.async(m, {
