@@ -1,7 +1,7 @@
 // Owner number
-global.owner = '6281390225803'
+global.owner = '6285221100126'
 // Owner name
-global.owner_name = 'Customer Service'
+global.owner_name = 'Wildan Izzudin'
 // Maximum upload file size limit (Default : 250 MB)
 global.max_upload = 250
 // Delay for spamming protection (Default : 3 seconds)
@@ -15,7 +15,7 @@ global.evaluate_chars = ['=>', '~>', '<', '>', '$']
 // Country code that will be automatically blocked by the system, when sending messages in private chat
 global.blocks = ['91', '92', '212']
 // Put target jid to forward friends story
-global.forwards = '6281390225803@c.us'
+global.forwards = '6285221100126@c.us'
 // Get neoxr apikey by registering at https://api.neoxr.my.id
 global.Api = new (require('./neoxrApi'))('5VC9rvNx')
 // Get bid and key configuration for autoreply chat ai feature by registering at https://brainshop.ai
