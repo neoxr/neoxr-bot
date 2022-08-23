@@ -194,12 +194,34 @@ module.exports = class Function {
                }
                let extension = filename ? filename.split`.` [filename.split`.`.length - 1] : ext
                let size = Buffer.byteLength(source)
-               let filepath = tmpdir() + '/' + (filename || Func.uuid() + '.' + ext)
+               let filepath = tmpdir() + '/' + (Func.uuid() + '.' + ext)
                let file = fs.writeFileSync(filepath, source)
+               let name = filename || path.basename(filepath)
                let data = {
                   status: true,
                   file: filepath,
-                  filename: path.basename(filepath),
+                  filename: name,
+                  mime: mime,
+                  extension: ext,
+                  size: await Func.getSize(size),
+                  bytes: size
+               }
+               return resolve(data)
+            } else if (source.startsWith('./')) {
+               let ext, mime
+               try {
+                  mime = await (await fromBuffer(source)).mime
+                  ext = await (await fromBuffer(source)).ext
+               } catch {
+                  mime = require('mime-types').lookup(filename ? filename.split`.` [filename.split`.`.length - 1] : 'txt')
+                  ext = require('mime-types').extension(mime)
+               }
+               let extension = filename ? filename.split`.` [filename.split`.`.length - 1] : ext
+               let size = fs.statSync(source).size
+               let data = {
+                  status: true,
+                  file: source,
+                  filename: path.basename(source),
                   mime: mime,
                   extension: ext,
                   size: await Func.getSize(size),
@@ -214,13 +236,14 @@ module.exports = class Function {
                   }
                }).then(async (response) => {
                   let extension = filename ? filename.split`.` [filename.split`.`.length - 1] : mime.extension(response.headers['content-type'])
-                  let file = fs.createWriteStream(`${tmpdir()}/${filename || Func.uuid() + '.' + extension}`)
+                  let file = fs.createWriteStream(`${tmpdir()}/${Func.uuid() + '.' + extension}`)
+                  let name = filename || path.basename(file.path)
                   response.data.pipe(file)
                   file.on('finish', async () => {
                      let data = {
                         status: true,
                         file: file.path,
-                        filename: path.basename(file.path),
+                        filename: name,
                         mime: mime.lookup(file.path),
                         extension: extension,
                         size: await Func.getSize(response.headers['content-length'] ? response.headers['content-length'] : 0),

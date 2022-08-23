@@ -95,7 +95,7 @@ const connect = async () => {
       if (connection === 'open') {
          global.db.creds = client.authState.creds
          spinnies.succeed('start', {
-            text: `Connected, you login as ${client.user.name}`
+            text: `Connected, you login as ${client.user.name || client.user.verifiedName}`
          })
       }
       if (connection === 'close') {
