@@ -4,15 +4,12 @@ const path = require('path')
 exports.run = {
    usage: ['update'],
    async: async (m, {
-      client,
-      args,
-      isPrefix,
-      command
+      client
    }) => {
       try {
          let stdout = execSync('git pull')
          const output = stdout.toString()
-         if (output.match(new RegExp('Already up to date', 'g'))) return client.reply(m.chat, Func.texted('bold', `🚩${output}`), m)
+         if (output.match(new RegExp('Already up to date', 'g'))) return client.reply(m.chat, Func.texted('bold', `🚩${output.trim()}`), m)
          client.reply(m.chat, output, m).then(async () => {
             Scandir('plugins').then(files => {
                global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
