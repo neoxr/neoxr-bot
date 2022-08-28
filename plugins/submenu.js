@@ -119,6 +119,7 @@ const submenu6 = prefix => {
 ◦  ${prefix}join *link*
 ◦  ${prefix}reset
 ◦  ${prefix}restart
+◦  ${prefix}update
 ◦  ${prefix}self *on / off*
 ◦  ${prefix}setpp *reply photo*
 ◦  ${prefix}setmsg *text*
