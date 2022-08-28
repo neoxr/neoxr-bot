@@ -6,7 +6,6 @@
         pkgs.libwebp
         pkgs.imagemagick
         pkgs.git
-        pkgs.speedtest-cli
         pkgs.wget
         pkgs.yarn
         pkgs.libuuid

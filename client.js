@@ -2,7 +2,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
-const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), online = require('./server')
+const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
 global.props = new (require('./system/dataset'))
@@ -15,7 +15,7 @@ global.store = makeInMemoryStore({
       stream: 'store'
    })
 })
-
+require('./server')
 const removeAuth = () => {
    try {
       fs.unlinkSync('./' + session)
@@ -169,5 +169,5 @@ const connect = async () => {
 
    return client
 }
-online()
+
 connect().catch(() => connect())
