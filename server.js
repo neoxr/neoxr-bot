@@ -8,7 +8,6 @@ server.all('/', (req, res) => {
    res.json({
       status: 'alive'
    })
-   res.end()
 })
 
 function keepAlive() {
