@@ -5,12 +5,12 @@ exports.run = {
       client
    }) => {
       try {
-         let stdout = execSync('git pull')
-         let output = stdout.toString()
+         var stdout = execSync('git pull')
+         var output = stdout.toString()
          if (output.match(new RegExp('Already up to date', 'g'))) return client.reply(m.chat, Func.texted('bold', `🚩 ${output.trim()}`), m)
-         if (output.match(new RegExp('Please commit your changes or stash them before you merge', 'g'))) {
-            let stdout = execSync('git stash && git pull')
-            let output = stdout.toString()
+         if (output.match(/stash/g)) {
+            var stdout = execSync('git stash && git pull')
+            var output = stdout.toString()
             client.reply(m.chat, `🚩 ${output.trim()}`, m).then(async () => {
                await props.save()
                process.send('reset')
