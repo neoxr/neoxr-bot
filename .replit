@@ -1,4 +1,4 @@
-run = "yarn install && npm run start"
+run = "npm run start"
 
 [nix]
 channel = "stable-21_11"
