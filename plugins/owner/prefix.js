@@ -24,7 +24,7 @@ exports.run = {
       } else if (command == '-prefix') {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, '#'), m)
          if (args[0].length > 1) return client.reply(m.chat, Func.texted('bold', `🚩 Enter only 1 prefix.`), m)
-         if (setting.prefix.lenght < 2) return client.reply(m.chat, Func.texted('bold', `🚩 Can't removing more prefix.`), m)
+         if (system.prefix.lenght < 2) return client.reply(m.chat, Func.texted('bold', `🚩 Can't removing more prefix.`), m)
          if (!system.prefix.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 Prefix ${args[0]} not exists in the database.`), m)
          system.prefix.forEach((data, index) => {
             if (data === args[0]) system.prefix.splice(index, 1)
