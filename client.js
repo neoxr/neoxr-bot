@@ -38,7 +38,7 @@ const connect = async () => {
       }
       await props.save()
    } else {
-  	global.db = content
+      global.db = content
       try {
          if (global.db.creds) {
             credentials = {
@@ -139,6 +139,11 @@ const connect = async () => {
       let text_welcome = `Thank you +tag for joining into +grup group.`
       let text_left = `+tag left from this group for no apparent reason.`
       let groupSet = global.db.groups[room.id]
+      try {
+         pic = await Func.fetchBuffer(await client.profilePictureUrl(member, 'image'))
+      } catch {
+         pic = await Func.fetchBuffer(await client.profilePictureUrl(room.id, 'image'))
+      }
       if (room.action == 'add') {
          if (groupSet.localonly) {
             if (typeof global.db.users[member] != 'undefined' && !global.db.users[member].whitelist && !member.startsWith('62') || !member.startsWith('62')) {
@@ -148,10 +153,18 @@ const connect = async () => {
             }
          }
          let txt = (groupSet.text_welcome != '' ? groupSet.text_welcome : text_welcome).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
-         if (groupSet.welcome) client.reply(room.id, txt, null)
+         if (groupSet.welcome) client.sendMessageModify(room.id, txt, null, {
+            largeThumb: true,
+            thumbnail: pic,
+            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+         })
       } else if (room.action == 'remove') {
          let txt = (groupSet.text_left != '' ? groupSet.text_left : text_left).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
-         if (groupSet.left) client.reply(room.id, txt, null)
+         if (groupSet.left) client.sendMessageModify(room.id, txt, null, {
+            largeThumb: true,
+            thumbnail: pic,
+            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+         })
       }
    })
 
