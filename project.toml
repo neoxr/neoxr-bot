@@ -1,5 +1,2 @@
 [[build.buildpacks]]
 uri = "heroku/nodejs"
-
-[[build.buildpacks]]
-uri = "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
