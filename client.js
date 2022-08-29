@@ -1,5 +1,5 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-const { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
+const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
@@ -71,7 +71,8 @@ const connect = async () => {
       msgRetryCounterMap,
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
-      ...fetchLatestBaileysVersion(),
+      // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
+      version: [2, 2232, 7],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }
