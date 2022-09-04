@@ -33,7 +33,6 @@ const connect = async () => {
          statistic: {},
          sticker: {},
          setting: {},
-         connect: {},
          creds: {}
       }
       await props.save()
