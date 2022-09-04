@@ -122,7 +122,7 @@ module.exports = async (client, m) => {
                url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
             }).then(() => chats.lastchat = new Date() * 1)
             if (!['me', 'owner'].includes(name) && users && (users.banned || new Date - users.banTemp < global.timer)) return
-            if (m.isGroup && groupSet.mute) continue
+            if (m.isGroup && !['activation'].includes(name) && groupSet.mute) continue
             if (cmd.cache && cmd.location) {
                let file = require.resolve(cmd.location)
                Func.reload(file)
