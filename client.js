@@ -108,7 +108,7 @@ const connect = async () => {
       }
    })
    
-   client.ev.on('creds.update', () => saveState)
+   // client.ev.on('creds.update', () => saveState)
 
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
