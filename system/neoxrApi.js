@@ -26,8 +26,8 @@ module.exports = class NeoxrApi {
       return json
    }
 
-   igs = async (url) => {
-      let json = await Func.fetchJson(this.baseUrl + '/igs2?q=' + Func.igFixed(url) + '&apikey=' + this.apiKey)
+   igs = async (str) => {
+      let json = await Func.fetchJson(this.baseUrl + '/igstory?username=' + str + '&apikey=' + this.apiKey)
       return json
    }
    
