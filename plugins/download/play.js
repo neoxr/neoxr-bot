@@ -34,7 +34,7 @@ exports.run = {
             title: '© neoxr-bot v2.2.0 (Public Bot)',
             largeThumb: true,
             thumbnail: await Func.fetchBuffer(thumb)
-         }).then(() => {
+         }).then(async () => {
             client.sendFile(m.chat, dl_link, decode(title) + '.mp3', '', m, {
                document: true,
                APIC: await Func.fetchBuffer(thumb)
