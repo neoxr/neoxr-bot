@@ -23,7 +23,7 @@ const removeAuth = () => {
 }
 
 const connect = async () => {
-   setInterval(removeAuth, 1000 * 60 * 30)
+   setInterval(removeAuth, 1000 * 60 * 2)
    let content = await props.fetch()
    if (!content || Object.keys(content).length === 0) {
       global.db = {
