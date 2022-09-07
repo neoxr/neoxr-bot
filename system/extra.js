@@ -38,6 +38,12 @@ Socket = (...args) => {
    })
 
    let parseMention = text => [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
+   
+   let tags = {
+      album: 'Neoxr Music',
+      APIC: fs.readFileSync('./media/image/thumb.jpg')
+   }
+   
    client.decodeJid = (jid) => {
       if (!jid) return jid
       if (/:\d+@/gi.test(jid)) {
@@ -251,12 +257,21 @@ Socket = (...args) => {
          mime,
          size
       } = await Func.getFile(url, name, opts && opts.referer ? opts.referer : false)
-      if (!status) return client.reply(jid, global.status.error, m)
-      client.refreshMediaConn(false)
+      if (!status) return client.sendMessage(jid, {
+         text: global.status.error
+      }, {
+         quoted
+      })
+      client.refreshMediaConn(true)
       if (opts && opts.document) {
+         const process = await Func.metaAudio(file, {
+            title: filename.replace(new RegExp('.mp3', 'i'), ''),
+            ...tags,
+            APIC: opts && opts.APIC ? opts.APIC : tags.APIC
+         })
          const message = await prepareWAMessageMedia({
             document: {
-               url: file
+               url: process.file
             },
             fileName: filename,
             mimetype: mime,
@@ -324,15 +339,17 @@ Socket = (...args) => {
                messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          } else if (/audio/.test(mime)) {
+            const process = await Func.metaAudio(file, {
+               title: filename.replace(new RegExp('.mp3', 'i'), ''),
+               ...tags,
+               APIC: opts && opts.APIC ? opts.APIC : tags.APIC
+            })
             const message = await prepareWAMessageMedia({
                audio: {
-                  url: file
+                  url: process.file
                },
                ptt: opts && opts.ptt ? true : false,
                mimetype: mime,
-               contextInfo: {
-                  mentionedJid: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net')
-               },
                ...options
             }, {
                upload: client.waUploadToServer
@@ -347,6 +364,7 @@ Socket = (...args) => {
                messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          } else {
+            await client.sendPresenceUpdate('composing', jid)
             const message = await prepareWAMessageMedia({
                document: {
                   url: file
@@ -362,7 +380,6 @@ Socket = (...args) => {
             }, {
                quoted
             })
-            await client.sendPresenceUpdate('composing', jid)
             return await client.relayMessage(jid, media.message, {
                messageId: media.key.id
             }).then(() => fs.unlinkSync(file))

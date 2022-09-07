@@ -11,6 +11,7 @@ const { green, blueBright, redBright } = require('chalk')
 const { tmpdir } = require('os')
 const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
+const NodeID3 = require('node-id3')
 
 module.exports = class Function {
    /* Delay
@@ -47,6 +48,44 @@ module.exports = class Function {
          } else {
             let buff = fs.readFileSync(file)
             resolve(buff)
+         }
+      })
+   }
+   
+   /* Audio Metadata
+    * @param {String|Buffer} source
+    * @param {Object} tags 
+    */
+   metaAudio = (source, tags = {}) => {
+      return new Promise(async (resolve) => {
+         try {
+            let {
+               status,
+               file,
+               mime
+            } = await this.getFile(await this.fetchBuffer(source))
+            if (!status) return resolve({
+               status: false
+            })
+            if (!/audio/.test(mime)) return resolve({
+               status: true,
+               file
+            })
+            NodeID3.write(tags, await this.fetchBuffer(file), function(err, buffer) {
+               if (err) return resolve({
+                  status: false
+               })
+               fs.writeFileSync(file, buffer)
+               resolve({
+                  status: true,
+                  file
+               })
+            })
+         } catch (e) {
+            console.log(e)
+            resolve({
+               status: false
+            })
          }
       })
    }
@@ -543,5 +582,4 @@ module.exports = class Function {
       }
       return result
    }
-
 }
