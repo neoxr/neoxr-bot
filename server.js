@@ -4,10 +4,11 @@ const fetch = require('node-fetch')
 const PORT = process.env.PORT || 3000
 
 server.set('json spaces', 2)
-server.all('/', (req, res) => {
-   res.setHeader('Content-Type', 'text/html')
+server.get('*', async (req, res) => {
    res.json({
-      status: 'alive'
+      online: true,
+      msg: `Server running with port ${PORT}`,
+      session_size: await Func.getSize(require('fs').statSync('session.json').size)
    })
 })
 
