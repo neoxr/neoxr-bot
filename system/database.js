@@ -2,6 +2,8 @@ module.exports = (m) => {
    const isNumber = x => typeof x === 'number' && !isNaN(x)
    let user = global.db.users[m.sender]
    if (user) {
+      if (!isNumber(user.afk)) user.afk = -1
+      if (!('afkReason' in user)) user.afkReason = ''
       if (!('banned' in user)) user.banned = false
       if (!isNumber(user.banTemp)) user.banTemp = 0
       if (!isNumber(user.banTimes)) user.banTimes = 0
@@ -13,6 +15,8 @@ module.exports = (m) => {
       if (!isNumber(user.warning)) user.warning = 0
    } else {
       global.db.users[m.sender] = {
+     	afk: -1,
+         afkReason: '',
          banned: false,
          banTemp: 0,
          banTimes: 0,

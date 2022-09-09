@@ -41,6 +41,11 @@ module.exports = async (client, m) => {
          chats.lastseen = new Date() * 1
          chats.chat += 1
       }
+      if (m.isGroup && !m.isBot && users.afk > -1) {
+         client.reply(m.chat, `You are back online after being offline for : ${Func.texted('bold', Func.toTime(new Date - users.afk))}\n\n• ${Func.texted('bold', 'Reason')}: ${users.afkReason ? users.afkReason : '-'}`, m)
+         users.afk = -1
+         users.afkReason = ''
+      }
       if (moment(new Date).format('HH:mm') == '00:00') {
          Object.entries(global.db.users).filter(([_, data]) => !data.limit < 10 && !data.premium).map(([_, data]) => data.limit = global.limit)
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
