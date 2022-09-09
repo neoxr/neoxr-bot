@@ -7,8 +7,7 @@ server.set('json spaces', 2)
 server.get('*', async (req, res) => {
    res.json({
       online: true,
-      msg: `Server running with port ${PORT}`,
-      session_size: await Func.getSize(require('fs').statSync('session.json').size)
+      msg: `Server running with port ${PORT}`
    })
 })
 
