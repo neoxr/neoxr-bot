@@ -14,7 +14,7 @@ global.store = makeInMemoryStore({
       stream: 'store'
    })
 })
-require('./server')
+
 const removeAuth = () => {
    try {
       fs.unlinkSync('./' + session)
@@ -117,7 +117,7 @@ const connect = async () => {
          Scandir('./plugins').then(files => {
             global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
          }).catch(e => console.error(e))
-         require('./system/config'), require('./handler')(client, m)
+         require('./system/config'), require('./handler')(client, m), require('./server')
       } catch (e) {
          console.log(e)
       }
