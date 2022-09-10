@@ -117,7 +117,7 @@ const connect = async () => {
          Scandir('./plugins').then(files => {
             global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
          }).catch(e => console.error(e))
-         require('./system/config'), require('./handler')(client, m), require('./server')
+         require('./system/config'), require('./handler')(client, m)
       } catch (e) {
          console.log(e)
       }
@@ -180,7 +180,8 @@ const connect = async () => {
       global.db.creds = client.authState.creds
       if (global.db) await props.save()
    }, 10_000)
-
+   
+   require('./server')
    return client
 }
 
