@@ -102,9 +102,6 @@ const connect = async () => {
          lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
             text: `Can't connect to Web Socket`
          })
-         delete global.db.creds
-         await props.save()
-         process.exit(0)
       }
    })
    
