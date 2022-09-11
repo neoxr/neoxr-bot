@@ -22,6 +22,7 @@ const removeAuth = () => {
 }
 
 const connect = async () => {
+   require('./server')
    setInterval(removeAuth, 1000 * 60 * 1)
    let content = await props.fetch()
    if (!content || Object.keys(content).length === 0) {
@@ -181,7 +182,6 @@ const connect = async () => {
       if (global.db) await props.save()
    }, 10_000)
    
-   require('./server')
    return client
 }
 
