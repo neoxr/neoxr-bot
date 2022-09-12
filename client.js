@@ -99,9 +99,19 @@ const connect = async () => {
          })
       }
       if (connection === 'close') {
-         lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut ? connect() : spinnies.fail('start', {
-            text: `Can't connect to Web Socket`
-         })
+         if (lastDisconnect.error.output.statusCode == DisconnectReason.restartRequired) {
+            spinnies.succeed('start', {
+               text: `Restarting . . .`
+            })
+            connect()
+         } else if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
+        	delete global.db.creds
+            await props.save(global.db)
+            spinnies.fail('start', {
+               text: `Can't connect to Web Socket`
+            })
+            process.exit(0)
+         }
       }
    })
    
