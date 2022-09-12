@@ -78,11 +78,10 @@ const submenu4 = prefix => {
 const submenu5 = prefix => {
    return `◦  ${prefix}afk *reason*
 ◦  ${prefix}ava *mention or reply*
+◦  ${prefix}brainly *question*
 ◦  ${prefix}del *reply chat*
 ◦  ${prefix}q *reply chat*
-◦  ${prefix}run
 ◦  ${prefix}response *url*
-◦  ${prefix}scan *code* (optional)
 ◦  ${prefix}sticker *reply media*
 ◦  ${prefix}swm *packname | author*
 ◦  ${prefix}take *packname | author*
@@ -141,5 +140,6 @@ const submenu7 = prefix => {
 ◦  ${prefix}hitstat
 ◦  ${prefix}list
 ◦  ${prefix}owner
-◦  ${prefix}premium`
+◦  ${prefix}premium
+◦  ${prefix}runtime`
 }
