@@ -99,22 +99,22 @@ const connect = async () => {
          })
       }
       if (connection === 'close') {
-         if (lastDisconnect.error.output.statusCode == DisconnectReason.restartRequired) {
-            spinnies.succeed('start', {
-               text: `Restarting . . .`
-            })
-            connect()
-         } else if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
-        	delete global.db.creds
-            await props.save(global.db)
+         if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
             spinnies.fail('start', {
                text: `Can't connect to Web Socket`
             })
+            delete global.db.creds
+            await props.save()
             process.exit(0)
+         } else {
+            spinnies.succeed('start', {
+               text: `Reconnecting . . .`
+            })
+            connect()
          }
       }
    })
-   
+
    client.ev.on('creds.update', () => saveState)
 
    client.ev.on('messages.upsert', async chatUpdate => {
@@ -188,7 +188,7 @@ const connect = async () => {
       global.db.creds = client.authState.creds
       if (global.db) await props.save()
    }, 10_000)
-   
+
    return client
 }
 
