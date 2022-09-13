@@ -551,7 +551,7 @@ Scandir = async (dir) => {
    let files = await Promise.all(subdirs.map(async (subdir) => {
       let res = resolve(dir, subdir)
       return (await stat(res)).isDirectory() ? Scandir(res) : res
-   }));
+   }))
    return files.reduce((a, f) => a.concat(f), [])
 }
 
