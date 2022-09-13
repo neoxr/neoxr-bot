@@ -107,10 +107,7 @@ const connect = async () => {
             await props.save()
             process.exit(0)
          } else {
-            spinnies.succeed('start', {
-               text: `Reconnecting . . .`
-            })
-            connect()
+            connect().catch(() => connect())
          }
       }
    })
