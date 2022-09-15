@@ -1,6 +1,6 @@
 { pkgs }: {
     deps = [
-        pkgs.nodejs-14_x
+        pkgs.nodejs
         pkgs.openssh_with_kerberos
         pkgs.nodePackages.typescript
         pkgs.arcan.ffmpeg

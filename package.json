@@ -22,6 +22,7 @@
    "dependencies":{
       "@adiwajshing/baileys":"github:neoxr/bails",
       "@adiwajshing/keyed-db": "^0.2.4",
+      "@hapi/hoek": "^10.0.1",
       "@colors/colors":"1.5.0",
       "awesome-phonenumber":"~2.59.0",
       "axios":"~0.24.0",
