@@ -22,7 +22,6 @@ const removeAuth = () => {
 }
 
 const connect = async () => {
-   require('./server')
    setInterval(removeAuth, 1000 * 60 * 1)
    let content = await props.fetch()
    if (!content || Object.keys(content).length === 0) {
