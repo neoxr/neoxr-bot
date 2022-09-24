@@ -24,7 +24,18 @@ exports.run = {
                })
             }
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
-         } else if (!/image\/(webp)/.test(mime)) {
+         } else if (/image\/(webp)/.test(mime)) {
+            for (let jid of id) {
+               await Func.delay(1500)
+               let media = await q.download()
+               await client.sendSticker(jid, media, null, {
+                  packname: global.db.setting.sk_pack,
+                  author: global.db.setting.sk_author,
+                  mentions: command == 'bcgc' ? await (await client.groupMetadata(jid)).participants.map(v => v.id) : []
+               })
+            }
+            client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
+         } else if (/video|image\/(jpe?g|png/.test(mime)) {
             for (let jid of id) {
                await Func.delay(1500)
                let media = await q.download()

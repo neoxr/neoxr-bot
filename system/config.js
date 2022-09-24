@@ -2,12 +2,12 @@
 global.owner = '6282141544557'
 // Owner name
 global.owner_name = 'Customer Service'
-// Maximum upload file size limit (Default : 250 MB)
-global.max_upload = 250
+// Maximum upload file size limit (Default : 50 MB)
+global.max_upload = 50
 // Delay for spamming protection (Default : 3 seconds)
 global.cooldown = 3
-// User Limitation (Default : 10)
-global.limit = 10
+// User Limitation (Default : 25)
+global.limit = 25
 // Time to be temporarily banned and others (Default : 30 minutes)
 global.timer = 1800000
 // Symbols that are excluded when adding a prefix (Don't change it)
