@@ -58,7 +58,7 @@
       "syntax-error":"~1.4.0",
       "usetube": "^2.1.4",
       "util":"~0.12.4",
-      "wa-sticker-formatter": "^3.6.0"
+      "wa-sticker-formatter": "3.6.0"
    },
    "bugs":{
       "url":"https://github.com/neoxr/neoxr-bot/issues"

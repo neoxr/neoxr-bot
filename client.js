@@ -70,7 +70,7 @@ const connect = async () => {
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2232, 8],
+      version: [2, 2234, 13],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }
