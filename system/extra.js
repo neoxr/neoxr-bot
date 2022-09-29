@@ -26,7 +26,7 @@ const {
    WAMessageProto,
    delay,
    jidDecode
-} = require('@adiwajshing/baileys')
+} = require('baileys')
 const PhoneNumber = require('awesome-phonenumber')
 const WSF = require('wa-sticker-formatter')
 

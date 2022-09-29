@@ -1,4 +1,4 @@
-const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('@adiwajshing/baileys')
+const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 const { state, saveState } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
@@ -70,7 +70,7 @@ const connect = async () => {
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2234, 13],
+      version: [2, 2236, 10],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }
