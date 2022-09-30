@@ -257,19 +257,16 @@ Socket = (...args) => {
          mime,
          size
       } = await Func.getFile(url, name, opts && opts.referer ? opts.referer : false)
-      if (!status) return client.sendMessage(jid, {
-         text: global.status.error
-      }, {
-         quoted
-      })
-      client.refreshMediaConn(true)
+      if (!status) return client.reply(jid, global.status.error, m)
+      client.refreshMediaConn(false)
       if (opts && opts.document) {
+         await client.sendPresenceUpdate('composing', jid)
          const process = await Func.metaAudio(file, {
             title: filename.replace(new RegExp('.mp3', 'i'), ''),
             ...tags,
             APIC: opts && opts.APIC ? opts.APIC : tags.APIC
          })
-         const message = await prepareWAMessageMedia({
+         return client.sendMessage(jid, {
             document: {
                url: process.file
             },
@@ -277,95 +274,55 @@ Socket = (...args) => {
             mimetype: mime,
             ...options
          }, {
-            upload: client.waUploadToServer
-         })
-         let media = generateWAMessageFromContent(jid, {
-            documentMessage: message.documentMessage
-         }, {
             quoted
-         })
-         await client.sendPresenceUpdate('composing', jid)
-         return await client.relayMessage(jid, media.message, {
-            messageId: media.key.id
          }).then(() => fs.unlinkSync(file))
       } else {
          if (/image\/(jpe?g|png)/.test(mime)) {
-            let thumb = await generateThumbnail(file, mime)
-            const message = await prepareWAMessageMedia({
+            await client.sendPresenceUpdate('composing', jid)
+            return client.sendMessage(jid, {
                image: {
                   url: file
                },
                caption: caption,
-               jpegThumbnail: thumb,
-               contextInfo: {
-                  mentionedJid: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net')
-               },
+               mentions: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net'),
                ...options
             }, {
-               upload: client.waUploadToServer
-            })
-            let media = generateWAMessageFromContent(jid, {
-               imageMessage: message.imageMessage
-            }, {
                quoted
-            })
-            await client.sendPresenceUpdate('composing', jid)
-            return await client.relayMessage(jid, media.message, {
-               messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          } else if (/video/.test(mime)) {
-            let thumb = await generateThumbnail(file, mime)
-            const message = await prepareWAMessageMedia({
+            await client.sendPresenceUpdate('composing', jid)
+            return client.sendMessage(jid, {
                video: {
                   url: file
                },
                caption: caption,
-               jpegThumbnail: thumb,
                gifPlayback: opts && opts.gif ? true : false,
-               contextInfo: {
-                  mentionedJid: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net')
-               },
+               mentions: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net'),
                ...options
             }, {
-               upload: client.waUploadToServer
-            })
-            let media = generateWAMessageFromContent(jid, {
-               videoMessage: message.videoMessage
-            }, {
                quoted
-            })
-            await client.sendPresenceUpdate('composing', jid)
-            return await client.relayMessage(jid, media.message, {
-               messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          } else if (/audio/.test(mime)) {
+            await client.sendPresenceUpdate(opts && opts.ptt ? 'recoding' : 'composing', jid)
             const process = await Func.metaAudio(file, {
                title: filename.replace(new RegExp('.mp3', 'i'), ''),
                ...tags,
                APIC: opts && opts.APIC ? opts.APIC : tags.APIC
             })
-            const message = await prepareWAMessageMedia({
+            return client.sendMessage(jid, {
                audio: {
                   url: process.file
                },
                ptt: opts && opts.ptt ? true : false,
                mimetype: mime,
+               mentions: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net'),
                ...options
             }, {
                upload: client.waUploadToServer
-            })
-            let media = generateWAMessageFromContent(jid, {
-               audioMessage: message.audioMessage
-            }, {
-               quoted
-            })
-            await client.sendPresenceUpdate(opts && opts.ptt ? 'recoding' : 'composing', jid)
-            return await client.relayMessage(jid, media.message, {
-               messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          } else {
             await client.sendPresenceUpdate('composing', jid)
-            const message = await prepareWAMessageMedia({
+            return client.sendMessage(jid, {
                document: {
                   url: file
                },
@@ -373,15 +330,7 @@ Socket = (...args) => {
                mimetype: mime,
                ...options
             }, {
-               upload: client.waUploadToServer
-            })
-            let media = generateWAMessageFromContent(jid, {
-               documentMessage: message.documentMessage
-            }, {
                quoted
-            })
-            return await client.relayMessage(jid, media.message, {
-               messageId: media.key.id
             }).then(() => fs.unlinkSync(file))
          }
       }
