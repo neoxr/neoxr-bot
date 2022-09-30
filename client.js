@@ -108,7 +108,8 @@ const connect = async () => {
          } else {
             connect().catch(() => connect())
          }
-      }
+      }   
+      if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
    })
 
    client.ev.on('creds.update', () => saveState)
