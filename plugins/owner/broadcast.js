@@ -9,7 +9,8 @@ exports.run = {
          let q = m.quoted ? m.quoted : m
          let mime = (q.msg || q).mimetype || ''
          let chatJid = Object.entries(global.db.chats).filter(([jid, _]) => jid.endsWith('.net')).map(([jid, _]) => jid)
-         let groupJid = await (await client.groupList()).map(v => v.id)
+         let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
+         let groupJid = await (await groupList()).map(v => v.id)
          const id = command == 'bc' ? chatJid : groupJid
          if (id.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Error, ID does not exist.`), m)
          if (text) {
@@ -35,7 +36,7 @@ exports.run = {
                })
             }
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
-         } else if (/video|image\/(jpe?g|png/.test(mime)) {
+         } else if (/video|image\/(jpe?g|png)/.test(mime)) {
             for (let jid of id) {
                await Func.delay(1500)
                let media = await q.download()

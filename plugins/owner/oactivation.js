@@ -1,6 +1,7 @@
 exports.run = {
    usage: ['omute'],
    async: async (m, {
+      client,
       args,
       isPrefix,
       command

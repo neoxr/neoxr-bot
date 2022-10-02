@@ -6,7 +6,8 @@ exports.run = {
       client,
       isPrefix
    }) => {
-      let groups = await client.groupList()
+      let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
+      let groups = await groupList()
       let rows = []
       for (let i = 0; i < groups.length; i++) {
          if (groups[i].id in global.db.groups) {

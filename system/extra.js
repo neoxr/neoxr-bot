@@ -79,8 +79,6 @@ Socket = (...args) => {
       return admin
    }
    
-   client.groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
-   
    client.copyNForward = async (jid, message, forceForward = false, options = {}) => {
       let vtype
       if (options.readViewOnce) {
