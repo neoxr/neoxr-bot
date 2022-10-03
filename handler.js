@@ -179,7 +179,7 @@ module.exports = async (client, m) => {
                client,
                args,
                text,
-               isPrefix,
+               isPrefix: isPrefix ? isPrefix : '',
                command,
                participants,
                blockList,
