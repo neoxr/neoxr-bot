@@ -35,7 +35,6 @@ exports.run = {
                   let chSize = Func.sizeLimit(json.data.size, global.max_upload)
                   if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.data.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.data.link)).data.url}`, m)
                   client.sendMessageModify(m.chat, text, m, {
-                     title: '© neoxr-bot v2.2.0 (Public Bot)',
                      largeThumb: true,
                      thumbnail: await Func.fetchBuffer('https://telegra.ph/file/fcf56d646aa059af84126.jpg')
                   }).then(async () => {

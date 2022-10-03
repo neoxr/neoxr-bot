@@ -34,7 +34,6 @@ exports.run = {
          let chSize = Func.sizeLimit(filesizeF, global.max_upload)
          if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
          client.sendMessageModify(m.chat, caption, m, {
-            title: '© neoxr-bot v2.2.0 (Public Bot)',
             largeThumb: true,
             thumbnail: await Func.fetchBuffer(thumb)
          }).then(async () => {

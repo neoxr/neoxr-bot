@@ -20,7 +20,6 @@ exports.run = {
          teks += `	◦  *Duration* : ${json.data.duration}\n\n`
          teks += global.footer
          client.sendMessageModify(m.chat, teks, m, {
-            title: '© neoxr-bot v2.2.0 (Public Bot)',
             ads: false,
             largeThumb: true,
             thumbnail: await Func.fetchBuffer('https://telegra.ph/file/92be727e349c3cf78c98a.jpg')

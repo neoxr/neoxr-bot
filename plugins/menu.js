@@ -1,6 +1,6 @@
 exports.run = {
    usage: ['menu', 'help', 'bot'],
-   hidden: ['menucat', 'menutype'],
+   hidden: ['menutype'],
    async: async (m, {
       client,
       text,
@@ -17,13 +17,13 @@ exports.run = {
                   case 'Array':
                      v.run.usage.map(x => commands.push({
                         usage: x,
-                        use: v.run.use || ''
+                        use: v.run.use ? Func.texted('bold', v.run.use) : ''
                      }))
                      break
                   case 'String':
                      commands.push({
                         usage: v.run.usage,
-                        use: v.run.use || ''
+                        use: v.run.use ? Func.texted('bold', v.run.use) : ''
                      })
                }
             })
