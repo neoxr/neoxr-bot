@@ -79,8 +79,11 @@ module.exports = async (client, m) => {
             }
          }
       }
-      let isPrefix
-      if (body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) {
+      let isPrefix,
+         usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
+         hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
+         univers = usage.concat(hidden)
+      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && univers.includes((body.split` ` [0]).toLowerCase())) {
          let args = body.replace(isPrefix, '').split` `.filter(v => v)
          let command = args.shift().toLowerCase()
          let start = body.replace(isPrefix, '')
@@ -169,7 +172,7 @@ module.exports = async (client, m) => {
                continue
             }
             if (cmd.private && m.isGroup) {
-           	client.reply(m.chat, global.status.private, m)
+               client.reply(m.chat, global.status.private, m)
                continue
             }
             cmd.async(m, {
