@@ -8,7 +8,7 @@ exports.run = {
    }) => {
       try {
          if (text) {
-            let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == args[0].toLowerCase())
+            let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
             let usage = Object.keys(Object.fromEntries(cmd))
             if (usage.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Category not available.`), m)
             let commands = []
