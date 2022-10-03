@@ -57,7 +57,7 @@ exports.run = {
             }], m)
          }
       } catch (e) {
-         client.reply(m.chat, Func.jsomFormat(e), m)
+         client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    error: false
