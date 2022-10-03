@@ -2,9 +2,9 @@ const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
 exports.run = {
    usage: ['hitstat', 'hitdaily'],
+   category: 'special',
    async: async (m, {
       client,
-      text,
       isPrefix,
       command
    }) => {

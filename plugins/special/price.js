@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['premium'],
+   category: 'special',
    async: async (m, {
       client,
       isPrefix

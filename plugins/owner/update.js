@@ -1,6 +1,7 @@
 const { execSync } = require('child_process')
 exports.run = {
    usage: ['update'],
+   category: 'owner',
    async: async (m, {
       client
    }) => {

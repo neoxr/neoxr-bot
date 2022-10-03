@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['tagall', 'everyone'],
+   usage: ['everyone'],
+   hidden: ['tagall'],
+   use: 'text (optional)',
+   category: 'admin tools',
    async: async (m, {
       client,
       text,

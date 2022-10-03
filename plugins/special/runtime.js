@@ -1,5 +1,7 @@
 exports.run = {
-   usage: ['run', 'runtime'],
+   usage: ['runtime'],
+   hidden: ['run'],
+   category: 'special',
    async: async (m, {
       client
    }) => {

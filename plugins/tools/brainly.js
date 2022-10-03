@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['brainly'],
+   use: 'question',
+   category: 'utilities',
    async: async (m, {
       client,
       text,

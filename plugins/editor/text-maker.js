@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['blackpink', 'blood', 'breakwall', 'glow', 'joker', 'magma', 'matrix', 'multicolor', 'neon', 'papercut', 'slice'],
+   use: 'text',
+   category: 'text maker',
    async: async (m, {
       client,
       text,

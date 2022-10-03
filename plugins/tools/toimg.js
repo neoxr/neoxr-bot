@@ -4,6 +4,8 @@ const { exec } = require('child_process')
 const { tmpdir } = require('os')
 exports.run = {
    usage: ['toimg'],
+   use: 'reply sticker',
+   category: 'utilities',
    async: async (m, {
       client
    }) => {

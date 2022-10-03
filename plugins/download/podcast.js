@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['podcast'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

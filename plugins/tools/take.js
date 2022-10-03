@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['take', 'wm'],
+   usage: ['take'],
+   hidden: ['wm'],
+   use: 'packname | author',
+   category: 'utilities',
    async: async (m, {
       client,
       text,

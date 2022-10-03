@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['me'],
+   category: 'user info',
    async: async (m, {
       client,
       isPrefix,

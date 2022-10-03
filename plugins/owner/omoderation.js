@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['autoread', 'oleft', 'owelcome'],
+   use: 'on / off',
+   category: 'owner',
    async: async (m, {
       client,
       args,

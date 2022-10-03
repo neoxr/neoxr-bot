@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['ban', 'unban'],
+   use: 'mention or reply',
+   category: 'owner',
    async: async (m, {
       client,
       text,

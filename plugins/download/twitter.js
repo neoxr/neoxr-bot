@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['twitter', 'tw'],
+   usage: ['twitter'],
+   hidden: ['tw', 'twdl'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

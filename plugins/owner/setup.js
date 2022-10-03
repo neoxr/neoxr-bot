@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['setpp', 'setmsg', 'setwm'],
+   use: 'text',
+   category: 'owner',
    async: async (m, {
       client,
       text,

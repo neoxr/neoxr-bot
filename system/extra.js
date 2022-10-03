@@ -504,6 +504,11 @@ Serialize = (client, m) => {
          m.quoted.download = () => client.downloadMediaMessage(m.quoted)
       }
    }
+   m.reply = (text) => client.sendMessage(m.chat, {
+         text
+      }, {
+         quoted: m
+    })
    if (typeof m.msg != 'undefined') {
       if (m.msg.url) m.download = () => client.downloadMediaMessage(m.msg)
    }

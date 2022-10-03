@@ -1,7 +1,10 @@
 const { decode } = require('html-entities')
 const { yta, ytv } = require('../../lib/y2mate')
 exports.run = {
-   usage: ['yta', 'ytv', 'ytmp3', 'ytmp4'],
+   usage: ['ytmp3', 'ytmp4'],
+   hidden: ['yta', 'ytv'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

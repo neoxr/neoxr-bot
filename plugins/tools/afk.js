@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['afk'],
+   use: 'reason (optional)',
+   category: 'utilities',
    async: async (m, {
       client,
       text

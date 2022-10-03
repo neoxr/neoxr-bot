@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['bc', 'bcgc'],
+   use: 'text or reply media',
+   category: 'owner',
    async: async (m, {
       client,
       text,

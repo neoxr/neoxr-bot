@@ -1,6 +1,9 @@
 const axios = require('axios')
 exports.run = {
-   usage: ['res', 'response'],
+   usage: ['response'],
+   hidden: ['res'],
+   use: 'link',
+   category: 'utilities',
    async: async (m, {
       client,
       args,

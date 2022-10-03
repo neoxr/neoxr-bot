@@ -1,5 +1,8 @@
 exports.run = {
    usage: ['fb'],
+   hidden: ['fbdl', 'fbvid'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

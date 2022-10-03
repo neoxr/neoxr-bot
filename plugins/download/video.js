@@ -3,6 +3,9 @@ const { ytv } = require('../../lib/y2mate')
 const yt = require('usetube')
 exports.run = {
    usage: ['video'],
+   hidden: ['playvid', 'playvideo'],
+   use: 'query',
+   category: 'downloader',
    async: async (m, {
       client,
       text,

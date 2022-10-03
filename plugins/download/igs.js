@@ -1,5 +1,8 @@
 exports.run = {
    usage: ['igs'],
+   hidden: ['igstory'],
+   use: 'username / link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

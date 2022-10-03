@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['o', 'ohidetag'],
+   usage: ['ohidetag'],
+   hidden: ['o'],
+   use: 'text',
+   category: 'owner',
    async: async (m, {
       client,
       text,

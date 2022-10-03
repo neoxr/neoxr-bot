@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['reset'],
+   category: 'owner',
    async: async (m, {
       client,
       command

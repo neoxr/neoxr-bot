@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['swm'],
+   use: 'packname | author',
+   category: 'utilities',
    async: async (m, {
       client,
       text,

@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['plugen', 'plugdis'],
+   use: 'plugin name',
+   category: 'owner',
    async: async (m, {
       client,
       args,

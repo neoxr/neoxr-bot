@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['tiktok', 'tikmp3', 'tikwm'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

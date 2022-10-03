@@ -1,5 +1,7 @@
 exports.run = {
-   usage: ['botstat', 'stat'],
+   usage: ['botstat'],
+   hidden: ['stat'],
+   category: 'special',
    async: async (m, {
       client
    }) => {

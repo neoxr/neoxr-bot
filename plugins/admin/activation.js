@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['mute'],
+   use: '0 / 1',
+   category: 'admin tools',
    async: async (m, {
       args,
       isPrefix,

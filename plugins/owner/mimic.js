@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['+mimic', '-mimic'],
+   use: 'mention or reply',
+   category: 'owner',
    async: async (m, {
       client,
       text,

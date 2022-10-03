@@ -3,7 +3,10 @@ const path = require('path')
 const { exec } = require('child_process')
 const { tmpdir } = require('os')
 exports.run = {
-   usage: ['tomp3', 'toaudio', 'tovn'],
+   usage: ['tomp3', 'tovn'],
+   hidden: ['toaudio'],
+   use: 'reply media',
+   category: 'utilities',
    async: async (m, {
       client,
       command

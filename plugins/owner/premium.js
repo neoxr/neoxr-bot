@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['+prem', '-prem'],
+   use: 'mention or reply',
+   category: 'owner',
    async: async (m, {
       client,
       text,

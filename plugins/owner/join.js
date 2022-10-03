@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['join'],
+   use: 'group link',
+   category: 'owner',
    async: async (m, {
       client,
       args,

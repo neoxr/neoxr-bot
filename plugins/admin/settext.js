@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['setwelcome', 'setleft', 'setout'],
+   use: 'text',
+   category: 'admin tools',
    async: async (m, {
       client,
       text,

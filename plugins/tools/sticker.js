@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['s', 'sk', 'stiker', 'sticker', 'sgif'],
+   usage: ['sticker'],
+   hidden: ['s', 'sk', 'stiker', 'sgif'],
+   use: 'reply media',
+   category: 'utilities',
    async: async (m, {
       client
    }) => {

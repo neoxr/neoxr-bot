@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['demote', 'kick'],
+   use: 'mention or reply',
+   category: 'admin tools',
    async: async (m, {
       client,
       text,

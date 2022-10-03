@@ -1,6 +1,7 @@
 const { writeFileSync: create, readFileSync: read }= require('fs')
 exports.run = {
-   usage: ['backup', 'save'],
+   usage: ['backup'],
+   category: 'owner',
    async: async (m, {
       client,
       command

@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['omute'],
+   use: '0 / 1',
+   category: 'owner',
    async: async (m, {
       client,
       args,

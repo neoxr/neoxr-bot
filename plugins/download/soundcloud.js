@@ -1,5 +1,8 @@
 exports.run = {
-   usage: ['soundcloud', 'scdl'],
+   usage: ['soundcloud'],
+   hidden: ['scdl'],
+   use: 'query / link',
+   category: 'downloader',
    async: async (m, {
       client,
       text,

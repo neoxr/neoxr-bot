@@ -2,6 +2,8 @@ const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
 exports.run = {
    usage: ['cmdstic', '+cmdstic', '-cmdstic'],
+   use: 'text',
+   category: 'owner',
    async: async (m, {
       client,
       text,

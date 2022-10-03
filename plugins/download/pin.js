@@ -1,5 +1,7 @@
 exports.run = {
    usage: ['pin'],
+   use: 'link',
+   category: 'downloader',
    async: async (m, {
       client,
       args,

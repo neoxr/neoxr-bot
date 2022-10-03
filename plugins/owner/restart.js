@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['restart'],
+   category: 'owner',
    async: async (m, {
       client
    }) => {
