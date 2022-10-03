@@ -3,11 +3,11 @@ exports.run = {
    hidden: ['menucat', 'menutype'],
    async: async (m, {
       client,
-      args,
+      text,
       isPrefix
    }) => {
       try {
-         if (args && args[0]) {
+         if (text) {
             let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == args[0].toLowerCase())
             let usage = Object.keys(Object.fromEntries(cmd))
             if (usage.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Category not available.`), m)
