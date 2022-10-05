@@ -355,7 +355,7 @@ Socket = (...args) => {
                mentions: [...caption.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net'),
                ...options
             }, {
-               upload: client.waUploadToServer
+               quoted
             }).then(() => fs.unlinkSync(file))
          } else {
             await client.sendPresenceUpdate('composing', jid)
