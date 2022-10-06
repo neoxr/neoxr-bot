@@ -1,6 +1,4 @@
-const {
-   decode
-} = require('html-entities')
+const { decode } = require('html-entities')
 exports.run = {
    usage: ['ytmp3', 'ytmp4'],
    hidden: ['yta', 'ytv'],
@@ -17,7 +15,7 @@ exports.run = {
          if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
          if (/yt?(a|mp3)/i.test(command)) {
-            const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=https://youtu.be/' + url)
+            const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=' + args[0])
             if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - P L A Y*\n\n`
             caption += `	◦  *Title* : ${decode(json.data.title)}\n`
@@ -37,7 +35,7 @@ exports.run = {
                })
             })
          } else if (/yt?(v|mp4)/i.test(command)) {
-            const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=https://youtu.be/' + url)
+            const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=https://youtu.be/' + args[0])
             if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - M P 4*\n\n`
             caption += `	◦  *Title* : ${decode(json.data.title)}\n`
