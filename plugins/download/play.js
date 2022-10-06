@@ -1,5 +1,4 @@
 const { decode } = require('html-entities')
-const { yta } = require('../../lib/y2mate')
 const yt = require('usetube')
 exports.run = {
    usage: ['play'],
@@ -17,29 +16,23 @@ exports.run = {
          client.sendReact(m.chat, '🕒', m.key)
          const search = await (await yt.searchVideo(text)).videos
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
-         const {
-            dl_link,
-            thumb,
-            title,
-            duration,
-            filesizeF
-         } = await yta('https://youtu.be/' + search[0].id)
-         if (!dl_link) return client.reply(m.chat, global.status.fail, m)
+         const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=https://youtu.be/' + search[0].id)
+         if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
          let caption = `乂  *Y T - P L A Y*\n\n`
-         caption += `	◦  *Title* : ${decode(title)}\n`
-         caption += `	◦  *Size* : ${filesizeF}\n`
-         caption += `	◦  *Duration* : ${duration}\n`
+         caption += `	◦  *Title* : ${decode(json.data.title)}\n`
+         caption += `	◦  *Size* : ${json.data.filesizeF}\n`
+         caption += `	◦  *Duration* : ${json.data.duration}\n`
          caption += `	◦  *Bitrate* : 128kbps\n\n`
          caption += global.footer
-         let chSize = Func.sizeLimit(filesizeF, global.max_upload)
-         if (chSize.oversize) return client.reply(m.chat, `💀 File size (${filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(dl_link)).data.url}`, m)
+         let chSize = Func.sizeLimit(json.data.filesizeF, global.max_upload)
+         if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.data.filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.data.dl_link)).data.url}`, m)
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
-            thumbnail: await Func.fetchBuffer(thumb)
+            thumbnail: await Func.fetchBuffer(json.data.thumb)
          }).then(async () => {
-            client.sendFile(m.chat, dl_link, decode(title) + '.mp3', '', m, {
+            client.sendFile(m.chat, json.data.dl_link, decode(json.data.title) + '.mp3', '', m, {
                document: true,
-               APIC: await Func.fetchBuffer(thumb)
+               APIC: await Func.fetchBuffer(json.data.thumb)
             })
          })
       } catch (e) {
