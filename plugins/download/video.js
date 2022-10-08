@@ -14,7 +14,7 @@ exports.run = {
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
-         client.sendReact(m.chat, '🕒', m.key)
+         client.sendReact(m.chat, '🕒⚡', m.key)
          const search = await (await yt.searchVideo(text)).videos
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
          const {
@@ -48,7 +48,7 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
+   limit: false,
    cache: true,
    location: __filename
 }
