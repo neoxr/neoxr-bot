@@ -13,7 +13,7 @@ exports.run = {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://youtu.be/zaRFmdtLhQ8'), m)
          if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
-         client.sendReact(m.chat, '🕒', m.key)
+         client.sendReact(m.chat, '🕒👁', m.key)
          if (/yt?(a|mp3)/i.test(command)) {
             const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=' + args[0])
             if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
@@ -59,7 +59,7 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
+   limit: false,
    cache: true,
    location: __filename
 }
