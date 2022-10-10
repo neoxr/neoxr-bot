@@ -11,11 +11,11 @@ exports.run = {
       let setup = global.db.groups[m.chat]
       if (command == 'setwelcome') {
          if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
-         setup.textwel = text
+         setup.text_welcome = text
          await client.reply(m.chat, Func.texted('bold', `🚩 Successfully set.`), m)
       } else if (/set(out|left)/i.test(command)) {
          if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
-         setup.textleft = text
+         setup.text_left = text
          await client.reply(m.chat, Func.texted('bold', `🚩 Successfully set.`), m)
       }
    },
