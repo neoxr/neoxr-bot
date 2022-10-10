@@ -14,7 +14,7 @@ exports.run = {
          if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
          if (/yt?(a|mp3)/i.test(command)) {
-            const json = await Func.fetchJson('https://yt.nxr.my.id/yta2?url=' + args[0] + '&type=audio')
+            const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=' + args[0] + '&type=audio')
             if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - P L A Y*\n\n`
             caption += `	◦  *Title* : ${json.title}\n`
@@ -34,7 +34,7 @@ exports.run = {
                })
             })
          } else if (/yt?(v|mp4)/i.test(command)) {
-            const json = await Func.fetchJson('https://yt.nxr.my.id/yta2?url=' + args[0] + '&type=video')
+            const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=' + args[0] + '&type=video')
             if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
             let caption = `乂  *Y T - M P 4*\n\n`
             caption += `	◦  *Title* : ${json.title}\n`

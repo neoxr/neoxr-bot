@@ -15,7 +15,7 @@ exports.run = {
          client.sendReact(m.chat, '🕒', m.key)
          const search = await (await yt.searchVideo(text)).videos
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
-         const json = await Func.fetchJson('https://yt.nxr.my.id/yta2?url=https://youtu.be/' + search[0].id + '&type=audio')
+         const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=https://youtu.be/' + search[0].id + '&type=audio')
          if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
