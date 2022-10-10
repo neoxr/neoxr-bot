@@ -1,4 +1,4 @@
-cconst yt = require('usetube')
+const yt = require('usetube')
 exports.run = {
    usage: ['video'],
    hidden: ['playvid', 'playvideo'],
