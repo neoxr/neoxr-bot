@@ -1,4 +1,3 @@
-const { decode } = require('html-entities')
 exports.run = {
    regex: /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/,
    async: async (m, {
@@ -23,24 +22,24 @@ exports.run = {
                let old = new Date()
                Func.hitstat('ytmp4', m.sender)
                links.map(async link => {
-                  const json = await Func.fetchJson('https://api.nxr.my.id/api/yta?url=' + link)
+                  const json = await Func.fetchJson('https://yt.nxr.my.id/yta2?url=' + link + '&type=video')
                   if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
                   let caption = `乂  *Y T - M P 4*\n\n`
-                  caption += `	◦  *Title* : ${decode(json.data.title)}\n`
-                  caption += `	◦  *Size* : ${json.data.filesizeF}\n`
-                  caption += `	◦  *Duration* : ${json.data.duration}\n`
-                  caption += `	◦  *Quality* : 480p\n\n`
+                  caption += `	◦  *Title* : ${json.title}\n`
+                  caption += `	◦  *Size* : ${json.data.size}\n`
+                  caption += `	◦  *Duration* : ${json.duration}\n`
+                  caption += `	◦  *Quality* : ${json.data.quality\n\n`
                   caption += global.footer
-                  let chSize = Func.sizeLimit(json.data.filesizeF, global.max_upload)
-                  if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.data.filesizeF}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.data.dl_link)).data.url}`, m)
-                  let isSize = (json.data.filesizeF).replace(/MB/g, '').trim()
+                  let chSize = Func.sizeLimit(json.data.size, global.max_upload)
+                  if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.data.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.data.url)).data.url}`, m)
+                  let isSize = (json.data.size).replace(/MB/g, '').trim()
                   if (isSize > 99) return client.sendMessageModify(m.chat, caption, m, {
                      largeThumb: true,
-                     thumbnail: await Func.fetchBuffer(json.data.thumb)
-                  }).then(async () => await client.sendFile(m.chat, json.data.dl_link, decode(json.data.title) + '.mp4', '', m, {
+                     thumbnail: await Func.fetchBuffer(json.thumbnail)
+                  }).then(async () => await client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
                      document: true
                   }))
-                  client.sendFile(m.chat, json.data.dl_link, Func.filename('mp4'), caption, m)
+                  client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
                })
             }
          }
