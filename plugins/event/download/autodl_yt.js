@@ -23,7 +23,7 @@ exports.run = {
                Func.hitstat('ytmp4', m.sender)
                links.map(async link => {
                   const json = await Func.fetchJson('https://yt.nxr.my.id/yta2?url=' + link + '&type=video')
-                  if (!json.status || !json.data.dl_link) return client.reply(m.chat, global.status.fail, m)
+                  if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
                   let caption = `乂  *Y T - M P 4*\n\n`
                   caption += `	◦  *Title* : ${json.title}\n`
                   caption += `	◦  *Size* : ${json.data.size}\n`
