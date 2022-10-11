@@ -603,4 +603,21 @@ module.exports = class Function {
       }
       return result
    }
+   
+   /* Timeout
+    * @param {Integer} ms
+    */ 
+   timeReverse = (duration) => {
+      let milliseconds = parseInt((duration % 1000) / 100),
+         seconds = Math.floor((duration / 1000) % 60),
+         minutes = Math.floor((duration / (1000 * 60)) % 60),
+         hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
+         days = Math.floor(duration / (24 * 60 * 60 * 1000))
+      let hoursF = (hours < 10) ? "0" + hours : hours
+      let minutesF = (minutes < 10) ? "0" + minutes : minutes
+      let secondsF = (seconds < 10) ? "0" + seconds : seconds
+      let daysF = (days < 10) ? "0" + days : days
+      // return hours + " Jam " + minutes + " Menit" + seconds + " Detik" + milliseconds;
+      return daysF + "D " + hoursF + "H " + minutesF + "M"
+   }
 }
