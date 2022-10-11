@@ -2,7 +2,7 @@ const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
 exports.run = {
    usage: ['groups'],
-   // category: 'special',
+   category: 'special',
    async: async (m, {
       client,
       isPrefix
@@ -31,7 +31,9 @@ exports.run = {
             member: {},
             text_left: '',
             text_welcome: '',
-            welcome: true
+            welcome: true,
+            expired: 0,
+            stay: false
          }
       }
       client.sendList(m.chat, '', `Bot has joined to ${groups.length} groups. 🍟`, '', 'Tap!', [{

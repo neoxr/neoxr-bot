@@ -36,6 +36,14 @@ module.exports = async (client, m) => {
             client.reply(global.forwards, caption)
          }
       }
+      if (m.isGroup && !groupSet.stay && (new Date * 1) >= groupSet.expired && groupSet.expired != 0) {
+         return client.reply(m.chat, Func.texted('italic', '🚩 Bot time has expired and will leave from this group, thank you.', null, {
+            mentions: participants.map(v => v.id)
+         })).then(async () => {
+            groupSet.expired = 0
+            await Func.delay(2000).then(() => client.groupLeave(m.chat))
+         })
+      }
       if (users) users.lastseen = new Date() * 1
       if (chats) {
          chats.lastseen = new Date() * 1

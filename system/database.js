@@ -45,6 +45,8 @@ module.exports = (m) => {
          if (!('text_left' in group)) group.text_left = ''
          if (!('text_welcome' in group)) group.text_welcome = ''
          if (!('welcome' in group)) group.welcome = true
+         if (!isNumber(group.expired)) group.expired = 0
+         if (!('stay' in group)) group.stay = false
       } else {
          global.db.groups[m.chat] = {
             activity: 0,
@@ -59,7 +61,9 @@ module.exports = (m) => {
             member: {},
             text_left: '',
             text_welcome: '',
-            welcome: true
+            welcome: true,
+            expired: 0,
+            stay: false
          }
       }
    }
