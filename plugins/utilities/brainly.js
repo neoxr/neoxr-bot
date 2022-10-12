@@ -9,13 +9,18 @@ exports.run = {
       command
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'jokowi'), m)
-         const json = await Func.fetchJson('https://neoxr.masuk.id/brainly?q=' + text)
+         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'nazi'), m)
          client.sendReact(m.chat, '🕒', m.key)
+         const json = await Api.brainly(text, 'id')
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
+         const data = []
+         json.data.map(v => data.push({
+            soal: v.pertanyaan.trim(),
+            jawaban: (/Jawaban:/i.test(v.jawaban.find(v => v).text) ? v.jawaban.find(v => v).text.replace(new RegExp('Jawaban:', 'i'), '') : v.jawaban.find(v => v).text).trim()
+         }))
          for (let i = 0; i < 3; i++) {
             await Func.delay(1500)
-            client.reply(m.chat, `${json.data[i].soal}\n\n*Jawaban* : ${json.data[i].jawaban}`, m)
+            client.reply(m.chat, `${data[i].soal}\n\n*Jawaban* : ${data[i].jawaban}`, m)
          }
       } catch (e) {
          console.log(e)

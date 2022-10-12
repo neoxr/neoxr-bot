@@ -6,7 +6,7 @@ exports.run = {
    usage: ['tomp3', 'tovn'],
    hidden: ['toaudio'],
    use: 'reply media',
-   category: 'utilities',
+   category: 'converter',
    async: async (m, {
       client,
       command

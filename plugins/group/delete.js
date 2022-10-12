@@ -2,7 +2,7 @@ exports.run = {
    usage: ['delete'],
    hidden: ['del'],
    use: 'reply chat',
-   category: 'utilities',
+   category: 'group',
    async: async (m, {
       client,
       isBotAdmin

@@ -1,7 +1,7 @@
 exports.run = {
    usage: ['q'],
    use: 'reply chat',
-   category: 'utilities',
+   category: 'group',
    async: async (m, {
       client
    }) => {

@@ -5,7 +5,7 @@ const { tmpdir } = require('os')
 exports.run = {
    usage: ['toimg'],
    use: 'reply sticker',
-   category: 'utilities',
+   category: 'converter',
    async: async (m, {
       client
    }) => {

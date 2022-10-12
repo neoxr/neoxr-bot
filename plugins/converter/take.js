@@ -2,7 +2,7 @@ exports.run = {
    usage: ['take'],
    hidden: ['wm'],
    use: 'packname | author',
-   category: 'utilities',
+   category: 'converter',
    async: async (m, {
       client,
       text,

@@ -2,7 +2,7 @@ exports.run = {
    usage: ['sticker'],
    hidden: ['s', 'sk', 'stiker', 'sgif'],
    use: 'reply media',
-   category: 'utilities',
+   category: 'converter',
    async: async (m, {
       client
    }) => {

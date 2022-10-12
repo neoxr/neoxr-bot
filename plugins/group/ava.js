@@ -1,7 +1,7 @@
 exports.run = {
    usage: ['ava'],
    use: 'mention or reply',
-   category: 'utilities',
+   category: 'group',
    async: async (m, {
       client,
       text
