@@ -11,6 +11,5 @@ exports.run = {
          return client.reply(m.chat, global.status.error, m)
       }
    },
-   error: false,
-   limit: true
+   error: false
 }
