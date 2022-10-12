@@ -1,7 +1,7 @@
 exports.run = {
    usage: ['alien', 'brick', 'bunny', 'caricature', 'clown', 'ink', 'latte', 'letter', 'pencil', 'puzzle', 'roses', 'sketch', 'splash', 'staco'],
    use: 'reply foto',
-   category: 'text maker',
+   category: 'image effect',
    async: async (m, {
       client,
       isPrefix,
@@ -18,7 +18,7 @@ exports.run = {
          let image = await scrap.uploadImage(img)
          let result = Api.ie(command.toLowerCase(), image)
          if (!result || result.constructor.name != 'String') return client.reply(m.chat, global.status.fail, m)
-         client.sendFile(m.chat, result, ``, ``, m)
+         client.sendFile(m.chat, result, ``, `🍟 *Process* : ${((new Date - old) * 1)} ms`, m)
       } catch (e) {
          console.log(e)
          return client.reply(m.chat, global.status.error, m)

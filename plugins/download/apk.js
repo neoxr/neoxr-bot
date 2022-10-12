@@ -24,7 +24,7 @@ exports.run = {
                   description: `[ ${v.size} | ${v.version} ]`
                })
             })
-            client.sendList(m.chat, '', `Menampilkan hasil pencarian untuk : “${text}”, silahkan pilih dibawah aplikasi yang ingin kamu unduh. 🍟`, '', 'Tap!', [{
+            client.sendList(m.chat, '', `Showing search results for : “${text}”, select below the application you want to download. 🍟`, '', 'Tap!', [{
                rows
             }], m)
          } else if (command == 'getapk') {
@@ -43,7 +43,7 @@ exports.run = {
             teks += '	◦  *Link* : ' + json.data.playstore + '\n\n'
             teks += global.footer
             let chSize = Func.sizeLimit(json.file.size, global.max_upload)
-            if (chSize.oversize) return client.reply(m.chat, `Ukuran file (${json.file.size}) melebihi batas maksimum, silahkan download sendiri melalui link berikut : ${await (await Func.shorten(json.file.url)).data.url}`, m)
+            if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.file.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await Func.shorten(json.file.url)).data.url}`, m)
             client.sendFile(m.chat, json.data.thumbnail, '', teks, m).then(() => {
                client.sendFile(m.chat, json.file.url, json.file.filename, '', m)
             })
@@ -55,6 +55,5 @@ exports.run = {
    },
    error: false,
    limit: true,
-   cache: true,
-   location: __filename
+   restrict: true,
 }

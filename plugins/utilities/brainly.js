@@ -15,8 +15,8 @@ exports.run = {
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
          const data = []
          json.data.map(v => data.push({
-            soal: v.pertanyaan.trim(),
-            jawaban: (/Jawaban:/i.test(v.jawaban.find(v => v).text) ? v.jawaban.find(v => v).text.replace(new RegExp('Jawaban:', 'i'), '') : v.jawaban.find(v => v).text).trim()
+            soal: v.question.trim(),
+            jawaban: (/Jawaban:/i.test(v.answer.find(v => v).text) ? v.answer.find(v => v).text.replace(new RegExp('Jawaban:', 'i'), '') : v.answer.find(v => v).text).trim()
          }))
          for (let i = 0; i < 3; i++) {
             await Func.delay(1500)
