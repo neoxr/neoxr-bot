@@ -20,8 +20,7 @@ exports.run = {
          caption += `	◦  *Author* : ${json.author}\n`
          caption += `	◦  *Likes* : ${json.like}\n`
          caption += `	◦  *Retweets* : ${json.retweet}\n`
-         caption += `	◦  *Comments* : ${json.reply}\n`
-         caption += `	◦  *Fetching* : ${((new Date - old) * 1)} ms\n\n`
+         caption += `	◦  *Comments* : ${json.reply}\n\n`
          caption += global.footer
          for (let i = 0; i < json.data.length; i++) {
             if (/jpg|mp4/.test(json.data[i].type)) {
