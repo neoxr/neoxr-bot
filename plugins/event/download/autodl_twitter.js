@@ -24,11 +24,13 @@ exports.run = {
                links.map(async link => {
                   let json = await Api.twitter(link)
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-                  let caption = `◦  *Author* : ${json.author}\n`
-                  caption += `◦  *Likes* : ${json.like}\n`
-                  caption += `◦  *Retweets* : ${json.retweet}\n`
-                  caption += `◦  *Comments* : ${json.reply}\n`
-                  caption += `◦  *Fetching* : ${((new Date - old) * 1)} ms`
+                  let caption = `乂  *T W I T T E R*\n\n`
+                  caption += `	◦  *Author* : ${json.author}\n`
+                  caption += `	◦  *Likes* : ${json.like}\n`
+                  caption += `	◦  *Retweets* : ${json.retweet}\n`
+                  caption += `	◦  *Comments* : ${json.reply}\n`
+                  caption += `	◦  *Fetching* : ${((new Date - old) * 1)} ms\n\n`
+                  caption += global.footer
                   json.data.map(async v => {
                      if (/jpg|mp4/.test(v.type)) {
                         client.sendFile(m.chat, v.url, '', caption, m)
