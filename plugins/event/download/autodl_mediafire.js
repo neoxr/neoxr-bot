@@ -47,6 +47,6 @@ exports.run = {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
-   limit: true,
+   limit: false,
    download: true
 }
