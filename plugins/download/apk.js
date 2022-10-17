@@ -54,6 +54,6 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
+   limit: false,
    restrict: true,
 }
