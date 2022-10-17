@@ -1,6 +1,6 @@
-const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
+const { useMultiAuthState, useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
-const { state, saveState } = useSingleFileAuthState(session)
+// const { state, saveState } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
@@ -15,57 +15,17 @@ global.store = makeInMemoryStore({
    })
 })
 
-const removeAuth = () => {
-   try {
-      fs.unlinkSync('./' + session)
-   } catch {}
-}
+const Helper = require('./system/helper')
 
 const connect = async () => {
-   setInterval(removeAuth, 1000 * 60 * 1)
-   let content = await props.fetch()
-   if (!content || Object.keys(content).length === 0) {
-      global.db = {
-         users: {},
-         chats: {},
-         groups: {},
-         statistic: {},
-         sticker: {},
-         setting: {},
-         creds: {}
-      }
-      await props.save()
-   } else {
-      global.db = content
-      try {
-         if (global.db.creds) {
-            credentials = {
-               creds: content.creds
-            }
-            credentials.creds.noiseKey.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.noiseKey.private.buffer) : Buffer.from(credentials.creds.noiseKey.private)
-            credentials.creds.noiseKey.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.noiseKey.public.buffer) : Buffer.from(credentials.creds.noiseKey.public)
-            credentials.creds.signedIdentityKey.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedIdentityKey.private.buffer) : Buffer.from(credentials.creds.signedIdentityKey.private)
-            credentials.creds.signedIdentityKey.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedIdentityKey.public.buffer) : Buffer.from(credentials.creds.signedIdentityKey.public)
-            credentials.creds.signedPreKey.keyPair.private = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.keyPair.private.buffer) : Buffer.from(credentials.creds.signedPreKey.keyPair.private)
-            credentials.creds.signedPreKey.keyPair.public = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.keyPair.public.buffer) : Buffer.from(credentials.creds.signedPreKey.keyPair.public)
-            credentials.creds.signedPreKey.signature = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signedPreKey.signature.buffer) : Buffer.from(credentials.creds.signedPreKey.signature)
-            credentials.creds.signalIdentities[0].identifierKey = /mongo/.test(process.env.DATABASE_URL) ? Buffer.from(content.creds.signalIdentities[0].identifierKey.buffer) : Buffer.from(credentials.creds.signalIdentities[0].identifierKey)
-            state.creds = credentials.creds
-         } else {
-            global.db.creds = state.creds
-         }
-      } catch (e) {
-         console.log(e)
-         global.db.creds = state.creds
-      }
-   }
-
+   const { state, saveCreds } = await useMultiAuthState('sessions')
+   store.readFormFile(session)
+   global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    global.client = Socket({
       logger: pino({
          level: 'silent'
       }),
       printQRInTerminal: true,
-      markOnlineOnConnect: true,
       msgRetryCounterMap,
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
@@ -92,7 +52,6 @@ const connect = async () => {
          text: 'Connecting . . .'
       })
       if (connection === 'open') {
-         global.db.creds = client.authState.creds
          spinnies.succeed('start', {
             text: `Connected, you login as ${client.user.name || client.user.verifiedName}`
          })
@@ -112,7 +71,7 @@ const connect = async () => {
       // if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
    })
 
-   client.ev.on('creds.update', () => saveState)
+   client.ev.on('creds.update', saveCreds)
 
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
@@ -182,7 +141,6 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      global.db.creds = client.authState.creds
       if (global.db) await props.save()
    }, 10_000)
 
