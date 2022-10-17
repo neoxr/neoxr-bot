@@ -19,7 +19,7 @@ const Helper = require('./system/helper')
 
 const connect = async () => {
    const { state, saveCreds } = await useMultiFileAuthState('sessions')
-   store.readFormFile(session)
+   store.readFromFile(session)
    global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    global.client = Socket({
       logger: pino({
