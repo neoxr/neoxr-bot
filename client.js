@@ -1,4 +1,4 @@
-const { useMultiAuthState, useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
+const { useMultiFileAuthState, useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
 // const { state, saveState } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
@@ -18,7 +18,7 @@ global.store = makeInMemoryStore({
 const Helper = require('./system/helper')
 
 const connect = async () => {
-   const { state, saveCreds } = await useMultiAuthState('sessions')
+   const { state, saveCreds } = await useMultiFileAuthState('sessions')
    store.readFormFile(session)
    global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    global.client = Socket({
