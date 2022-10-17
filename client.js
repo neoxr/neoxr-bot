@@ -1,6 +1,6 @@
-const { useMultiFileAuthState, useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
+const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
-// const { state, saveState } = useSingleFileAuthState(session)
+const { state, saveState } = useSingleFileAuthState(session)
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
@@ -15,12 +15,9 @@ global.store = makeInMemoryStore({
    })
 })
 
-const Helper = require('./system/helper')
-
 const connect = async () => {
-   const { state, saveCreds } = await useMultiFileAuthState('sessions')
-   store.readFromFile(session)
    global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
+   await props.save(global.db)
    global.client = Socket({
       logger: pino({
          level: 'silent'
@@ -30,7 +27,7 @@ const connect = async () => {
       browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2236, 10],
+      version: [2, 2238, 7],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }
@@ -61,7 +58,6 @@ const connect = async () => {
             spinnies.fail('start', {
                text: `Can't connect to Web Socket`
             })
-            delete global.db.creds
             await props.save()
             process.exit(0)
          } else {
@@ -71,7 +67,7 @@ const connect = async () => {
       // if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
    })
 
-   client.ev.on('creds.update', saveCreds)
+   client.ev.on('creds.update', () => saveState)
 
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
