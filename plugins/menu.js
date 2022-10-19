@@ -76,7 +76,7 @@ exports.run = {
             let print = global.db.setting.msg
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
-               print += '\n\n乂 *' + k.toUpperCase().split('').map(v => v + ' ').join('') + '*\n\n'
+               print += '\n\n乂  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
                let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
