@@ -9,7 +9,7 @@ exports.run = {
       command
    }) => {
       try {
-         let setting = global.db.setting.menuStyle
+         let setting = global.db.setting
          if (!args || !args[0]) {
             let rows = [{
                title: `STYLE 1`,
