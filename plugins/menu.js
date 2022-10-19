@@ -76,7 +76,7 @@ exports.run = {
             let print = global.db.setting.msg
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
-               print += '\n\n乂 *' + k.toUpperCase() + '*\n\n'
+               print += '\n\n乂 *' + k.toUpperCase().split('').map(v => v + ' ').join('') + '*\n\n'
                let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
@@ -99,7 +99,7 @@ exports.run = {
                print += commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `	◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
             }
             client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-               ads: true,
+               ads: false,
                largeThumb: true,
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d826ed4128ba873017479.jpg')
             })
