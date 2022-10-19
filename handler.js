@@ -90,8 +90,8 @@ module.exports = async (client, m) => {
       let isPrefix,
          usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
          hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
-         univers = usage.concat(hidden)
-      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && univers.includes((body.split` ` [0]).toLowerCase())) {
+         commands = usage.concat(hidden)
+      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && commands.includes((body.split` ` [0]).toLowerCase())) {
          let args = body.replace(isPrefix, '').split` `.filter(v => v)
          let command = args.shift().toLowerCase()
          let start = body.replace(isPrefix, '')
@@ -99,7 +99,6 @@ module.exports = async (client, m) => {
          let text = clean.join` `
          let prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
          const is_commands = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))
-         let commands = Func.arrayJoin(Object.values(is_commands).map(v => v.run.usage))
          let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
          try {
             if (new Date() * 1 - chats.command > (global.cooldown * 1000)) {
