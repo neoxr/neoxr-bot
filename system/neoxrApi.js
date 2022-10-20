@@ -113,4 +113,14 @@ module.exports = class NeoxrApi {
   	let json = await Func.fetchJson(this.baseUrl + '/brainly?q=' + query + '&iso=' + lang + '&apikey=' + this.apiKey)
       return json
    }
+   
+   sholat = async (city) => {
+      let json = await Func.fetchJson(this.baseUrl + '/sholat?q=' + city + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   kbbg = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/kbbg?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
 }

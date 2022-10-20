@@ -49,7 +49,7 @@ module.exports = async (client, m) => {
          chats.lastseen = new Date() * 1
          chats.chat += 1
       }
-      if (m.isGroup && !m.isBot && users.afk > -1) {
+      if (m.isGroup && !m.isBot && users && users.afk > -1) {
          client.reply(m.chat, `You are back online after being offline for : ${Func.texted('bold', Func.toTime(new Date - users.afk))}\n\n• ${Func.texted('bold', 'Reason')}: ${users.afkReason ? users.afkReason : '-'}`, m)
          users.afk = -1
          users.afkReason = ''

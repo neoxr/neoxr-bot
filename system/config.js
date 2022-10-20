@@ -23,6 +23,8 @@ global.chatai_bid = '164728'
 global.chatai_key = 'MKPsfkgXLZPGrWoH'
 // Source version
 global.version = '2.2.1',
+// Bot name
+global.botname = `© neoxr-bot v${global.version} (Public Bot)`
 // Footer text
 global.footer = 'ꜱɪᴍᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ ɴᴇᴏxʀ ッ'
 // Global status
