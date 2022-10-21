@@ -24,10 +24,10 @@ const connect = async () => {
       }),
       printQRInTerminal: true,
       msgRetryCounterMap,
-      browser: ['@neoxr / neoxr-bot', 'Chrome', '1.0.0'],
+      browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2238, 7],
+      version: [2, 2240, 7],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }

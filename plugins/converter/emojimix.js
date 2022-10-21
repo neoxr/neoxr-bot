@@ -1,6 +1,6 @@
 exports.run = {
    usage: ['emojimix'],
-   hidden: ['mix', 'emojimix'],
+   hidden: ['mix', 'emomix'],
    use: 'emoji + emoji',
    category: 'converter',
    async: async (m, {
