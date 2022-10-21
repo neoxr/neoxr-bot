@@ -14,7 +14,7 @@ global.store = makeInMemoryStore({
 })
 
 const connect = async () => {
-   const { state, saveState } = await useMultiFileAuthState('session')
+   const { state, saveCreds } = await useMultiFileAuthState('session')
    global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    await props.save(global.db)
    global.client = Socket({
@@ -66,7 +66,7 @@ const connect = async () => {
       // if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
    })
 
-   client.ev.on('creds.update', () => saveState)
+   client.ev.on('creds.update', saveCreds)
 
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
