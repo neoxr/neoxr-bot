@@ -61,7 +61,7 @@ DATABASE_URL = 'mongodb+srv://neoxrbot:yntkts@cluster0.kontol.mongodb.net/myFirs
 ### 乂  Installation
 
 ```
-$ git clone -b 'multiauth' https://github.com/neoxr/neoxr-bot
+$ git clone -b 'multi-auth' https://github.com/neoxr/neoxr-bot
 ```
 
 And then type this on your console.
