@@ -1,2 +1,0 @@
-[[build.buildpacks]]
-uri = "heroku/nodejs"
