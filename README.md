@@ -6,7 +6,7 @@ An automated system (WhatsApp Bot) that can help to do something, search and get
 <img width="" src="https://img.shields.io/github/repo-size/neoxr/neoxr-bot?color=green&label=Repo%20Size&style=for-the-badge&logo=appveyor">
 </p>
 
-> **NEW!** Implementation of my other project namely Github Database **[@neoxr/gitdb](https://github.com/neoxr/gitdb)** to see **[Click Here](https://github.com/neoxr/neoxr-bot/tree/gitdb)**
+> **IMPORTANT!** scan qr **[here](https://replit.com/@wildanizzudin/scan?embed=true)** and save creds.json file in the **[session](https://github.com/neoxr/neoxr-bot/tree/multi-auth/session)** folder
 
 ### 乂  Database Setup
 
