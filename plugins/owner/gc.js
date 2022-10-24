@@ -84,7 +84,7 @@ exports.run = {
                if (!admin) return client.reply(m.chat, Func.texted('bold', `🚩 Can't get ${groupName} group link because the bot is not an admin.`), m)
                client.reply(m.chat, 'https://chat.whatsapp.com/' + (await client.groupInviteCode(jid)), m)
             } else if (dial == 3) {
-               await client.reply(jid, `🚩 Goodbye!, the bot will leave the group to reduce server load.`, null, {
+               await client.reply(jid, `🚩 Good Bye!`, null, {
                   mentions: groupMetadata.participants.map(v => v.id)
                }).then(() => {
                   client.groupLeave(jid).then(() => {
