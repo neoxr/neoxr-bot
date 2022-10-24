@@ -1,5 +1,6 @@
 exports.run = {
-   usage: ['setwelcome', 'setleft', 'setout'],
+   usage: ['setwelcome', 'setleft'],
+   hidden: ['setout'],
    use: 'text',
    category: 'admin tools',
    async: async (m, {
