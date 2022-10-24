@@ -4,7 +4,7 @@ exports.run = {
    }) => {
       try {
          setInterval(async () => {
-            let day = 86400000 * 1,
+            let day = 86400000 * 7,
                now = new Date() * 1
             for (let jid in global.db.users) {
                if (now - global.db.users[jid].lastseen > week && !global.db.users[jid].premium && !global.db.users[jid].banned && global.db.users[jid].point < 5000000) delete global.db.users[jid]
@@ -18,7 +18,7 @@ exports.run = {
                   delete global.db.groups[jid]
                }
             }
-         }, 10_000)
+         }, 60_000)
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }
