@@ -72,8 +72,7 @@ exports.run = {
             }
          }
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, global.status.error, m)
+         return client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    error: false,
