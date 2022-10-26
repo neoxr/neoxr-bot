@@ -129,7 +129,7 @@ module.exports = class NeoxrApi {
       return json
    }
    
-   igstalk = async (query) => {
+   igstalk = async (username) => {
       let json = await Func.fetchJson(this.baseUrl + '/igstalk?username=' + username + '&apikey=' + this.apiKey)
       return json
    }

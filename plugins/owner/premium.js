@@ -21,13 +21,18 @@ exports.run = {
          }
       } catch (e) {} finally {
          let data = global.db.users[user]
+         if (typeof data == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
          if (command == '+prem') {
+            if (data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 @${user.replace(/@.+/, '')} has become registered as a premium account.`), m)
             data.limit += 1000
             data.premium = true
+            data.expired = (new Date() * 1) + (86400000 * 30)
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully added @${user.replace(/@.+/, '')} to premium user.`), m)
          } else if (command == '-prem') {
+            if (data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 Not a premium account.`), m)
             data.limit = global.limit
             data.premium = false
+            data.expired = 0
             client.reply(m.chat, Func.texted('bold', `🚩 @${user.replace(/@.+/, '')}'s premium status has been successfully deleted.`), m)
          }
       }
