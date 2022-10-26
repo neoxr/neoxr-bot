@@ -2,6 +2,7 @@ exports.run = {
    usage: ['setcover'],
    hidden: ['cover'],
    use: 'reply foto',
+   category: 'owner',
    async: async (m, {
       client
    }) => {
