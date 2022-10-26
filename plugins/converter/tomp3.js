@@ -1,4 +1,4 @@
-const { readFileSync: read, unlinkSync: remove } = require('fs')
+const { readFileSync: read, unlinkSync: remove, writeFileSync: create } = require('fs')
 const path = require('path')
 const { exec } = require('child_process')
 const { tmpdir } = require('os')
@@ -35,7 +35,7 @@ exports.run = {
                client.reply(m.chat, global.status.wait, m)
                let buffer = await m.quoted.download()
                const media = path.join(tmpdir(), Func.filename('mp3'))
-               let save = fs.writeFileSync(media, buffer)
+               let save = create(media, buffer)
                const result = Func.filename('mp3')
                exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
                   remove(media)
