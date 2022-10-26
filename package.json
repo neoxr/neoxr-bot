@@ -41,7 +41,6 @@
       "html-entities":"~2.3.2",
       "jimp":"^0.16.1",
       "jsdom":"16.6.0",
-      "lyrics-parse": "^1.1.1",
       "mime-types":"~2.1.32",
       "mongoose": "5.10.8",
       "moment-timezone":"~0.5.34",
@@ -56,6 +55,7 @@
       "rootpath": "^0.1.2",
       "spinnies":"~0.5.1",
       "syntax-error":"~1.4.0",
+      "translate-google-api": "~1.0.4",
       "usetube": "^2.1.4",
       "util":"~0.12.4",
       "wa-sticker-formatter": "3.6.0"
