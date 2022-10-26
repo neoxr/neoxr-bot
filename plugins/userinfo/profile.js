@@ -7,10 +7,11 @@ exports.run = {
       isPrefix,
       blockList
    }) => {
-   	let number = isNaN(text) ? (text.startsWith('+') ? text.replace(/[()+\s-]/g, '') : (text).split`@` [1]) : text
+      let number = isNaN(text) ? (text.startsWith('+') ? text.replace(/[()+\s-]/g, '') : (text).split`@` [1]) : text
       if (!text && !m.quoted) return client.reply(m.chat, Func.texted('bold', `🚩 Mention or Reply chat target.`), m)
       if (isNaN(number)) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid number.`), m)
       if (number.length > 15) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid format.`), m)
+      let pic = await Func.fetchBuffer('./media/image/default.jpg')
       try {
          if (text) {
             var user = number + '@s.whatsapp.net'
@@ -20,12 +21,9 @@ exports.run = {
             var user = number + '@s.whatsapp.net'
          }
       } catch (e) {} finally {
-      let target = global.db.users[m.sender]
-      let pic = await Func.fetchBuffer('./media/image/default.jpg')
-      let _own = [...new Set([global.owner, ...global.db.setting.owners])]
-      try {
+         let target = global.db.users[m.sender]
+         let _own = [...new Set([global.owner, ...global.db.setting.owners])]
          pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
-      } catch {} finally {
          let blocked = blockList.includes(user) ? true : false
          let now = new Date() * 1
          let lastseen = (target.lastseen == 0) ? 'Never' : Func.toDate(now - target.lastseen)
@@ -43,8 +41,8 @@ exports.run = {
          caption += `	◦ *Expired* : ${target.expired == 0 ? '-' : Func.timeReverse(target.expired - new Date() * 1)}\n\n`
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
-             largeThumb: true,
-             thumbnail: pic
+            largeThumb: true,
+            thumbnail: pic
          })
       }
    },
