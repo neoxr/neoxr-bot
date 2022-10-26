@@ -23,6 +23,7 @@ exports.run = {
          }
       } catch (e) {} finally {
          let target = global.db.users[user]
+         if (typeof target == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
          let _own = [...new Set([global.owner, ...global.db.setting.owners])]
          pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
          let blocked = blockList.includes(user) ? true : false
