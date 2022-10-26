@@ -4,6 +4,7 @@ exports.run = {
    category: 'user info',
    async: async (m, {
       client,
+      text,
       isPrefix,
       blockList
    }) => {
