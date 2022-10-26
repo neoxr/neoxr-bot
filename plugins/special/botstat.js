@@ -31,9 +31,7 @@ exports.run = {
          }
          const system = global.db.setting
          client.sendMessageModify(m.chat, statistic(stats, system), m, {
-            ads: false,
-            largeThumb: true,
-            thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d826ed4128ba873017479.jpg')
+            largeThumb: true
          })
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
