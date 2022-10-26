@@ -25,9 +25,8 @@ exports.run = {
          let target = global.db.users[user]
          if (typeof target == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
          try {
-            let pic = await Func.fetchBuffer('./media/image/default.jpg')
-         } catch (e) {} finally {
             pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
+         } catch (e) {} finally {
             let blocked = blockList.includes(user) ? true : false
             let now = new Date() * 1
             let lastseen = (target.lastseen == 0) ? 'Never' : Func.toDate(now - target.lastseen)
