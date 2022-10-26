@@ -3,7 +3,7 @@ const { decode } = require('html-entities')
 exports.run = {
    usage: ['lirik'],
    use: 'query',
-   category: 'utilities',
+   // category: 'utilities',
    async: async (m, {
       client,
       text,
