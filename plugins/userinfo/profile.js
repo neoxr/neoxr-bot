@@ -24,28 +24,30 @@ exports.run = {
       } catch (e) {} finally {
          let target = global.db.users[user]
          if (typeof target == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
-         let _own = [...new Set([global.owner, ...global.db.setting.owners])]
-         pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
-         let blocked = blockList.includes(user) ? true : false
-         let now = new Date() * 1
-         let lastseen = (target.lastseen == 0) ? 'Never' : Func.toDate(now - target.lastseen)
-         let usebot = (target.usebot == 0) ? 'Never' : Func.toDate(now - target.usebot)
-         let caption = `乂  *U S E R - P R O F I L E*\n\n`
-         caption += `	◦ *Name* : ${m.pushName}\n`
-         caption += `	◦ *Limit* : ${Func.formatNumber(target.limit)}\n`
-         caption += `	◦ *Hitstat* : ${Func.formatNumber(target.hit)}\n`
-         caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[user] != 'undefined' ? global.db.groups[m.chat].member[user].warning : 0) + ' / 5' : target.warning + ' / 5')}\n\n`
-         caption += `乂  *U S E R - S T A T U S*\n\n`
-         caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
-         caption += `	◦ *Banned* : ${(new Date - target.banTemp < global.timer) ? Func.toTime(new Date(target.banTemp + global.timer) - new Date()) + ' (' + ((global.timer / 1000) / 60) + ' min)' : target.banned ? '√' : '×'}\n`
-         caption += `	◦ *Use In Private* : ${(Object.keys(global.db.chats).includes(user) ? '√' : '×')}\n`
-         caption += `	◦ *Premium* : ${(target.premium ? '√' : '×')}\n`
-         caption += `	◦ *Expired* : ${target.expired == 0 ? '-' : Func.timeReverse(target.expired - new Date() * 1)}\n\n`
-         caption += global.footer
-         client.sendMessageModify(m.chat, caption, m, {
-            largeThumb: true,
-            thumbnail: pic
-         })
+         try {
+            let pic = await Func.fetchBuffer('./media/image/default.jpg')
+         } catch (e) {} finally {
+            pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
+            let blocked = blockList.includes(user) ? true : false
+            let now = new Date() * 1
+            let lastseen = (target.lastseen == 0) ? 'Never' : Func.toDate(now - target.lastseen)
+            let usebot = (target.usebot == 0) ? 'Never' : Func.toDate(now - target.usebot)
+            let caption = `乂  *U S E R - P R O F I L E*\n\n`
+            caption += `	◦ *Limit* : ${Func.formatNumber(target.limit)}\n`
+            caption += `	◦ *Hitstat* : ${Func.formatNumber(target.hit)}\n`
+            caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[user] != 'undefined' ? global.db.groups[m.chat].member[user].warning : 0) + ' / 5' : target.warning + ' / 5')}\n\n`
+            caption += `乂  *U S E R - S T A T U S*\n\n`
+            caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
+            caption += `	◦ *Banned* : ${(new Date - target.banTemp < global.timer) ? Func.toTime(new Date(target.banTemp + global.timer) - new Date()) + ' (' + ((global.timer / 1000) / 60) + ' min)' : target.banned ? '√' : '×'}\n`
+            caption += `	◦ *Use In Private* : ${(Object.keys(global.db.chats).includes(user) ? '√' : '×')}\n`
+            caption += `	◦ *Premium* : ${(target.premium ? '√' : '×')}\n`
+            caption += `	◦ *Expired* : ${target.expired == 0 ? '-' : Func.timeReverse(target.expired - new Date() * 1)}\n\n`
+            caption += global.footer
+            client.sendMessageModify(m.chat, caption, m, {
+               largeThumb: true,
+               thumbnail: pic
+            })
+         }
       }
    },
    error: false,
