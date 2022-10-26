@@ -22,7 +22,7 @@ exports.run = {
             var user = number + '@s.whatsapp.net'
          }
       } catch (e) {} finally {
-         let target = global.db.users[m.sender]
+         let target = global.db.users[user]
          let _own = [...new Set([global.owner, ...global.db.setting.owners])]
          pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
          let blocked = blockList.includes(user) ? true : false
