@@ -14,7 +14,6 @@ exports.run = {
             }
             for (let jid in global.db.groups) {
                if (now - global.db.groups[jid].activity > day && !global.db.groups[jid].stay && global.db.groups[jid].expired == 0) {
-                  client.groupLeave(jid)
                   delete global.db.groups[jid]
                }
             }
