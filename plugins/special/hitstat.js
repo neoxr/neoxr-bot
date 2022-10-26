@@ -26,8 +26,7 @@ exports.run = {
       teks += `\n\n${global.footer}`
       client.sendMessageModify(m.chat, teks, m, {
          ads: false,
-         largeThumb: true,
-         thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d826ed4128ba873017479.jpg')
+         largeThumb: true
       })
    },
    error: false,

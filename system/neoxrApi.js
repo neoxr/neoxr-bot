@@ -123,4 +123,14 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/kbbg?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
+   
+   chord = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/chord?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   igstalk = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/igstalk?username=' + username + '&apikey=' + this.apiKey)
+      return json
+   }
 }

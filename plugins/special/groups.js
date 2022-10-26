@@ -16,7 +16,7 @@ exports.run = {
             rows.push({
                title: groups[i].subject,
                rowId: `${isPrefix}gc ${groups[i].id}`,
-               description: `[ ${groups[i].participants.length} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
+               description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
             })
          } else global.db.groups[groups[i].id] = {
             activity: 0,
