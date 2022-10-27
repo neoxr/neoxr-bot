@@ -1,5 +1,5 @@
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault(global.timezone)
 module.exports = async (client, m) => {
    try {
       require('./system/database')(m)

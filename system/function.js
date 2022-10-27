@@ -10,7 +10,7 @@ const { fromBuffer } = require('file-type')
 const { green, blueBright, redBright } = require('chalk')
 const { tmpdir } = require('os')
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault(global.timezone)
 const NodeID3 = require('node-id3')
 const {
    read,
@@ -619,5 +619,18 @@ module.exports = class Function {
       let daysF = (days < 10) ? "0" + days : days
       // return hours + " Jam " + minutes + " Menit" + seconds + " Detik" + milliseconds;
       return daysF + "D " + hoursF + "H " + minutesF + "M"
+   }
+   
+   /* Timeout
+    * @param ()
+    */ 
+   greeting = () => {
+      let time = moment.tz(global.timezone).format('HH')
+      let res = `Don't forget to sleep`
+      if (time >= 3) res = `Good Evening`
+      if (time > 8) res = `Good Morning`
+      if (time >= 15) res = `Good Afternoon`
+      if (time >= 18) res = `Good Night`
+      return res
    }
 }

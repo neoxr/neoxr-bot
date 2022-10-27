@@ -21,6 +21,8 @@ global.Api = new (require('./neoxrApi'))(process.env.API_KEY)
 // Get bid and key configuration for autoreply chat ai feature by registering at https://brainshop.ai
 global.chatai_bid = '164728'
 global.chatai_key = 'MKPsfkgXLZPGrWoH'
+// Timezone (Default : Asia/Jakarta)
+global.timezone = 'Asia/Jakarta'
 // Bot version
 global.version = '2.2.1',
 // Bot name

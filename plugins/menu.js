@@ -54,7 +54,7 @@ exports.run = {
                      description: ``
                   })
                }
-               await client.sendList(m.chat, '', global.db.setting.msg, global.botname, 'Tap!', [{
+               await client.sendList(m.chat, '', global.db.setting.msg.replace(new RegExp('+tag', 'g'), `@{m.sender.replace(/@.+/g, '')}`).replace(new RegExp('+name', 'g'), m.pushName).replace(new RegExp('+greeting', 'g'), Func.greeting()), global.botname, 'Tap!', [{
                   rows
                }], m)
             }
@@ -73,7 +73,7 @@ exports.run = {
                }
             }
             const keys = Object.keys(category).sort()
-            let print = global.db.setting.msg
+            let print = global.db.setting.msg.replace(new RegExp('+tag', 'g'), `@{m.sender.replace(/@.+/g, '')}`).replace(new RegExp('+name', 'g'), m.pushName).replace(new RegExp('+greeting', 'g'), Func.greeting())
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n乂  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'

@@ -19,7 +19,7 @@ exports.run = {
             client.sendFile(m.chat, json.data[i].url, ``, `🍟 *Fetching* : ${((new Date - old) * 1)} ms (${i+1})`, m)
             await Func.delay(1500)
          }
-         await Func.delay(1500)
+         await Func.delay(3000)
          client.reply(m.chat, Func.texted('bold', `✅ Done, all stories successfully downloaded.`), m)
       } catch (e) {
          console.log(e)
