@@ -20,7 +20,7 @@ exports.run = {
                teks += '	◦  *Snippet* : ' + v.description + '\n'
                teks += '	◦  *Link* : ' + v.url + '\n\n'
             })
-            client.sendMessageModify(m.chat, json.data.chord, m, {
+            client.sendMessageModify(m.chat, teks, m, {
                ads: false,
                largeThumb: true,
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d7b761ea856b5ba7b0713.jpg')
@@ -29,7 +29,7 @@ exports.run = {
             let json = await Api.google(text, true)
             if (!json.status) return client.reply(m.chat, global.status.fail, m)
             for (let i = 0; i < 5; i++) {
-               var rand = Math.floor(json.length * Math.random())
+               var rand = Math.floor(json.data.length * Math.random())
                let caption = `乂  *G O O G L E - I M A G E*\n\n`
                caption += `	◦ *Title* : ${json.data[i].origin.title}\n`
                caption += `	◦ *Dimensions* : ${json.data[i].width} × ${json.data[i].height}\n\n`
