@@ -1,3 +1,5 @@
+const moment = require('moment-timezone')
+moment.tz.setDefault('Asia/Jakarta').locale('id')
 exports.run = {
    usage: ['common'],
    use: 'mention or reply',
@@ -19,7 +21,8 @@ exports.run = {
             var user = number + '@s.whatsapp.net'
          }
       } catch (e) {} finally {
-         let arr = []
+         let arr = [],
+            rows = []
          let groups = Object.values(await client.groupFetchAllParticipating())
          for (let group of groups) {
             let participants = group.participants || []
@@ -28,13 +31,13 @@ exports.run = {
          if (arr.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 No groups with bots.`), m)
          for (let i = 0; i < arr.length; i++) {
             if (arr[i].id in global.db.groups) {
-               let v = global.db.arr[arr[i].id]
+               let v = global.db.groups[arr[i].id]
                rows.push({
                   title: arr[i].subject,
                   rowId: `${isPrefix}gc ${arr[i].id}`,
                   description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
                })
-            } else global.db.arr[arr[i].id] = {
+            } else global.db.groups[arr[i].id] = {
                activity: 0,
                autoread: true,
                antidelete: true,
