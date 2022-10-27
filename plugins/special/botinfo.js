@@ -1,12 +1,13 @@
 exports.run = {
    usage: ['tnc', 'script'],
+   hidden: ['sc'],
    category: 'special',
    async: async (m, {
       client,
       args,
       command
    }) => {
-      if (command == 'script') return client.reply(m.chat, info(), m)
+      if (command == 'script' || command == 'sc') return client.reply(m.chat, info(), m)
       if (command == 'tnc') return client.sendMessageModify(m.chat, tnc(), m, {
          largeThumb: true
       })
