@@ -6,7 +6,8 @@ exports.run = {
    category: 'group',
    async: async (m, {
       client,
-      text
+      text,
+      isPrefix
    }) => {
       let number = isNaN(text) ? (text.startsWith('+') ? text.replace(/[()+\s-]/g, '') : (text).split`@` [1]) : text
       if (!text && !m.quoted) return client.reply(m.chat, Func.texted('bold', `🚩 Mention or reply chat target.`), m)
