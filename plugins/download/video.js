@@ -39,7 +39,7 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
+   limit: false,
    cache: true,
    location: __filename
 }
