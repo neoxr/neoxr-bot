@@ -73,7 +73,7 @@ exports.run = {
                }
             }
             const keys = Object.keys(category).sort()
-            let print = global.db.setting.msg.replace('+tag', `@{m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting())
+            let print = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting())
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n乂  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
