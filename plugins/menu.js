@@ -54,7 +54,7 @@ exports.run = {
                      description: ``
                   })
                }
-               await client.sendList(m.chat, '', global.db.setting.msg.replace('+tag', `@{m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()), global.botname, 'Tap!', [{
+               await client.sendList(m.chat, '', global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()), global.botname, 'Tap!', [{
                   rows
                }], m)
             }
