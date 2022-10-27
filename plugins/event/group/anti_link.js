@@ -6,9 +6,8 @@ exports.run = {
       isAdmin
    }) => {
       try {
-         if (groupSet.antilink && !isAdmin && body && body.match(/(chat.whatsapp.com)/gi)) {
-            if (body.includes(await client.groupInviteCode(m.chat))) return
-            client.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
+         if (groupSet.antilink && !isAdmin && body) {
+            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || Func.isUrl(body) && !Func.socmed(body)) return client.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
