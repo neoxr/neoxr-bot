@@ -29,7 +29,7 @@ exports.run = {
             data.expired = (new Date() * 1) + (86400000 * 30)
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully added @${user.replace(/@.+/, '')} to premium user.`), m)
          } else if (command == '-prem') {
-            if (data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 Not a premium account.`), m)
+            if (!data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 Not a premium account.`), m)
             data.limit = global.limit
             data.premium = false
             data.expired = 0
