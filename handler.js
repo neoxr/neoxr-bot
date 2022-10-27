@@ -152,6 +152,13 @@ module.exports = async (client, m) => {
                client.reply(m.chat, global.status.errorF, m)
                continue
             }
+            if (cmd.restrict && !isOwner && text && new RegExp('\\b' + global.db.setting.toxic.join('\\b|\\b') + '\\b').test(text.toLowerCase())) {
+               client.reply(m.chat, `🚩 You violated the *Terms & Conditions* of using bots by using blacklisted keywords, as a penalty for your violation being blocked and banned. To unblock and get banned you have to pay *Rp. 10,000,-*`, m).then(() => {
+                  users.banned = true
+                  client.updateBlockStatus(m.sender, 'block')
+               })
+               continue
+            }
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
