@@ -3,7 +3,8 @@ exports.run = {
    hidden: ['stat'],
    category: 'special',
    async: async (m, {
-      client
+      client,
+      blockList
    }) => {
       try {
          let users = Object.entries(global.db.users).length
@@ -25,6 +26,7 @@ exports.run = {
             groups,
             mimic: (global.db.setting.mimic).length,
             banned,
+            blocked: blockList.length,
             premium,
             hitstat,
             uptime: Func.toTime(process.uptime() * 1000)
@@ -49,6 +51,7 @@ const statistic = (stats, system) => {
 	◦  ${Func.texted('bold', Func.formatNumber(stats.chats))} Personal Chats
 	◦  ${Func.texted('bold', Func.formatNumber(stats.users))} Users In Database
 	◦  ${Func.texted('bold', Func.formatNumber(stats.banned))} Users Banned
+	◦  ${Func.texted('bold', Func.formatNumber(stats.blocked))} Users Blocked
 	◦  ${Func.texted('bold', Func.formatNumber(stats.mimic))} Mimics Target
 	◦  ${Func.texted('bold', Func.formatNumber(stats.premium))} Premium Users
 	◦  ${Func.texted('bold', Func.formatNumber(stats.hitstat))} Commands Hit

@@ -1,5 +1,5 @@
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault(global.timezone)
 exports.run = {
    usage: ['cmdstic'],
    category: 'owner',

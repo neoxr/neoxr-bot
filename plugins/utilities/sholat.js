@@ -25,7 +25,8 @@ exports.run = {
          teks += '	◦  ```Isya   :``` ' + json.data.isya + '\n\n'
          teks += global.footer
          client.sendMessageModify(m.chat, teks, m, {
-            largeThumb: true
+            largeThumb: true,
+            thumbnail: await Func.fetchBuffer('https://telegra.ph/file/7f16d028627d675791d68.jpg')
          })
       } catch {
          return client.reply(m.chat, global.status.error, m)
