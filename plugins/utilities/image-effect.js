@@ -22,7 +22,7 @@ exports.run = {
             let rows = []
             style.map(v => rows.push({
                title: v.toUpperCase(),
-               rowId: `${isPrefix + command + v} ${image}`,
+               rowId: `${isPrefix + v} ${image}`,
                description: ``
             }))
             client.sendList(m.chat, '', `Choose style you want 🍟`, '', 'Tap!', [{

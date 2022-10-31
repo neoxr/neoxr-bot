@@ -1,6 +1,7 @@
 exports.run = {
    usage: ['link'],
    hidden: ['getlink'],
+   category: 'group',
    async: async (m, {
       client
    }) => {
