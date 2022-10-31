@@ -30,9 +30,9 @@ exports.run = {
             }], m)
          } else {
             if (!args || !args[0]) return
-            if (/telegra/i.test(args[0])) return
-            client.sendReact(m.chat, '🕒', m.key)
+            if (!/telegra/i.test(args[0])) return
             let old = new Date()
+            await client.sendReact(m.chat, '🕒', m.key)
             let result = Api.ie(command.toLowerCase(), args[0])
             if (!result || result.constructor.name != 'String') return client.reply(m.chat, global.status.fail, m)
             client.sendFile(m.chat, result, ``, `🍟 *Process* : ${((new Date - old) * 1)} ms`, m)

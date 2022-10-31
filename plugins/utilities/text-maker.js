@@ -28,6 +28,7 @@ exports.run = {
             if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'neoxr bot'), m)
             if (text.length > 10) return client.reply(m.chat, Func.texted('bold', `🚩 Text is too long max 10 characters.`), m)
             let old = new Date()
+            await client.sendReact(m.chat, '🕒', m.key)
             let result = Api.tm(command.toLowerCase(), text)
             if (!result || result.constructor.name != 'String') return client.reply(m.chat, global.status.fail, m)
             client.sendFile(m.chat, result, ``, `🍟 *Process* : ${((new Date - old) * 1)} ms`, m)
