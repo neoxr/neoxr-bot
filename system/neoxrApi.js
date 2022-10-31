@@ -129,8 +129,18 @@ module.exports = class NeoxrApi {
       return json
    }
    
+   lyric = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/lyric?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
+   
    igstalk = async (username) => {
       let json = await Func.fetchJson(this.baseUrl + '/igstalk?username=' + username + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   google = async (query, image = false) => {
+      let json = await Func.fetchJson(this.baseUrl + '/' + (image ? 'goimg' : 'google') + '?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
 }
