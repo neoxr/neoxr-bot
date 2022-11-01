@@ -25,7 +25,7 @@
       "@colors/colors":"1.5.0",
       "awesome-phonenumber":"~2.59.0",
       "axios":"~0.24.0",
-      "baileys":"6.0.0",
+      "baileys":"latest",
       "cfonts":"~2.10.0",
       "chalk":"~4.1.0",
       "cheerio":"~1.0.0-rc.5",
