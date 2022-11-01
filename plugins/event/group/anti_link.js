@@ -7,7 +7,14 @@ exports.run = {
    }) => {
       try {
          if (groupSet.antilink && !isAdmin && body) {
-            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || Func.isUrl(body) && !Func.socmed(body)) return client.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
+            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || Func.isUrl(body) && !Func.socmed(body)) return client.sendMessage(m.chat, {
+               delete: {
+                  remoteJid: m.chat,
+                  fromMe: false,
+                  id: m.key.id,
+                  participant: m.sender
+               }
+            }).then(() => client.groupParticipantsUpdate(m.chat, [m.sender], 'remove'))
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
