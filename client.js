@@ -63,8 +63,7 @@ const connect = async () => {
          } else {
             connect().catch(() => connect())
          }
-      }   
-      // if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
+      }
    })
 
    client.ev.on('creds.update', () => saveState)
@@ -116,14 +115,14 @@ const connect = async () => {
          if (groupSet.welcome) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
-            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+            url: global.db.setting.link
          })
       } else if (room.action == 'remove') {
          let txt = (groupSet.text_left != '' ? groupSet.text_left : text_left).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
          if (groupSet.left) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
-            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+            url: global.db.setting.link
          })
       }
    })

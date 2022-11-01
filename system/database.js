@@ -104,6 +104,7 @@ module.exports = (m) => {
       if (!('msg' in setting)) setting.msg = 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : PostgreSQL\n◦ *Library* : Baileys v4.3.0\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.'
       if (!isNumber(setting.menuStyle)) setting.menuStyle = 1
       if (!('cover' in setting)) setting.cover = 'https://telegra.ph/file/d826ed4128ba873017479.jpg'
+      if (!('link' in setting)) setting.link = 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
    } else {
       global.db.setting = {
          autodownload: true,
@@ -124,7 +125,8 @@ module.exports = (m) => {
          owners: ['6285887776722', '994408364923'],
          msg: 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : PostgreSQL\n◦ *Library* : Baileys v4.4.0\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.',
          menuStyle: 1,
-         cover: 'https://telegra.ph/file/d826ed4128ba873017479.jpg'
+         cover: 'https://telegra.ph/file/d826ed4128ba873017479.jpg',
+         link: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
       }
    }
 }
