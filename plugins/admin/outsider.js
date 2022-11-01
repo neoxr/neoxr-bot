@@ -10,7 +10,7 @@ exports.run = {
       participants
    }) => {
       try {
-         let member = participants.map(u => u.id).filter(v => !v.statsWith('62'))
+         let member = participants.map(u => u.id).filter(v => !v.startsWith('62'))
          if (!args || !args[0]) {
             if (member.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 This group is clean from outsiders.`), m)
             let teks = `*${member.length}* outsiders found, send *${isPrefix + command} -y* to remove them.\n\n`
@@ -28,5 +28,6 @@ exports.run = {
       }
    },
    admin: true,
-   group: true
+   group: true,
+   botAdmin: true
 }
