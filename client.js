@@ -26,7 +26,7 @@ const connect = async () => {
       browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2240, 7],
+      version: [2, 2241, 7],
       getMessage: async (key) => {
          return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
       }
@@ -62,8 +62,7 @@ const connect = async () => {
          } else {
             connect().catch(() => connect())
          }
-      }   
-      // if (update.receivedPendingNotifications) await client.reply(global.owner + '@c.us', Func.texted('bold', `🚩 Successfully connected to WhatsApp.`))
+      }
    })
 
    client.ev.on('creds.update', saveCreds)
@@ -115,14 +114,14 @@ const connect = async () => {
          if (groupSet.welcome) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
-            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+            url: global.db.setting.link
          })
       } else if (room.action == 'remove') {
          let txt = (groupSet.text_left != '' ? groupSet.text_left : text_left).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
          if (groupSet.left) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
-            url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
+            url: global.db.setting.link
          })
       }
    })
