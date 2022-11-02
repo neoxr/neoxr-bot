@@ -10,7 +10,7 @@ exports.run = {
       participants
    }) => {
       try {
-         let member = participants.map(u => u.id).filter(v => !v.startsWith('62'))
+         let member = participants.filter(v => !v.admin).map(v => v.id).filter(v => !v.startsWith('62') && v != client.decodeJid(client.user.id))
          if (!args || !args[0]) {
             if (member.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 This group is clean from outsiders.`), m)
             let teks = `🚩 *${member.length}* outsiders found, send *${isPrefix + command} -y* to remove them.\n\n`
