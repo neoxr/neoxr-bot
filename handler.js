@@ -19,7 +19,7 @@ module.exports = async (client, m) => {
       if (!setting.online) await client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) await client.sendPresenceUpdate('available', m.chat)
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Func.jsonFormat(m), m)
-      if (m.isGroup && isBotAdmin) groupSet.localonly = false
+      if (m.isGroup && !isBotAdmin) groupSet.localonly = false
       if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
       if (!m.isGroup) await client.readMessages([m.key])
       if (m.isGroup) groupSet.activity = new Date() * 1
