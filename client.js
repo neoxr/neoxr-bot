@@ -1,6 +1,4 @@
-const { useSingleFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
-const session = process.argv[2] ? process.argv[2] + '.json' : 'session.json'
-const { state, saveState } = useSingleFileAuthState(session)
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
 const spinnies = new (require('spinnies'))()
 const { Socket, Serialize, Scandir } = require('./system/extra')
@@ -16,6 +14,7 @@ global.store = makeInMemoryStore({
 })
 
 const connect = async () => {
+   const { state, saveCreds } = await useMultiFileAuthState('session')
    global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    await props.save(global.db)
    global.client = Socket({
@@ -23,14 +22,10 @@ const connect = async () => {
          level: 'silent'
       }),
       printQRInTerminal: true,
-      msgRetryCounterMap,
       browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2240, 7],
-      getMessage: async (key) => {
-         return await store.loadMessage(client.decodeJid(key.remoteJid), key.id)
-      }
+      version: [2, 2241, 7]
    })
 
    store.bind(client.ev)
@@ -66,7 +61,7 @@ const connect = async () => {
       }
    })
 
-   client.ev.on('creds.update', () => saveState)
+   client.ev.on('creds.update', saveCreds)
 
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
