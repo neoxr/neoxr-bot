@@ -33,7 +33,33 @@ module.exports = class Scraper {
          }
       })
    }
-   
+
+   /* Simsimi Chat
+    * @param {String} text
+    */
+   simsimi = (text) => {
+      return new Promise(async (resolve) => {
+         try { // https://simsimi.net/ & https://simsimi.info
+            let json = await (await axios.get('https://api.simsimi.net/v2/?text=' + encodeURI(text) + '&lc=id')).data
+            if (json.success.match(new RegExp('Aku tidak mengerti', 'g'))) return resolve({
+               creator: global.creator,
+               status: false
+            })
+            resolve({
+               cretor: global.creator,
+               status: true,
+               msg: json.success
+            })
+         } catch (e) {
+            console.log(e)
+            return resolve({
+               creator: global.creator,
+               status: false
+            })
+         }
+      })
+   }
+
    /* URL Shortener
     * @param {String} url
     */
@@ -66,7 +92,7 @@ module.exports = class Scraper {
          }
       })
    }
-   
+
    /* Image Uploader (telegra.ph)
     * @param {Buffer} buffer
     */

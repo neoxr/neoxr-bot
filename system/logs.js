@@ -1,13 +1,6 @@
-let {
-   yellow,
-   gray,
-   green,
-   blueBright,
-   cyanBright,
-   redBright
-} = require('chalk')
-let fs = require('fs')
-let moment = require('moment-timezone')
+const { yellow, gray, green, blueBright, cyanBright, redBright } = require('chalk')
+const fs = require('fs')
+const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
 
 module.exports = async (client, m, myPrefix) => {
