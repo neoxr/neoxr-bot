@@ -18,7 +18,7 @@ client.fakeLoc = async (jid, text, caption) => {
          "imageMessage": {
             "mimetype": "image/jpeg",
             "caption": caption,
-            "jpegThumbnail": await Func.createThumb(await fs.readFileSync(`./media/images/thumb.jpg`))
+            "jpegThumbnail": await Func.createThumb(await fs.readFileSync(`./media/image/thumb.jpg`))
          }
       }
    }
