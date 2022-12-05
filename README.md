@@ -26,8 +26,12 @@ $ git clone https://github.com/neoxr/neoxr-bot
 And then type this on your console.
 ```
 $ npm i
-$ node . <session_name>
+$ node .
 ```
+
+### 乂  Documentation
+
+You can see the documentation for using the messaging function [Here](https://github.com/neoxr/neoxr-bot/blob/master/DOCS.md).
 
 **NOTE :** 
 
