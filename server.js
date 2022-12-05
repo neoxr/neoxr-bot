@@ -7,7 +7,8 @@ server.set('json spaces', 2)
 server.get('*', async (req, res) => {
    res.json({
       online: true,
-      msg: `Server running with port ${PORT}`
+      msg: `Server running with port ${PORT}`,
+      server: await (await fetch('http://ip-api.com/json')).json()
    })
 })
 
