@@ -3,9 +3,11 @@ const pino = require('pino'), path = require('path'), fs = require('fs'), colors
 global.component = new (require('nb-func'))
 const { Extra, Function, MongoDB, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
-MongoDB.db = global.database
+if (process.env.DATABASE_URL) {
+   MongoDB.db = global.database
+}
+global.props = process.env.DATABASE_URL ? MongoDB : new(require('./system/localdb'))(global.database)
 global.Func = Function
-global.props = MongoDB
 global.scrap = Scraper
 global.store = makeInMemoryStore({
    logger: pino().child({

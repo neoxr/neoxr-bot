@@ -24,7 +24,7 @@
       "cfonts":"~2.10.0",
       "child_process":"~1.0.2",
       "express": "~4.16.4",
-      "nb-func": "^1.1.9",
+      "nb-func": "^1.2.0",
       "network-speed": "^2.1.1",
       "node-gtts": "^2.0.2",
       "pino":"~7.0.5",

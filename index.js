@@ -21,16 +21,12 @@ function start() {
 	})
 }
 
-if (!process.env.DATABASE_URL) {
-   console.log(colors.red(`You have to setup the database first.`))
-} else {
-   CFonts.say('NEOXR BOT', {
-      font: 'tiny',
-      align: 'center',
-      colors: ['system']
-   }), CFonts.say('Github : https://github.com/neoxr/neoxr-bot', {
-      colors: ['system'],
-      font: 'console',
-      align: 'center'
-   }), start()
-}
+CFonts.say('NEOXR BOT', {
+   font: 'tiny',
+   align: 'center',
+   colors: ['system']
+}), CFonts.say('Github : https://github.com/neoxr/neoxr-bot', {
+   colors: ['system'],
+   font: 'console',
+   align: 'center'
+}), start()
