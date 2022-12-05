@@ -8,7 +8,7 @@ An automated system (WhatsApp Bot) that can help to do something, search and get
 
 ### 乂  Database Setup
 
-Version ```^2.2.2 ``` is different from previous versions, the difference lies in the database structure, a few installation packages and also some additional features, the database that is used is only for MongoDB.
+Version ```^2.2.2``` is different from previous versions, the difference lies in the database structure, a few installation packages and also some additional features, the database that is used is only for MongoDB.
 
 You can get free MongoDB database service at MongoDB Atlas, and sorry I can't write the tutorial here because it's a bit complicated so you can watch this **[Video](https://m.youtube.com/watch?v=4-fRVd1yzr0)**
 
@@ -31,7 +31,7 @@ $ node . <session_name>
 
 **NOTE :** 
 
-1. Use node version **14.x** or **16.x*** to avoid errors.
+1. Use node version **14.x** or **16.x** to avoid errors.
 2. If you find an error you can create an issue on this repo, don't ask me on whatsapp it's very annoying.
 3. This script is free and semi open source, you can get more apikey limit in **[Here](https://api.neoxr.my.id)**.
 

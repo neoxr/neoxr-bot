@@ -73,7 +73,7 @@ const connect = async () => {
          Scandir('./plugins').then(files => {
             global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
          }).catch(e => console.error(e))
-         require('./handler')(client, m)
+         require('./system/baileys'), require('./handler')(client, m)
       } catch (e) {
          console.log(e)
       }
