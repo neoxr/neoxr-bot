@@ -1,6 +1,6 @@
 module.exports = (m) => {
    const isNumber = x => typeof x === 'number' && !isNaN(x)
-   let user = global.db.users[m.sender]
+   let user = global.db.users.find(v => v.jid == m.sender)
    if (user) {
       if (!isNumber(user.afk)) user.afk = -1
       if (!('afkReason' in user)) user.afkReason = ''
@@ -15,7 +15,8 @@ module.exports = (m) => {
       if (!isNumber(user.spam)) user.spam = 0
       if (!isNumber(user.warning)) user.warning = 0
    } else {
-      global.db.users[m.sender] = {
+      global.db.users.push({
+         jid: m.sender,
      	afk: -1,
          afkReason: '',
          banned: false,
@@ -28,11 +29,11 @@ module.exports = (m) => {
          hit: 0,
          spam: 0,
          warning: 0
-      }
+      })
    }
 
    if (m.isGroup) {
-      let group = global.db.groups[m.chat]
+      let group = global.db.groups.find(v => v.jid == m.chat)
       if (group) {
          if (!isNumber(group.activity)) group.activity = 0
          if (!('autoread' in group)) group.autoread = true
@@ -50,7 +51,8 @@ module.exports = (m) => {
          if (!isNumber(group.expired)) group.expired = 0
          if (!('stay' in group)) group.stay = false
       } else {
-         global.db.groups[m.chat] = {
+         global.db.groups.push({
+            jid: m.chat,
             activity: 0,
             autoread: true,
             antidelete: true,
@@ -66,21 +68,24 @@ module.exports = (m) => {
             welcome: true,
             expired: 0,
             stay: false
-         }
+         })
       }
    }
 
-   let chat = global.db.chats[m.chat]
+   let chat = global.db.chats.find(v => v.jid == m.chat)
    if (chat) {
       if (!isNumber(chat.chat)) chat.chat = 0
       if (!isNumber(chat.lastchat)) chat.lastchat = 0
+      if (!isNumber(chat.lastseen)) chat.lastseen = 0
       if (!isNumber(chat.command)) chat.command = 0
    } else {
-      global.db.chats[m.chat] = {
+      global.db.chats.push({
+         jid: m.chat,
          chat: 0,
          lastchat: 0,
+         lastseen: 0,
          command: 0
-      }
+      })
    }
 
    let setting = global.db.setting
@@ -101,8 +106,8 @@ module.exports = (m) => {
       if (!('online' in setting)) setting.online = true
       if (!('onlyprefix' in setting)) setting.onlyprefix = '+'
       if (!('owners' in setting)) setting.owners = ['6285887776722', '994408364923']
-      if (!('msg' in setting)) setting.msg = 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : PostgreSQL\n◦ *Library* : Baileys v4.3.0\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.'
-      if (!isNumber(setting.menuStyle)) setting.menuStyle = 1
+      if (!('msg' in setting)) setting.msg = 'Hi +tag 🪸\nI am an automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : MongoDB\n◦ *Library* : Baileys v6.0.1\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.'
+      if (!isNumber(setting.menuStyle)) setting.menuStyle = 2
       if (!('cover' in setting)) setting.cover = 'https://telegra.ph/file/d826ed4128ba873017479.jpg'
       if (!('link' in setting)) setting.link = 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
    } else {
@@ -123,8 +128,8 @@ module.exports = (m) => {
          online: true,
          onlyprefix: '+',
          owners: ['6285887776722', '994408364923'],
-         msg: 'An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : PostgreSQL\n◦ *Library* : Baileys v4.4.0\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.',
-         menuStyle: 1,
+         msg: 'Hi +tag 🪸\nI am an automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.\n\n◦ *Database* : MongoDB\n◦ *Library* : Baileys v6.0.1\n◦ *Rest API* : https://api.neoxr.my.id\n◦ *Source* : https://github.com/neoxr/neoxr-bot\n\nIf you find an error or want to upgrade premium plan contact the owner.',
+         menuStyle: 2,
          cover: 'https://telegra.ph/file/d826ed4128ba873017479.jpg',
          link: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP'
       }

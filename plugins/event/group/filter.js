@@ -27,14 +27,14 @@ exports.run = {
                      })
                   })
                })
-               return client.sendMessage(m.chat, {
+               return client.reply(m.chat, `乂  *W A R N I N G* \n\nYou got warning : [ ${warning} / 5 ]\n\If you get 5 warnings you will be kicked automatically from the group.`, m).then(() => client.sendMessage(m.chat, {
                   delete: {
                      remoteJid: m.chat,
                      fromMe: isBotAdmin ? false : true,
                      id: m.key.id,
                      participant: m.sender
                   }
-               }).then(() => client.reply(m.chat, `乂  *W A R N I N G* \n\nYou got warning : [ ${warning} / 5 ]\n\If you get 5 warnings you will be kicked automatically from the group.`, m))
+               }))
             }
          }
       } catch (e) {

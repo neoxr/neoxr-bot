@@ -10,32 +10,36 @@ exports.run = {
       let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
       let groups = await groupList()
       let rows = []
-      for (let i = 0; i < groups.length; i++) {
-         if (groups[i].id in global.db.groups) {
-            let v = global.db.groups[groups[i].id]
+      groups.map(x => {
+         let v = global.db.groups.find(v => v.jid == x.id)
+         if (v) {
             rows.push({
-               title: groups[i].subject,
-               rowId: `${isPrefix}gc ${groups[i].id}`,
-               description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))}  | ${groups[i].participants.length} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
+               title: x.subject,
+               rowId: `${isPrefix}gc ${x.id}`,
+               description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))}  | ${x.participants.length} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
             })
-         } else global.db.groups[groups[i].id] = {
-            activity: 0,
-            autoread: true,
-            antidelete: true,
-            antilink: false,
-            antivirtex: false,
-            filter: false,
-            left: false,
-            localonly: false,
-            mute: false,
-            member: {},
-            text_left: '',
-            text_welcome: '',
-            welcome: true,
-            expired: 0,
-            stay: false
+         } else {
+            global.db.groups.push({
+               jid: x.id,
+               activity: new Date * 1,
+               autoread: true,
+               antidelete: true,
+               antilink: false,
+               antivirtex: false,
+               filter: false,
+               game: true,
+               left: false,
+               localonly: false,
+               mute: false,
+               member: {},
+               text_left: '',
+               text_welcome: '',
+               welcome: true,
+               expired: 0,
+               stay: false
+            })
          }
-      }
+      })
       client.sendList(m.chat, '', `Bot has joined to ${groups.length} groups. 🍟`, '', 'Tap!', [{
          rows
       }], m)

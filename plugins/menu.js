@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['menu', 'help', 'bot'],
+   usage: ['menu', 'help', 'bot', 'command'],
    hidden: ['menutype'],
    async: async (m, {
       client,
@@ -100,7 +100,8 @@ exports.run = {
             }
             client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
                ads: false,
-               largeThumb: true
+               largeThumb: true,
+               url: global.db.setting.link
             })
          }
       } catch (e) {

@@ -9,7 +9,7 @@ exports.run = {
       isPrefix,
       command
    }) => {
-      let setup = global.db.groups[m.chat]
+      let setup = global.db.groups.find(v => v.jid == m.chat)
       if (command == 'setwelcome') {
          if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
          setup.text_welcome = text

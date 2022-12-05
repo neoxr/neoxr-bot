@@ -8,48 +8,9 @@ An automated system (WhatsApp Bot) that can help to do something, search and get
 
 ### 乂  Database Setup
 
-This script can use 2 types of database types NoSQL and SQL, for NoSQL types using MongoDB and SQL using PostgreSQL. 
+Version ```^2.2.2 ``` is different from previous versions, the difference lies in the database structure, a few installation packages and also some additional features, the database that is used is only for MongoDB.
 
-You can get free MongoDB database service at MongoDB Atlas while you can get PostgreSQL on Heroku and Railway.
-
-#### 1. Heroku
-
-If you want to get from heroku, register first and do this steps :
-
-- Go to **add-ons** page
-- Search **Heroku Posgress**
-- Choose **Hobby Dev** and **ADD**
-- Go to **Setting**
-- Click **Config Variables**
-- Then copy **DATABASE_URL** value
-- Paste on **.env** file
-- Done!
-
-**Example :**
-```.env
-DATABASE_URL = 'postgres://nmxbabrmewzxmy:d9651df4c26df9d9fdc447be36cf32349ffc3acad641dd3fb72b2bd682ace017@ec2-63-34-180-86.eu-west-1.compute.amazonaws.com:5432/d9atreqoeau273g'
-```
-
-#### 2. Railway
-
-Just like heroku must register first and do this steps :
-
-- Create **New Project**
-- Search **Provision PostgreSQL**
-- Click **PostgreSQL** on your project
-- Click **Variables**
-- Click **Copy all**
-- Paste on **.env** file
-- Done!
-
-**Example :**
-```.env
-DATABASE_URL = 'postgresql://postgres:mWdv7uNGHddW183m@containers-us-west-71.railway.app:6917/railway'
-```
-
-#### 3. MongoDB Atlas
-
-Sorry, I can't write the tutorial here because it's a bit complicated so you can watch this **[Video](https://m.youtube.com/watch?v=4-fRVd1yzr0)**
+You can get free MongoDB database service at MongoDB Atlas, and sorry I can't write the tutorial here because it's a bit complicated so you can watch this **[Video](https://m.youtube.com/watch?v=4-fRVd1yzr0)**
 
 **Example :**
 ```.env
@@ -70,7 +31,7 @@ $ node . <session_name>
 
 **NOTE :** 
 
-1. Use node version **14.x** to avoid errors.
+1. Use node version **14.x** or **16.x*** to avoid errors.
 2. If you find an error you can create an issue on this repo, don't ask me on whatsapp it's very annoying.
 3. This script is free and semi open source, you can get more apikey limit in **[Here](https://api.neoxr.my.id)**.
 

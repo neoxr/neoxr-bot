@@ -6,7 +6,7 @@ exports.run = {
       isPrefix,
       blockList
    }) => {
-      let user = global.db.users[m.sender]
+      let user = global.db.users.find(v => v.jid == m.sender)
       let pic = await Func.fetchBuffer('./media/image/default.jpg')
       let _own = [...new Set([global.owner, ...global.db.setting.owners])]
       try {
@@ -20,11 +20,11 @@ exports.run = {
          caption += `	◦ *Name* : ${m.pushName}\n`
          caption += `	◦ *Limit* : ${Func.formatNumber(user.limit)}\n`
          caption += `	◦ *Hitstat* : ${Func.formatNumber(user.hit)}\n`
-         caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[m.sender] != 'undefined' ? global.db.groups[m.chat].member[m.sender].warning : 0) + ' / 5' : user.warning + ' / 5')}\n\n`
+         caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups.find(v => v.jid == m.chat).member[m.sender] != 'undefined' ? global.db.groups.find(v => v.jid == m.chat).member[m.sender].warning : 0) + ' / 5' : user.warning + ' / 5')}\n\n`
          caption += `乂  *U S E R - S T A T U S*\n\n`
          caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
          caption += `	◦ *Banned* : ${(new Date - user.banTemp < global.timer) ? Func.toTime(new Date(user.banTemp + global.timer) - new Date()) + ' (' + ((global.timer / 1000) / 60) + ' min)' : user.banned ? '√' : '×'}\n`
-         caption += `	◦ *Use In Private* : ${(Object.keys(global.db.chats).includes(m.sender) ? '√' : '×')}\n`
+         caption += `	◦ *Use In Private* : ${(global.db.chats.map(v => v.jid).includes(m.sender) ? '√' : '×')}\n`
          caption += `	◦ *Premium* : ${(user.premium ? '√' : '×')}\n`
          caption += `	◦ *Expired* : ${user.expired == 0 ? '-' : Func.timeReverse(user.expired - new Date() * 1)}\n\n`
          caption += global.footer

@@ -8,7 +8,7 @@ exports.run = {
       isPrefix,
       command
    }) => {
-      let setting = global.db.groups[m.chat]
+      let setting = global.db.groups.find(v => v.jid == m.chat)
       let rows = [{
          title: Func.ucword(command),
          rowId: `${isPrefix + command} on`,

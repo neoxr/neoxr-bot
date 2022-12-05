@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['tiktok', 'tikmp3', 'tikwm'],
+   hidden: ['tt'],
    use: 'link',
    category: 'downloader',
    async: async (m, {
@@ -15,7 +16,7 @@ exports.run = {
          let old = new Date()
          let json = await Api.tiktok(Func.ttFixed(args[0]))
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-         if (command == 'tiktok') return client.sendButton(m.chat, json.data.video, `If you want to get the *original sound* press the button below.\n🍟 *Fetching* : ${((new Date - old) * 1)} ms`, ``, m, [{
+         if (command == 'tiktok' || command == 'tt') return client.sendButton(m.chat, json.data.video, `If you want to get the *original sound* press the button below.\n🍟 *Fetching* : ${((new Date - old) * 1)} ms`, ``, m, [{
             buttonId: `${isPrefix}tikmp3 ${args[0]}`,
             buttonText: {
                displayText: 'Backsound'

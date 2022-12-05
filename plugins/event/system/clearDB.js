@@ -4,19 +4,20 @@ exports.run = {
    }) => {
       try {
          setInterval(async () => {
-            let day = 86400000 * 7,
+            let day = 86400000 * 3,
                now = new Date() * 1
-            for (let jid in global.db.users) {
-               if (now - global.db.users[jid].lastseen > day && !global.db.users[jid].premium && !global.db.users[jid].banned && global.db.users[jid].point < 5000000) delete global.db.users[jid]
-            }
-            for (let jid in global.db.chats) {
-               if (now - global.db.chats[jid].lastseen > day) delete global.db.chats[jid]
-            }
-            for (let jid in global.db.groups) {
-               if (now - global.db.groups[jid].activity > day && !global.db.groups[jid].stay && global.db.groups[jid].expired == 0) {
-                  delete global.db.groups[jid]
-               }
-            }
+            global.db.groups.filter(v => now - v.lastseen > day && !v.premium && !v.banned && v.point < 1000000).map(x => {
+               let user = global.db.users.find(x => x.jid == v.jid)
+               if (user) Func.removeItem(global.db.users, user)
+            })
+            global.db.chats.filter(v => now - v.lastseen > day).map(v => {
+               let chat = global.db.chats.find(x => x.jid == v.jid)
+               if (chat) Func.removeItem(global.db.chats, chat)
+            })
+            global.db.groups.filter(v => now - v.lastseen > day).map(v => {
+               let group = global.db.groups.find(x => x.jid == v.jid)
+               if (group) Func.removeItem(global.db.groups, group)
+            })
          }, 60_000)
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)

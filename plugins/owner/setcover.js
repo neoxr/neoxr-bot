@@ -17,8 +17,8 @@ exports.run = {
          let link = await scrap.uploadImage(img)
          setting.cover = link
          client.reply(m.chat, Func.texted('bold', `🚩 Cover successfully set.`), m)
-      } catch {
-         return client.reply(m.chat, global.status.error, m)
+      } catch (e) {
+         return client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    owner: true,

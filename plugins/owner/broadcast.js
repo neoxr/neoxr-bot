@@ -15,15 +15,16 @@ exports.run = {
          let groupJid = await (await groupList()).map(v => v.id)
          const id = command == 'bc' ? chatJid : groupJid
          if (id.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Error, ID does not exist.`), m)
+         client.sendReact(m.chat, '🕒', m.key)
          if (text) {
             for (let jid of id) {
                await Func.delay(1500)
                await client.sendMessageModify(jid, text, null, {
-                  title: '© neoxr-bot v2.2.0 (Public Bot)',
+                  title: global.botname,
                   thumbnail: await Func.fetchBuffer('https://telegra.ph/file/aa76cce9a61dc6f91f55a.jpg'),
                   largeThumb: true,
-                  url: 'https://chat.whatsapp.com/Dh1USlrqIfmJT6Ji0Pm2pP',
-                  mentionedJid: command == 'bcgc' ? await (await client.groupMetadata(jid)).participants.map(v => v.id) : []
+                  url: global.db.setting.link,
+                  mentions: command == 'bcgc' ? await (await client.groupMetadata(jid)).participants.map(v => v.id) : []
                })
             }
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
@@ -52,7 +53,7 @@ exports.run = {
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
          } else client.reply(m.chat, Func.texted('bold', `🚩 Media / text not found or media is not supported.`), m)
       } catch (e) {
-         client.reply(m.chat, Func.texted('bold', `🚩 Media / text not found or media is not supported.`), m)
+         client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    owner: true

@@ -23,24 +23,18 @@ exports.run = {
       } catch (e) {} finally {
          let is_user = global.db.users
          let is_owner = [global.client.user.id.split`@` [0], global.owner, ...global.db.setting.owners].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(user)
-         if (typeof is_user[user] == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 User data not found.`), m)
+         if (!is_user.some(v => v.jid == user)) return client.reply(m.chat, Func.texted('bold', `🚩 User data not found.`), m)
          if (command == 'ban') {
             if (is_owner) return client.reply(m.chat, Func.texted('bold', `🚩 Can't banned owner number.`), m)
-            if (user == client.user.id) return client.reply(m.chat, Func.texted('bold', `🚩 ??.`), m)
-            if (is_user[user].banned) return client.reply(m.chat, Func.texted('bold', `🚩 Target already banned.`), m)
-            is_user[user].banned = true
-            let banned = 0
-            for (let jid in is_user) {
-               if (is_user[jid].banned) banned++
-            }
+            if (user == client.user.id) return client.reply(m.chat, Func.texted('bold', `🚩 ??`), m)
+            if (is_user.find(v => v.jid == user).banned) return client.reply(m.chat, Func.texted('bold', `🚩 Target already banned.`), m)
+            is_user.find(v => v.jid == user).banned = true
+            let banned = is_user.filter(v => v.banned).length
             client.reply(m.chat, `乂  *B A N N E D*\n\n*“Successfully added @${user.split`@`[0]} into banned list.”*\n\n*Total : ${banned}*`, m)
          } else if (command == 'unban') {
-            if (!is_user[user].banned) return client.reply(m.chat, Func.texted('bold', `🚩 Target not banned.`), m)
-            is_user[user].banned = false
-            let banned = 0
-            for (let jid in is_user) {
-               if (is_user[jid].banned) banned++
-            }
+            if (!is_user.find(v => v.jid == user).banned) return client.reply(m.chat, Func.texted('bold', `🚩 Target not banned.`), m)
+            is_user.find(v => v.jid == user).banned = false
+            let banned = is_user.filter(v => v.banned).length
             client.reply(m.chat, `乂  *U N B A N N E D*\n\n*“Succesfully removing @${user.split`@`[0]} from banned list.”*\n\n*Total : ${banned}*`, m)
          }
       }

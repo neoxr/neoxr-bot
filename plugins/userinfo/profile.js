@@ -22,7 +22,7 @@ exports.run = {
             var user = number + '@s.whatsapp.net'
          }
       } catch (e) {} finally {
-         let target = global.db.users[user]
+         let target = global.db.users.find(v => v.jid == user)
          if (typeof target == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
          try {
             pic = await Func.fetchBuffer(await client.profilePictureUrl(user, 'image'))
@@ -34,11 +34,11 @@ exports.run = {
             let caption = `乂  *U S E R - P R O F I L E*\n\n`
             caption += `	◦ *Limit* : ${Func.formatNumber(target.limit)}\n`
             caption += `	◦ *Hitstat* : ${Func.formatNumber(target.hit)}\n`
-            caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups[m.chat].member[user] != 'undefined' ? global.db.groups[m.chat].member[user].warning : 0) + ' / 5' : target.warning + ' / 5')}\n\n`
+            caption += `	◦ *Warning* : ${((m.isGroup) ? (typeof global.db.groups.find(v => v.jid == m.chat).member[user] != 'undefined' ? global.db.groups.find(v => v.jid == m.chat).member[user].warning : 0) + ' / 5' : target.warning + ' / 5')}\n\n`
             caption += `乂  *U S E R - S T A T U S*\n\n`
             caption += `	◦ *Blocked* : ${(blocked ? '√' : '×')}\n`
             caption += `	◦ *Banned* : ${(new Date - target.banTemp < global.timer) ? Func.toTime(new Date(target.banTemp + global.timer) - new Date()) + ' (' + ((global.timer / 1000) / 60) + ' min)' : target.banned ? '√' : '×'}\n`
-            caption += `	◦ *Use In Private* : ${(Object.keys(global.db.chats).includes(user) ? '√' : '×')}\n`
+            caption += `	◦ *Use In Private* : ${(global.db.chats.map(v => v.jid).includes(user) ? '√' : '×')}\n`
             caption += `	◦ *Premium* : ${(target.premium ? '√' : '×')}\n`
             caption += `	◦ *Expired* : ${target.expired == 0 ? '-' : Func.timeReverse(target.expired - new Date() * 1)}\n\n`
             caption += global.footer

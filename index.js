@@ -2,6 +2,7 @@ console.log('Starting . . .')
 require('dotenv').config(), require('rootpath')(), require('./server')
 const { spawn: spawn } = require('child_process'), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts')
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+process.on('uncaughtException', console.error)
 
 function start() {
 	let args = [path.join(__dirname, 'client.js'), ...process.argv.slice(2)]

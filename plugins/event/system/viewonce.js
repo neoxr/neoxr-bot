@@ -1,10 +1,11 @@
 exports.run = {
    async: async (m, {
       client,
-      body
+      body,
+      isOwner
    }) => {
       try {
-         if (m.msg && m.msg.viewOnce) {
+         if (m.msg && m.msg.viewOnce && !isOwner) {
             let media = await client.downloadMediaMessage(m.msg)
             if (/image/.test(m.mtype)) {
                client.sendFile(m.chat, media, Func.filename('jpg'), body ? body : '', m)

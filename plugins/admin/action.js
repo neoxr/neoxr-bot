@@ -16,7 +16,7 @@ exports.run = {
          let mention = number.replace(/@.+/g, '')
          let users = m.isGroup ? participants.find(u => u.id == number) : {}
          if (!users) return client.reply(m.chat, Func.texted('bold', `🚩 @${mention} already logged out or does not exist in this group.`), m)
-         if (number  == client.user.id.split(':')[0] + 's.whatsapp.net') return client.reply(m.chat, Func.texted('bold', `??`), m)
+         if (number  == client.decodeJid(client.user.id))return client.reply(m.chat, Func.texted('bold', `??`), m)
          if (command == 'kick') return client.groupParticipantsUpdate(m.chat, [number], 'remove')
          if (command == 'demote') return client.groupParticipantsUpdate(m.chat, [number], 'demote')
       } catch (e) {

@@ -1,4 +1,4 @@
-const yt = require('usetube')
+const yts = require('yt-search')
 exports.run = {
    usage: ['play'],
    hidden: ['lagu', 'song'],
@@ -13,9 +13,9 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const search = await (await yt.searchVideo(text)).videos
+         const search = await (await yts(text)).all
          if (!search || search.length == 0) return client.reply(m.chat, global.status.fail, m)
-         const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=https://youtu.be/' + search[0].id + '&type=audio')
+         const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=https://youtu.be/' + search[0].videoId + '&type=audio')
          if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
@@ -41,6 +41,7 @@ exports.run = {
    },
    error: false,
    limit: true,
+   restrict: true,
    cache: true,
    location: __filename
 }

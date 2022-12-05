@@ -1,6 +1,7 @@
 exports.run = {
-   usage: ['chord'],
-   use: 'query',
+   usage: ['artinama'],
+   hidden: ['nama'],
+   use: 'name',
    category: 'utilities',
    async: async (m, {
       client,
@@ -9,11 +10,13 @@ exports.run = {
       command
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
+         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'megawati'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         let json = await Api.chord(text)
+         let json = await Api.nama(text)
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
-         client.reply(m.chat, json.data.chord, m)
+         let teks = `◦  *Nama* : ${Func.ucword(text)}\n`
+         teks += `◦  *Arti* : ${json.data.arti.split('arti:')[1]}`
+         client.reply(m.chat, teks, m)
       } catch {
          client.reply(m.chat, global.status.error, m)
       }

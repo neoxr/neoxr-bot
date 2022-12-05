@@ -4,7 +4,8 @@ exports.run = {
       client,
       body,
       users,
-      setting
+      setting,
+      prefixes
    }) => {
       try {
          const regex = /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/;
@@ -20,26 +21,28 @@ exports.run = {
                }
                client.sendReact(m.chat, '🕒', m.key)
                let old = new Date()
-               Func.hitstat('ytmp4', m.sender)
+               Func.hitstat('yt', m.sender)
                links.map(async link => {
-                  const json = await Func.fetchJson('https://yt.nxr.my.id/yt2?url=' + link + '&type=video')
-                  if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
-                  let caption = `乂  *Y T - M P 4*\n\n`
-                  caption += `	◦  *Title* : ${json.title}\n`
-                  caption += `	◦  *Size* : ${json.data.size}\n`
-                  caption += `	◦  *Duration* : ${json.duration}\n`
-                  caption += `	◦  *Quality* : ${json.data.quality}\n\n`
-                  caption += global.footer
-                  let chSize = Func.sizeLimit(json.data.size, global.max_upload)
-                  if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.data.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.data.url)).data.url}`, m)
-                  let isSize = (json.data.size).replace(/MB/g, '').trim()
-                  if (isSize > 99) return client.sendMessageModify(m.chat, caption, m, {
-                     largeThumb: true,
-                     thumbnail: await Func.fetchBuffer(json.thumbnail)
-                  }).then(async () => await client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
-                     document: true
+                  const json = await Func.fetchJson('https://yt.nxr.my.id/yt3?url=' + link)
+                  if (!json.status) return client.reply(m.chat, global.status.fail, m)
+                  let sections = [{
+                     title: 'Audio',
+                     rows: []
+                  }, {
+                     title: 'Video',
+                     rows: []
+                  }]
+                  json.data.mp3.map(v => sections[0].rows.push({
+                     title: `${v.q} (${v.size})`,
+                     rowId: `${prefixes[0]}convert ${link}|${json.id}|mp3|${v.k}|${v.size}|${json.token}|${json.expires}`,
+                     description: ``
                   }))
-                  client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
+                  json.data.mp4.map(v => sections[1].rows.push({
+                     title: `${v.q} (${v.size})`,
+                     rowId: `${prefixes[0]}convert ${link}|${json.id}|mp4|${v.k}|${v.size}|${json.token}|${json.expires}`,
+                     description: ``
+                  }))
+                  client.sendList(m.chat, '', `Choose type and quality 🍟`, '', 'Tap!', sections, m)
                })
             }
          }

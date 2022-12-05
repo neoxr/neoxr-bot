@@ -30,32 +30,36 @@ exports.run = {
             if (participants.some(u => u.id == user)) arr.push(group)
          }
          if (arr.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 No groups with bots.`), m)
-         for (let i = 0; i < arr.length; i++) {
-            if (arr[i].id in global.db.groups) {
-               let v = global.db.groups[arr[i].id]
+         arr.map(x => {
+            let v = global.db.groups.find(v => v.jid == x.id)
+            if (v) {
                rows.push({
-                  title: arr[i].subject,
-                  rowId: `${isPrefix}gc ${arr[i].id}`,
-                  description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
+                  title: x.subject,
+                  rowId: `${isPrefix}gc ${x.id}`,
+                  description: `[ ${v.stay ? 'FOREVER' : (v.expired == 0 ? 'NOT SET' : Func.timeReverse(v.expired - new Date() * 1))}  | ${x.participants.length} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')} ]`
                })
-            } else global.db.groups[arr[i].id] = {
-               activity: 0,
-               autoread: true,
-               antidelete: true,
-               antilink: false,
-               antivirtex: false,
-               filter: false,
-               left: false,
-               localonly: false,
-               mute: false,
-               member: {},
-               text_left: '',
-               text_welcome: '',
-               welcome: true,
-               expired: 0,
-               stay: false
+            } else {
+               global.db.groups.push({
+                  jid: x.id,
+                  activity: new Date * 1,
+                  autoread: true,
+                  antidelete: true,
+                  antilink: false,
+                  antivirtex: false,
+                  filter: false,
+                  game: true,
+                  left: false,
+                  localonly: false,
+                  mute: false,
+                  member: {},
+                  text_left: '',
+                  text_welcome: '',
+                  welcome: true,
+                  expired: 0,
+                  stay: false
+               })
             }
-         }
+         })
          client.sendList(m.chat, '', `Bot and @${user.replace(/@.+/,'')} are in same *${arr.length}* groups. 🍟`, '', 'Tap!', [{
             rows
          }], m)

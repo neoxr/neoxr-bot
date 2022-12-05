@@ -7,12 +7,12 @@ exports.run = {
       blockList
    }) => {
       try {
-         let users = Object.entries(global.db.users).length
-         let chats = Object.keys(global.db.chats).filter(v => v.endsWith('.net')).length
+         let users = global.db.users.length
+         let chats = global.db.chats.filter(v => v.jid.endsWith('.net')).length
          let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
          let groups = await (await groupList()).map(v => v.id).length
-         let banned = Object.entries(global.db.users).filter(([jid, data]) => data.banned).length
-         let premium = Object.entries(global.db.users).filter(([jid, data]) => data.premium).length
+         let banned = global.db.users.filter(v => v.banned).length
+         let premium = global.db.users.filter(v => v.premium).length
          class Hit extends Array {
             total(key) {
                return this.reduce((a, b) => a + (b[key] || 0), 0)

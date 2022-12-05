@@ -73,12 +73,12 @@ exports.run = {
             let now = new Date() * 1
             if (/1D|7D|30D/.test(dial)) {
                let day = 86400000 * parseInt(dial.replace('D', ''))
-               global.db.groups[jid].expired = now + day
-               global.db.groups[jid].stay = false
+               global.db.groups.find(v => v.jid == jid).expired = now + day
+               global.db.groups.find(v => v.jid == jid).stay = false
                return client.reply(m.chat, Func.texted('bold', `🚩 Bot duration is successfully set to stay for ${dial.replace('D', ' day')} di in ${groupName} group.`), m)
             } else if (dial == 1) {
-               global.db.groups[jid].expired = 0
-               global.db.groups[jid].stay = true
+               global.db.groups.find(v => v.jid == jid).expired = 0
+               global.db.groups.find(v => v.jid == jid).stay = true
                return client.reply(m.chat, Func.texted('bold', `🚩 Successfully set bot to stay forever in ${groupName} group.`), m)
             } else if (dial == 2) {
                if (!admin) return client.reply(m.chat, Func.texted('bold', `🚩 Can't get ${groupName} group link because the bot is not an admin.`), m)
@@ -88,16 +88,16 @@ exports.run = {
                   mentions: groupMetadata.participants.map(v => v.id)
                }).then(() => {
                   client.groupLeave(jid).then(() => {
-                     global.db.groups[jid].expired = 0
-                     global.db.groups[jid].stay = false
+                     global.db.groups.find(v => v.jid == jid).expired = 0
+                     global.db.groups.find(v => v.jid == jid).stay = false
                      return client.reply(m.chat, Func.texted('bold', `🚩 Successfully leave from ${groupName} group.`), m)
                   })
                })
             } else if (dial == 4) {
-               global.db.groups[jid].mute = true
+               global.db.groups.find(v => v.jid == jid).mute = true
                client.reply(m.chat, Func.texted('bold', `🚩 Bot successfully muted in ${groupName} group.`), m)
             } else if (dial == 5) {
-               global.db.groups[jid].mute = false
+               global.db.groups.find(v => v.jid == jid).mute = false
                client.reply(m.chat, Func.texted('bold', `🚩 Bot successfully unmuted in ${groupName} group.`), m)
             } else if (dial == 6) {
                if (!admin) return client.reply(m.chat, Func.texted('bold', `🚩 Can't close ${groupName} group link because the bot is not an admin.`), m)
@@ -114,7 +114,7 @@ exports.run = {
                   })
                })
             } else if (dial == 8) {
-               let set = global.db.groups[jid]
+               let set = global.db.groups.find(v => v.jid == jid)
                let time = set.stay ? 'FOREVER' : (set.expired == 0 ? 'NOT SET' : Func.timeReverse(set.expired - new Date() * 1))
                let member = groupMetadata.participants.map(u => u.id).length
                let pic = await client.profilePictureUrl(jid, 'image')
@@ -130,8 +130,8 @@ exports.run = {
                   thumbnail: await Func.fetchBuffer(pic)
                })
             } else if (dial == 9) {
-               global.db.groups[jid].expired = 0
-               global.db.groups[jid].stay = false
+               global.db.groups.find(v => v.jid == jid).expired = 0
+               global.db.groups.find(v => v.jid == jid).stay = false
                client.reply(m.chat, Func.texted('bold', `🚩 Duration of bot in the ${groupName} group has been successfully reset.`), m)
             }
          }

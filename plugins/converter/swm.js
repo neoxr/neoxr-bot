@@ -52,6 +52,7 @@ exports.run = {
          return client.reply(m.chat, global.status.error, m)
       }
    },
+   limit: true,
    cache: true,
    location: __filename
 }

@@ -8,7 +8,7 @@ exports.run = {
       isPrefix,
       command
    }) => {
-      let gc = global.db.groups[m.chat]
+      let gc = global.db.groups.find(v => v.jid == m.chat)
       let opt = [0, 1]
       let rows = [{
          title: 'True',

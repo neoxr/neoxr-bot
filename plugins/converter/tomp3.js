@@ -13,7 +13,7 @@ exports.run = {
    }) => {
       try {
          if (m.quoted && typeof m.quoted.buttons != 'undefined' && typeof m.quoted.videoMessage != 'undefined') {
-            client.reply(m.chat, global.status.wait, m)
+            client.sendReact(m.chat, '🕒', m.key)
             const media = await client.saveMediaMessage(m.quoted.videoMessage)
             const result = Func.filename('mp3')
             exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
@@ -32,7 +32,7 @@ exports.run = {
          } else {
             let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
             if (/ogg/.test(mime)) {
-               client.reply(m.chat, global.status.wait, m)
+               client.sendReact(m.chat, '🕒', m.key)
                let buffer = await m.quoted.download()
                const media = path.join(tmpdir(), Func.filename('mp3'))
                let save = create(media, buffer)
@@ -51,7 +51,7 @@ exports.run = {
                   })
                })
             } else if (/audio|video/.test(mime)) {
-               client.reply(m.chat, global.status.wait, m)
+               client.sendReact(m.chat, '🕒', m.key)
                const media = await client.saveMediaMessage(m.quoted ? m.quoted : m.msg)
                const result = Func.filename('mp3')
                exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
@@ -76,6 +76,7 @@ exports.run = {
       }
    },
    error: false,
+   limit: true,
    cache: true,
    location: __filename
 }

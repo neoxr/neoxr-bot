@@ -1,11 +1,13 @@
+require('./system/config')
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
-const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal')
-const spinnies = new (require('spinnies'))()
-const { Socket, Serialize, Scandir } = require('./system/extra')
-global.props = new (require('./system/dataset'))
-global.neoxr = new (require('./system/map'))
-global.Func = new (require('./system/function'))
-global.scrap = new (require('./system/scraper'))
+const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios'), spinnies = new (require('spinnies'))()
+global.component = new (require('nb-func'))
+const { Extra, Function, MongoDB, Scraper } = component
+const { Socket, Serialize, Scandir } = Extra
+MongoDB.db = global.database
+global.Func = Function
+global.props = MongoDB
+global.scrap = Scraper
 global.store = makeInMemoryStore({
    logger: pino().child({
       level: 'silent',
@@ -15,7 +17,7 @@ global.store = makeInMemoryStore({
 
 const connect = async () => {
    const { state, saveCreds } = await useMultiFileAuthState('session')
-   global.db = {users:{}, chats:{}, groups:{}, statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
+   global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    await props.save(global.db)
    global.client = Socket({
       logger: pino({
@@ -71,7 +73,7 @@ const connect = async () => {
          Scandir('./plugins').then(files => {
             global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
          }).catch(e => console.error(e))
-         require('./system/config'), require('./handler')(client, m)
+         require('./handler')(client, m)
       } catch (e) {
          console.log(e)
       }
@@ -90,9 +92,9 @@ const connect = async () => {
    client.ev.on('group-participants.update', async (room) => {
       let meta = await (await client.groupMetadata(room.id))
       let member = room.participants[0]
-      let text_welcome = `Thank you +tag for joining into +grup group.`
+      let text_welcome = `Thanks +tag for joining into +grup group.`
       let text_left = `+tag left from this group for no apparent reason.`
-      let groupSet = global.db.groups[room.id]
+      let groupSet = global.db.groups.find(v => v.jid == room.id)
       try {
          pic = await Func.fetchBuffer(await client.profilePictureUrl(member, 'image'))
       } catch {
@@ -100,7 +102,7 @@ const connect = async () => {
       }
       if (room.action == 'add') {
          if (groupSet.localonly) {
-            if (typeof global.db.users[member] != 'undefined' && !global.db.users[member].whitelist && !member.startsWith('62') || !member.startsWith('62')) {
+            if (global.db.users.some(v => v.jid == member) && !global.db.users.find(v => v.jid == member).whitelist && !member.startsWith('62') || !member.startsWith('62')) {
                client.reply(room.id, Func.texted('bold', `Sorry @${member.split`@`[0]}, this group is only for indonesian people and you will removed automatically.`))
                client.updateBlockStatus(member, 'block')
                return await Func.delay(2000).then(() => client.groupParticipantsUpdate(room.id, [member], 'remove'))
@@ -131,9 +133,9 @@ const connect = async () => {
    })
 
    setInterval(async () => {
-      if (global.db) await props.save()
-   }, 10_000)
-
+      if (global.db) await props.save(global.db)
+   }, 30_000)
+   
    return client
 }
 

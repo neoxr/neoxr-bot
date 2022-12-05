@@ -20,7 +20,7 @@ exports.run = {
             var user = number + '@s.whatsapp.net'
          }
       } catch (e) {} finally {
-         let data = global.db.users[user]
+         let data = global.db.users.find(v => v.jid == user)
          if (typeof data == 'undefined') return client.reply(m.chat, Func.texted('bold', `🚩 Can't find user data.`), m)
          if (command == '+prem') {
             if (data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 @${user.replace(/@.+/, '')} has become registered as a premium account.`), m)

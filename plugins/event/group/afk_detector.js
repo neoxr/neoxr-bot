@@ -7,7 +7,7 @@ exports.run = {
       try {
          let afk = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
          for (let jid of afk) {
-            let is_user = global.db.users[jid]
+            let is_user = global.db.users.find(v => v.jid == jid)
             if (!is_user) continue
             let afkTime = is_user.afk
             if (!afkTime || afkTime < 0) continue
