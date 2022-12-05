@@ -1,4 +1,3 @@
-require('./system/config')
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios'), spinnies = new (require('spinnies'))()
 global.component = new (require('nb-func'))
@@ -16,6 +15,7 @@ global.store = makeInMemoryStore({
 })
 
 const connect = async () => {
+   require('./system/config')
    const { state, saveCreds } = await useMultiFileAuthState('session')
    global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    await props.save(global.db)
