@@ -1,4 +1,4 @@
-# # # 乂 Non - Media Message
+### 乂  Non-Media Messages
 
 ```Javascript
 // send text
@@ -32,7 +32,7 @@ client.sendList(m.chat, 'This is header', `Hello everyone!`, '© neoxr-bot', 'Ta
    rows
 }], m)
          
-// send button text
+// send text button
 const buttons = [{
    buttonId: `.a`,
    buttonText: {
