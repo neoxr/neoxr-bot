@@ -19,6 +19,14 @@ exports.run = {
                title: `STYLE 2`,
                rowId: `${isPrefix + command} 2`,
                description: ''
+            }, {
+               title: `STYLE 3`,
+               rowId: `${isPrefix + command} 3`,
+               description: ''
+            }, {
+               title: `STYLE 4`,
+               rowId: `${isPrefix + command} 4`,
+               description: ''
             }]
             client.sendList(m.chat, '', `Choose menu style. 🍟`, '', 'Tap!', [{
                rows
