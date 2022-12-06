@@ -43,7 +43,7 @@ exports.run = {
             teks += '	◦  *Link* : ' + json.data.playstore + '\n\n'
             teks += global.footer
             let chSize = Func.sizeLimit(json.file.size, global.max_upload)
-            if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.file.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await Func.shorten(json.file.url)).data.url}`, m)
+            if (chSize.oversize) return client.reply(m.chat, `💀 File size (${json.file.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await scrap.shorten(json.file.url)).data.url}`, m)
             client.sendFile(m.chat, json.data.thumbnail, '', teks, m).then(() => {
                client.sendFile(m.chat, json.file.url, json.file.filename, '', m)
             })
