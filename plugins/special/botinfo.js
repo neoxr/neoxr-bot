@@ -20,11 +20,8 @@ exports.run = {
 let info = () => {
    return `This bot was created and developed with the purpose of *learning*.
    
-1. Single Auth
+Source :
 - https://github.com/neoxr/neoxr-bot
-
-2. Multi Auth
-- https://github.com/neoxr/neoxr-bot/tree/multi-auth
 
 65% of the data sent from this bot comes from Rest API: https://api.neoxr.my.id`
 }
@@ -32,7 +29,7 @@ let info = () => {
 const tnc = () => {
    return `➠ User, group, and chat data will be deleted automatically if no activity is detected for 7 days (reason: database cleaning).
 
-➠ Free users get ${global.limit} / day and will reset automatically at 00.00.
+➠ Free users get ${global.limit} / day and will reset after 12 hours
 
 ➠ Don't spam, pause each command usage for ${global.cooldown} seconds.
 

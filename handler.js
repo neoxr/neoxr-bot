@@ -1,5 +1,4 @@
-const moment = require('moment-timezone')
-moment.tz.setDefault(global.timezone)
+const cron = require('node-cron')
 module.exports = async (client, m) => {
    try {
       require('./system/database')(m)
@@ -60,10 +59,15 @@ module.exports = async (client, m) => {
          users.afk = -1
          users.afkReason = ''
       }
-      if (moment(new Date).format('HH:mm') == '00:00') {
+      // reset limit and hitdaily every 12 hours
+      cron.schedule('00 12 * * *', () => {
+         setting.lastReset = new Date * 1
          global.db.users.filter(v => v.limit < global.limit && !v.premium).map(v => v.limit = global.limit)
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
-      }
+      }, {
+         scheduled: true,
+         timezone: global.timezone
+      })
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
          if (!groupSet.member[m.sender]) {
