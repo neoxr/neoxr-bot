@@ -179,7 +179,7 @@ exports.run = {
             let print = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting())
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
-               print += '\n\n–  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
+               print += '\n\n –  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
                let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
