@@ -173,7 +173,7 @@ module.exports = async (client, m) => {
                continue
             }
             if (cmd.restrict && !isOwner && text && new RegExp('\\b' + global.db.setting.toxic.join('\\b|\\b') + '\\b').test(text.toLowerCase())) {
-               client.reply(m.chat, `🚩 You violated the *Terms & Conditions* of using bots by using blacklisted keywords, as a penalty for your violation being blocked and banned. To unblock and get banned you have to pay *Rp. 10,000,-*`, m).then(() => {
+               client.reply(m.chat, `🚩 You violated the *Terms & Conditions* of using bots by using blacklisted keywords, as a penalty for your violation being blocked and banned. To unblock and unbanned you have to pay *Rp. 10,000,-*`, m).then(() => {
                   users.banned = true
                   client.updateBlockStatus(m.sender, 'block')
                })
@@ -188,7 +188,7 @@ module.exports = async (client, m) => {
                continue
             }
             if (cmd.limit && users.limit < 1) {
-               return client.reply(m.chat, `🚩 Your bot usage has reached the limit and will be reset at 00.00\n\nTo get more limits, upgrade to a premium plan send *${prefixes[0]}premium*`, m).then(() => users.premium = false)
+               return client.reply(m.chat, `🚩 Your bot usage has reached the limit and will be will be reset after 12 hours.\n\nTo get more limits, upgrade to a premium plan send *${prefixes[0]}premium*`, m).then(() => users.premium = false)
                continue
             }
             if (cmd.limit && users.limit > 0) {
