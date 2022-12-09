@@ -1,6 +1,6 @@
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
-const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios'), spinnies = new (require('spinnies'))()
-global.component = new (require('nb-func'))
+const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
+global.component = new (require('fuckers'))
 const { Extra, Function, MongoDB, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
 if (process.env.DATABASE_URL) {
@@ -44,19 +44,11 @@ const connect = async () => {
             small: true
          })
       }
-      if (connection === 'connecting') spinnies.add('start', {
-         text: 'Connecting . . .'
-      })
       if (connection === 'open') {
-         spinnies.succeed('start', {
-            text: `Connected, you login as ${client.user.name || client.user.verifiedName}`
-         })
-      }
-      if (connection === 'close') {
+         console.log(colors.green(`Connected, you login as ${client.user.name || client.user.verifiedName}`))
+      } else if (connection === 'close') {
          if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
-            spinnies.fail('start', {
-               text: `Can't connect to Web Socket`
-            })
+            console.log(colors.red(`Can't connect to Web Socket`))
             await props.save()
             process.exit(0)
          } else {

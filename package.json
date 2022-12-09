@@ -7,7 +7,7 @@
       "start":"node ."
    },
    "engines":{
-      "node":"14.x",
+      "node":"16.x",
       "npm":"8.x"
    },
    "repository":{
@@ -20,16 +20,16 @@
    "author":"Wildan Izzudin",
    "license":"ISC",
    "dependencies":{
+      "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors":"1.5.0",
+      "baileys":"6.0.3",
       "cfonts":"~2.10.0",
-      "child_process":"~1.0.2",
       "express": "~4.16.4",
-      "nb-func": "^1.2.1",
+      "fuckers": "^1.0.0",
       "network-speed": "^2.1.1",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
       "pino":"~7.0.5",
-      "spinnies":"~0.5.1",
       "translate-google-api": "~1.0.4",
       "yt-search": "~2.10.0"
    },

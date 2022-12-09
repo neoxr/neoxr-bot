@@ -1,14 +1,14 @@
 { pkgs }: {
     deps = [
-        pkgs.nodejs
+        pkgs.nodejs-16_x
         pkgs.openssh_with_kerberos
         pkgs.nodePackages.typescript
+        pkhs.nodePackages.forever
         pkgs.arcan.ffmpeg
         pkgs.libwebp
         pkgs.imagemagick
         pkgs.git
         pkgs.wget
-        pkgs.yarn
         pkgs.libuuid
     ];
     env = {
