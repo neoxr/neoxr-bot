@@ -17,7 +17,7 @@ function start() {
 	})
 	.on('exit', code => {
 		console.error('Exited with code:', code)
-		if (code == 1) start()
+		start()
 	})
 }
 
