@@ -1,3 +1,4 @@
+const fs = require('fs')
 exports.run = {
    usage: ['menu', 'help', 'bot', 'command'],
    hidden: ['menutype'],
@@ -7,6 +8,14 @@ exports.run = {
       isPrefix
    }) => {
       try {
+         client.menu = client.menu ? client.menu : {}
+         const id = m.chat
+         if ((id in client.menu)) {
+            await client.sendReact(m.chat, '😡', m.key)
+            return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
+         }       
+         const local_size = fs.existsSync('./' + global.database + '.json') ? await Func.getSize(fs.statSync('./' + global.database + '.json').size) : ''
+         const message = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? 'Mongo' : `Local (${local_size})`)).replace('+version', JSON.parse(require('fs').readFileSync('./package.json', 'utf-8')).dependencies.baileys)
          const style = global.db.setting.menuStyle
          if (style == 1) {
             if (text) {
@@ -54,9 +63,14 @@ exports.run = {
                      description: ``
                   })
                }
-               await client.sendList(m.chat, '', global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()), global.botname, 'Tap!', [{
-                  rows
-               }], m)
+               client.menu[id] = [
+                  await client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
+                     rows
+                  }], m),
+                  setTimeout(() => {
+                     delete client.menu[id]
+                  }, 180000)
+               ]
             }
          } else if (style == 2) {
             let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
@@ -73,7 +87,7 @@ exports.run = {
                }
             }
             const keys = Object.keys(category).sort()
-            let print = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting())
+            let print = message
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n乂  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
@@ -98,11 +112,16 @@ exports.run = {
                })
                print += commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `	◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
             }
-            client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-               ads: false,
-               largeThumb: true,
-               url: global.db.setting.link
-            })
+            client.menu[id] = [
+               await client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
+                  ads: false,
+                  largeThumb: true,
+                  url: global.db.setting.link
+               }),
+               setTimeout(() => {
+                  delete client.menu[id]
+               }, 180000)
+            ]
          } else if (style == 3) {
             if (text) {
                let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
@@ -157,9 +176,14 @@ exports.run = {
                      description: ``
                   })
                }
-               await client.sendList(m.chat, '', global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()), global.botname, 'Tap!', [{
-                  rows
-               }], m)
+               client.menu[id] = [
+                  await client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
+                     rows
+                  }], m),
+                  setTimeout(() => {
+                     delete client.menu[id]
+                  }, 180000)
+               ]
             }
          } else if (style == 4) {
             let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
@@ -176,7 +200,7 @@ exports.run = {
                }
             }
             const keys = Object.keys(category).sort()
-            let print = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting())
+            let print = message
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n –  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
@@ -209,11 +233,16 @@ exports.run = {
                   }
                }).join('\n')
             }
-            client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-               ads: false,
-               largeThumb: true,
-               url: global.db.setting.link
-            })
+            client.menu[id] = [
+               await client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
+                  ads: false,
+                  largeThumb: true,
+                  url: global.db.setting.link
+               }),
+               setTimeout(() => {
+                  delete client.menu[id]
+               }, 180000)
+            ]
          }
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
