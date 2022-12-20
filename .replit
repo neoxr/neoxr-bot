@@ -1,4 +1,4 @@
-run = "clear && forever index.js"
+run = "clear && node --max-old-space-size=8046 index.js"
 
 [nix]
 channel = "stable-21_11"
