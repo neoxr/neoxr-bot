@@ -10,10 +10,6 @@ exports.run = {
       try {
          client.menu = client.menu ? client.menu : {}
          const id = m.chat
-         if ((id in client.menu)) {
-            await client.sendReact(m.chat, '😡', m.key)
-            return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
-         }       
          const local_size = fs.existsSync('./' + global.database + '.json') ? await Func.getSize(fs.statSync('./' + global.database + '.json').size) : ''
          const message = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? 'Mongo' : `Local (${local_size})`)).replace('+version', JSON.parse(require('fs').readFileSync('./package.json', 'utf-8')).dependencies.baileys)
          const style = global.db.setting.menuStyle
@@ -63,16 +59,15 @@ exports.run = {
                      description: ``
                   })
                }
-               client.menu[id] = [
-                  await client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
-                     rows
-                  }], m),
-                  setTimeout(() => {
-                     delete client.menu[id]
-                  }, 180000)
-               ]
+               client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
+                  rows
+               }], m)
             }
          } else if (style == 2) {
+            if ((id in client.menu)) {
+               await client.sendReact(m.chat, '😡', m.key)
+               return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
+            }
             let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
@@ -176,16 +171,15 @@ exports.run = {
                      description: ``
                   })
                }
-               client.menu[id] = [
-                  await client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
-                     rows
-                  }], m),
-                  setTimeout(() => {
-                     delete client.menu[id]
-                  }, 180000)
-               ]
+               client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
+                  rows
+               }], m)
             }
          } else if (style == 4) {
+            if ((id in client.menu)) {
+               await client.sendReact(m.chat, '😡', m.key)
+               return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
+            }
             let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
@@ -248,5 +242,7 @@ exports.run = {
          client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
-   error: false
+   error: false,
+   cache: true,
+   location: __filename
 }
