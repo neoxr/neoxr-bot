@@ -6,7 +6,7 @@ exports.run = {
          setInterval(async () => {
             let day = 86400000 * 3,
                now = new Date() * 1
-            global.db.groups.filter(v => now - v.lastseen > day && !v.premium && !v.banned && v.point < 1000000).map(x => {
+            global.db.users.filter(v => now - v.lastseen > day && !v.premium && !v.banned && v.point < 1000000).map(v => {
                let user = global.db.users.find(x => x.jid == v.jid)
                if (user) Func.removeItem(global.db.users, user)
             })

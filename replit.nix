@@ -3,6 +3,7 @@
         pkgs.nodejs
         pkgs.openssh_with_kerberos
         pkgs.nodePackages.typescript
+        pkgs.nodePackages.pm2
         pkgs.arcan.ffmpeg
         pkgs.libwebp
         pkgs.imagemagick
