@@ -31,6 +31,11 @@ module.exports = class NeoxrApi {
       return json
    }
    
+   igh = async (str) => {
+      let json = await Func.fetchJson(this.baseUrl + '/igh?url=' + str + '&apikey=' + this.apiKey)
+      return json
+   }
+   
    line = async (url) => {
       let json = await Func.fetchJson(this.baseUrl + '/line?url=' + url + '&apikey=' + this.apiKey)
       return json
