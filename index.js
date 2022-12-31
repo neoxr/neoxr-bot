@@ -11,7 +11,6 @@ function start() {
 		if (data == 'reset') {
 			console.log('Restarting...')
 			p.kill()
-			start()
 			delete p
 		}
 	})
