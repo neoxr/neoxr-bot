@@ -130,11 +130,6 @@ const connect = async () => {
       if (global.db) await props.save(global.db)
    }, 30_000)
    
-   setInterval(async () => {
-      const session = await Scandir('./session')
-      session.filter(v => v != 'creds.json').map(v => v && fs.unlinkSync(v))
-   }, 60_000)
-   
    return client
 }
 
