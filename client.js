@@ -132,7 +132,7 @@ const connect = async () => {
    
    setInterval(async () => {
       const session = await Scandir('./session')
-      session.filter(v != 'creds.json').map(v => v && fs.unlinkSync(v))
+      session.filter(v => v != 'creds.json').map(v => v && fs.unlinkSync(v))
    }, 60_000)
    
    return client
