@@ -280,7 +280,7 @@ module.exports = async (client, m) => {
       }
    } catch (e) {
       console.log(e)
-      if (!m.fromMe) m.reply(Func.jsonFormat(e))
+      // if (!m.fromMe) m.reply(Func.jsonFormat(e))
    }
 }
 
