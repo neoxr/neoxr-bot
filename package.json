@@ -22,7 +22,7 @@
    "dependencies": {
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "1.5.0",
-      "baileys": "6.0.1",
+      "baileys": "4.5.8",
       "cfonts": "~2.10.0",
       "express": "~4.16.4",
       "fuckers": "^1.0.0",
