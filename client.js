@@ -1,4 +1,4 @@
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('bails')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, Scraper } = component
@@ -26,10 +26,31 @@ const connect = async () => {
          level: 'silent'
       }),
       printQRInTerminal: true,
+      patchMessageBeforeSending: (message) => {
+         const requiresPatch = !!(
+            message.buttonsMessage ||
+            message.templateMessage ||
+            message.listMessage
+         );
+         if (requiresPatch) {
+            message = {
+               viewOnceMessage: {
+                  message: {
+                     messageContextInfo: {
+                        deviceListMetadataVersion: 2,
+                        deviceListMetadata: {},
+                     },
+                     ...message,
+                  },
+               },
+            };
+         }
+         return message
+      },
       browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
       auth: state,
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2245, 9]
+      version: [2, 2247, 7]
    })
 
    store.bind(client.ev)
