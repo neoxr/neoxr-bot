@@ -1,6 +1,6 @@
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
-global.component = new (require('fuckers'))
+global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
 if (process.env.DATABASE_URL) {
