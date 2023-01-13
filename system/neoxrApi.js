@@ -148,4 +148,9 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/' + (image ? 'goimg' : 'google') + '?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
+   
+   nama = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/artinama?nama=' + query + '&apikey=' + this.apiKey)
+      return json
+   }  
 }
