@@ -13,7 +13,7 @@ exports.run = {
          if (command == 'cerpen') {
             client.sendReact(m.chat, '🕒', m.key)
             const json = await Api.cerpenList(args[0])
-            if (!json.status && json.category_list) return m.reply(`*Category List* :\n\n${json.category_list.map(v => `- ${Func.ucwords(v)}`).join('\n')}`)
+            if (!json.status && json.category_list) return m.reply(`*Category List* :\n\n${json.category_list.map(v => `- ${Func.ucword(v)}`).join('\n')}`)
             if (!json.status) return m.reply(Func.jsonFormat(json))
             let rows = []
             json.data.map(v => rows.push({
