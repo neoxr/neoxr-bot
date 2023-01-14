@@ -7,6 +7,7 @@ exports.run = {
       command
    }) => {
       try {
+         client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.cerpen(command.split`-` [1].trim())
          if (!json.status) return m.reply(Func.jsonFormat(json))
          let text = `*${json.data.title.toUpperCase()}*\n`

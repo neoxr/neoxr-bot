@@ -1,7 +1,7 @@
 exports.run = {
    usage: ['cerpen'],
    hidden: ['cerpenget'],
-   use: 'category (optional)',
+   use: 'category',
    category: 'e - perpus',
    async: async (m, {
       client,
@@ -11,7 +11,9 @@ exports.run = {
    }) => {
       try {
          if (command == 'cerpen') {
+            client.sendReact(m.chat, '🕒', m.key)
             const json = await Api.cerpenList(args[0])
+            if (!json.status && json.category_list) return m.reply(`*Category List* :\n\n${json.category_list.map(v => `- ${Func.ucwords(v)}`).join('\n')}`)
             if (!json.status) return m.reply(Func.jsonFormat(json))
             let rows = []
             json.data.map(v => rows.push({
@@ -24,6 +26,7 @@ exports.run = {
             }], m)
          } else if (command == 'cerpenget') {
             if (!args || !args[0]) return
+            client.sendReact(m.chat, '🕒', m.key)
             const json = await Api.cerpenFetch(args[0])
             if (!json.status) return m.reply(Func.jsonFormat(json))
             let text = `*${json.data.title.toUpperCase()}*\n`
