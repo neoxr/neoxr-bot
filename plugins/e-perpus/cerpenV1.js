@@ -16,7 +16,7 @@ exports.run = {
             let rows = []
             json.data.map(v => rows.push({
                title: v.title,
-               rowId: `${isPrefix}cerpenget ${v.url}`
+               rowId: `${isPrefix}cerpenget ${v.url}`,
                description: ``
             }))
             client.sendList(m.chat, '', `Choose one 🍟`, '', 'Tap!', [{
