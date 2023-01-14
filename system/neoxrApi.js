@@ -152,5 +152,20 @@ module.exports = class NeoxrApi {
    nama = async (query) => {
       let json = await Func.fetchJson(this.baseUrl + '/artinama?nama=' + query + '&apikey=' + this.apiKey)
       return json
-   }  
+   }
+   
+   cerpen = async (category) => {
+      let json = await Func.fetchJson(this.baseUrl + '/cerpen?category=' + category + '&apikey=' + this.apiKey)
+      return json
+   }
+
+   cerpenList = async (category) => {
+      let json = await Func.fetchJson(this.baseUrl + '/cerpen-list?category=' + category + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   cerpenFetch = async (url) => {
+      let json = await Func.fetchJson(this.baseUrl + '/cerpen-get?url=' + url + '&apikey=' + this.apiKey)
+      return json
+   }
 }
