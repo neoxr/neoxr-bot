@@ -168,4 +168,9 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/cerpen-get?url=' + url + '&apikey=' + this.apiKey)
       return json
    }
+   
+   cnn = async (url) => {
+      let json = url ? await Func.fetchJson(this.baseUrl + '/cnn?url=url&apikey=' + this.apiKey) : await Func.fetchJson(this.baseUrl + '/cnn?apikey=' + this.apiKey)
+      return json
+   }
 }
