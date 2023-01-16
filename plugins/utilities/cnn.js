@@ -1,7 +1,6 @@
 exports.run = {
    usage: ['cnn'],
    hidden: ['cnnget'],
-   use: 'category',
    category: 'utilities',
    async: async (m, {
       client,

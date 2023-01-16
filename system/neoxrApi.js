@@ -170,7 +170,7 @@ module.exports = class NeoxrApi {
    }
    
    cnn = async (url) => {
-      let json = url ? await Func.fetchJson(this.baseUrl + '/cnn?url=url&apikey=' + this.apiKey) : await Func.fetchJson(this.baseUrl + '/cnn?apikey=' + this.apiKey)
+      let json = url ? await Func.fetchJson(this.baseUrl + '/cnn?url=' + url + '&apikey=' + this.apiKey) : await Func.fetchJson(this.baseUrl + '/cnn?apikey=' + this.apiKey)
       return json
    }
 }
