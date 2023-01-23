@@ -13,7 +13,7 @@ server.get('*', async (req, res) => {
 })
 
 server.listen(PORT, () => {
-   keepAlive()
+   // keepAlive()
    console.log(`Server running with port ${PORT}!`)
 })
 

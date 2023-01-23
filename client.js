@@ -1,4 +1,4 @@
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require('bails')
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(require('fs').existsSync('./node_modules/bails') ? 'bails' : 'baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, Scraper } = component
@@ -43,14 +43,23 @@ const connect = async () => {
                      ...message,
                   },
                },
-            };
+            }
          }
          return message
       },
       browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
       auth: state,
+      getMessage: async (key) => {
+         if (store) {
+            const msg = await store.loadMessage(key.remoteJid, key.id)
+            return msg.message || undefined
+         }
+         return {
+            conversation: 'hello'
+         }
+      },
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2247, 7]
+      version: [2, 2301, 6]
    })
 
    store.bind(client.ev)
