@@ -11,7 +11,8 @@ exports.run = {
          client.menu = client.menu ? client.menu : {}
          const id = m.chat
          const local_size = fs.existsSync('./' + global.database + '.json') ? await Func.getSize(fs.statSync('./' + global.database + '.json').size) : ''
-         const message = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? 'Mongo' : `Local (${local_size})`)).replace('+version', JSON.parse(require('fs').readFileSync('./package.json', 'utf-8')).dependencies.bails)
+         const library = JSON.parse(require('fs').readFileSync('./package.json', 'utf-8'))
+         const message = global.db.setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? 'Mongo' : `Local (${local_size})`)).replace('+version', (library.dependencies.bails ? library.dependencies.bails : library.dependencies.baileys).replace('^', '').replace('~', ''))
          const style = global.db.setting.menuStyle
          if (style == 1) {
             if (text) {
