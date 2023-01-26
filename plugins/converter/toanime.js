@@ -3,16 +3,10 @@ exports.run = {
    use: 'reply foto',
    category: 'converter',
    async: async (m, {
-      client,
-      text,
-      isPrefix,
-      command
+      client
    }) => {
-      try {
-         let exif = global.db.setting
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Hi | Dude'), m)
+      try {     
          client.sendReact(m.chat, '🕒', m.key)
-         let [top, bottom] = text.split`|`
          if (m.quoted ? m.quoted.message : m.msg.viewOnce) {
             let type = m.quoted ? Object.keys(m.quoted.message)[0] : m.mtype
             let q = m.quoted ? m.quoted.message[type] : m.msg
