@@ -210,7 +210,7 @@ module.exports = class NeoxrApi {
    }
    
    toAnime = async url => {
-   	let json = await Func.fetchJson('https://qq.indocoder.dev/?url=' + url)
-   	return json
+      let json = await Func.fetchJson('https://qq.indocoder.dev/?url=' + url)
+      return json
    }
 }
