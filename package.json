@@ -1,6 +1,6 @@
 {
    "name": "neoxr-self",
-   "version": "1.0.0",
+   "version": "2.3.1",
    "description": "WhatsApp Bot (Self Bot)",
    "main": "index.js",
    "engines": {
@@ -19,7 +19,6 @@
       "cfonts": "3.1.1",
       "express": "^4.18.2",
       "node-cron": "^3.0.0",
-      "nodemailer": "^6.9.0",
       "spinnies": "^0.5.1"
    }
 }

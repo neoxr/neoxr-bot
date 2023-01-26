@@ -8,10 +8,6 @@ global.timer = 1800000
 global.evaluate_chars = ['=>', '~>', '~', '>', '$']
 // Country code that will be automatically blocked by the system, when sending messages in private chat
 global.blocks = ['91', '92', '212']
-// Put target jid to forward friends story
-global.forwards = '6285221100126-1613705538@g.us'
-// Put target jid to directly message
-global.directly = '120363041423056255@g.us'
 // Get bid and key configuration for autoreply chat ai feature by registering at https://brainshop.ai
 global.chatai_bid = '167631'
 global.chatai_key = 'ShjoKsAlT7QKd2QO'
