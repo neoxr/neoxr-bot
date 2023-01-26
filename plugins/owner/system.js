@@ -1,20 +1,19 @@
-exports.run = {
-   usage: ['chatbot', 'debug', 'multiprefix', 'online', 'self', 'viewstory'],
-   use: 'on / off',
-   async: async (m, {
-      client,
-      args,
-      isPrefix,
-      command
-   }) => {
+neoxr.create(async (m, {
+   client,
+   args,
+   prefix,
+   command,
+   Func
+}) => {
+   try {
       let system = global.db.setting
       let rows = [{
          title: Func.ucword(command),
-         rowId: `${isPrefix + command} on`,
+         rowId: `${prefix + command} on`,
          description: `[ Status : ON ]`
       }, {
          title: Func.ucword(command),
-         rowId: `${isPrefix + command} off`,
+         rowId: `${prefix + command} off`,
          description: `[ Status : OFF ]`
       }]
       let type = command.toLowerCase()
@@ -30,8 +29,12 @@ exports.run = {
       if (system[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       system[type] = status
       client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
-   },
-   owner: true,
-   cache: true,
-   location: __filename
-}
+   } catch (e) {
+      client.reply(m.chat, Func.jsonFormat(e), m)
+   }
+}, {
+   usage: ['chatbot', 'noprefix', 'multiprefix', 'online', 'self', 'viewstory'],
+   use: 'on / off',
+   category: 'owner',
+   owner: true
+}, __filename)

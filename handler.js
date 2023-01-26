@@ -1,8 +1,16 @@
+const cron = require('node-cron'),
+   fs = require('fs'),
+   FormData = require('form-data'),
+   axios = require('axios'),
+   component = new(require('@neoxr/neoxr-js')),
+   { execSync } = require('child_process'),
+   { Function: Func, Logs, Scraper } = new(require('@neoxr/neoxr-js'))
+require('./lib/system/functions')
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault(global.timezone).locale('id')
 module.exports = async (client, m) => {
    try {
-      require('./system/database')(m)
+      require('./lib/system/schema')(m)
       const isOwner = [global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []
@@ -18,41 +26,30 @@ module.exports = async (client, m) => {
       if (!setting.online) await client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) await client.sendPresenceUpdate('available', m.chat)
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Func.jsonFormat(m), m)
-      if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
       if (m.chat.endsWith('broadcast') && setting.viewstory) await client.readMessages([m.key])
+      if (m.isGroup) groupSet.activity = new Date() * 1
       if (users) users.lastseen = new Date() * 1
       if (chats) {
-         chats.lastseen = new Date() * 1
+         chats.lastchat = new Date() * 1
          chats.chat += 1
       }
-      let getPrefix = body ? body.charAt(0) : ''
-      let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
-      require('./system/logs')(client, m, myPrefix)
+      cron.schedule('*/25 * * * *', () => {
+         process.send('reset')
+      }, {
+         scheduled: true,
+         timezone: global.timezone
+      })
+      const getPrefix = body ? body.charAt(0) : ''
+      const prefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
+      Logs(client, m, prefix)
       if (m.isBot || m.chat.endsWith('broadcast')) return
-      if (body && body == myPrefix) {
-         if (!isOwner) return
-         let old = new Date()
-         let banchat = setting.self ? true : false
-         if (!banchat) {
-            await client.reply(m.chat, Func.texted('bold', `Checking . . .`), m)
-            return client.reply(m.chat, Func.texted('bold', `Response Speed: ${((new Date - old) * 1)}ms`), m)
-         } else {
-            await client.reply(m.chat, Func.texted('bold', `Checking . . .`), m)
-            return client.reply(m.chat, Func.texted('bold', `Response Speed: ${((new Date - old) * 1)}ms (nonaktif)`), m)
-         }
-      }
-      let isPrefix,
-         isCommands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)).concat(Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)))
-      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && isCommands.includes((body.split` ` [0]).toLowerCase())) {
-         let args = body.replace(isPrefix, '').split` `.filter(v => v)
-         let command = args.shift().toLowerCase()
-         let start = body.replace(isPrefix, '')
-         let clean = start.trim().split` `.slice(1)
-         let text = clean.join` `
-         let prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
-         const is_commands = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage || prop.run.hidden))
-         let commands = Func.arrayJoin(Object.values(is_commands).map(v => v.run.usage)).concat(Func.arrayJoin(Object.values(is_commands).map(v => v.run.hidden))).filter(v => v)
-         let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
+      const commands = neoxr.plugins.filter(v => v.usage).map(v => v.usage).concat(neoxr.plugins.filter(v => v.hidden).map(v => v.hidden)).flat(Infinity)
+      const args = body && body.replace(prefix, '').split` `.filter(v => v)
+      const command = args && args.shift().toLowerCase()
+      const clean = body && body.replace(prefix, '').trim().split` `.slice(1)
+      const text = clean ? clean.join` ` : undefined
+      const prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
+      if (body && prefix && commands.includes(command) || body && !prefix && commands.includes(command) && setting.noprefix) {
          try {
             if (new Date() * 1 - chats.command > (global.cooldown * 1000)) {
                chats.command = new Date() * 1
@@ -63,81 +60,58 @@ module.exports = async (client, m) => {
             global.db.chats.push({
                jid: m.chat,
                chat: 1,
-               lastchat: 0,
-               lastseen: new Date() * 1,
+               lastchat: new Date() * 1,
                command: new Date() * 1
             })
          }
-         if (!commands.includes(command) && matcher.length > 0 && !setting.self) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + isPrefix + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
-         for (let name in is_commands) {
-            let cmd = is_commands[name].run
-            let turn = cmd.usage ? cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false : false
-            let turn_hidden = cmd.hidden ? cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false : false
-            if (body && global.evaluate_chars.some(v => body.startsWith(v)) && !body.startsWith(myPrefix)) return
-            if (!turn && !turn_hidden) continue
-            if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
+         let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
+         if (!commands.includes(command) && matcher.length > 0 && !setting.self) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + (prefix ? prefix : '') + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)       
+         if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
+         neoxr.plugins.map(async cmd => {
+            const turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
+            const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
+            const name = cmd.pluginName
+            if (!turn && !turn_hidden) return
             if (setting.self && !isOwner && !m.fromMe) return
-            if (cmd.cache && cmd.location) {
-               let file = require.resolve(cmd.location)
-               Func.reload(file)
-            }
-            if (cmd.error) {
-               client.reply(m.chat, global.status.errorF, m)
-               continue
-            }
-            if (cmd.owner && !isOwner) {
-               client.reply(m.chat, global.status.owner, m)
-               continue
-            }
+            if (cmd.owner && !isOwner) return client.reply(m.chat, global.status.owner, m)
             if (cmd.group && !m.isGroup) {
                client.reply(m.chat, global.status.group, m)
-               continue
+               return
             } else if (cmd.botAdmin && !isBotAdmin) {
                client.reply(m.chat, global.status.botAdmin, m)
-               continue
+               return
             } else if (cmd.admin && !isAdmin) {
                client.reply(m.chat, global.status.admin, m)
-               continue
+               return
             }
-            if (cmd.private && m.isGroup) {
-               continue
-            }
+            if (cmd.private && m.isGroup) return client.reply(m.chat, global.status.private, m)
             cmd.async(m, {
                client,
                args,
                text,
-               isPrefix: isPrefix ? isPrefix : '',
+               prefix: prefix ? prefix : '',
                command,
                participants,
                blockList,
                isOwner,
                isAdmin,
-               isBotAdmin
+               isBotAdmin,
+               Func,
+               Scraper,
+               execSync,
+               component
             })
-            break
-         }
+         })
       } else {
-         let prefixes = setting.multiprefix ? setting.prefix : [setting.onlyprefix]
-         const is_events = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => !prop.run.usage && !prop.run.hidden))
-         for (let name in is_events) {
-            let event = is_events[name].run
-            if (event.cache && event.location) {
-               let file = require.resolve(event.location)
-               Func.reload(file)
-            }
+         neoxr.plugins.filter(v => !v.usage).map(async event => {
+            let name = event.pluginName
             if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
-            if (setting.self && !['chatAI', 'exec', 'directly', 'anti_delete', 'viewonce'].includes(name) && !isOwner && !m.fromMe) continue
-            if (!m.isGroup && ['chatAI'].includes(name) && !setting.chatbot && chats && new Date() * 1 - chats.lastchat < global.timer) continue
-            if (event.cache && event.location) {
-               let file = require.resolve(event.location)
-               Func.reload(file)
-            }
-            if (event.error) continue
-            if (event.owner && !isOwner) continue
-            if (event.group && !m.isGroup) continue
-            if (event.botAdmin && !isBotAdmin) continue
-            if (event.admin && !isAdmin) continue
-            if (event.private && m.isGroup) continue
+            if (setting.self && !['chatbot', 'system_ev'].includes(name) && !isOwner && !m.fromMe) return
+            if (event.owner && !isOwner) return
+            if (event.group && !m.isGroup) return
+            if (event.botAdmin && !isBotAdmin) return
+            if (event.admin && !isAdmin) return
+            if (event.private && m.isGroup) return
             event.async(m, {
                client,
                body,
@@ -150,12 +124,15 @@ module.exports = async (client, m) => {
                chats,
                groupSet,
                groupMetadata,
-               setting
+               setting,
+               Func,
+               Scraper
             })
-         }
+         })
       }
    } catch (e) {
-      if (!m.fromMe) return m.reply(Func.jsonFormat(e))
+      console.log(e)
+      if (!m.fromMe) return m.reply(Func.jsonFormat(new Error('neoxr-bot encountered an error :' + e)))
    }
 }
 
