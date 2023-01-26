@@ -2,6 +2,8 @@
 
 An automated system (WhatsApp Bot) that can help to do something, search and get data / information only through WhatsApp.
 
+<p align="center"><img width="70%" src="https://telegra.ph/file/ba45f5d683053696f613d.jpg"></p>
+
 ### 乂  Database Setup
 
 This bot uses mongodb database, so you have to create an account on Mongodb Atlas.
@@ -27,7 +29,7 @@ $ node .
 
 **NOTE :** 
 
-1. Use node version **14.x** or **16.x** to avoid errors.
+1. Use node version **14.x** to avoid errors.
 2. If you find an error you can create an issue on this repo, don't ask me on whatsapp it's very annoying.
 3. This script is free and semi open source, you can get more apikey limit in **[Here](https://api.neoxr.my.id)**.
 
