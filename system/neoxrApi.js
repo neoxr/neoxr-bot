@@ -178,4 +178,39 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/gempa?apikey=' + this.apiKey)
       return json
    }
+   
+   asahotak = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/asahotak?apikey=' + this.apiKey)
+      return json
+   }
+   
+   whoami = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/whoami?apikey=' + this.apiKey)
+      return json
+   }
+   
+   whatword = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/whatword?apikey=' + this.apiKey)
+      return json
+   }
+   
+   whatflag = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/whatflag?apikey=' + this.apiKey)
+      return json
+   }
+   
+   whatsong = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/whatsong?apikey=' + this.apiKey)
+      return json
+   }
+   
+   tekateki = async () => {
+      let json = await Func.fetchJson(this.baseUrl + '/tekateki?apikey=' + this.apiKey)
+      return json
+   }
+   
+   toAnime = async url => {
+   	let json = await Func.fetchJson('https://qq.indocoder.dev/?url=' + url)
+   	return json
+   }
 }
