@@ -17,7 +17,7 @@ module.exports = class NeoxrApi {
    }
    
    fb = async (url) => {
-      let json = await Func.fetchJson(this.baseUrl + '/fb?url=' + url + '&apikey=' + this.apiKey)
+      let json = await Func.fetchJson(this.baseUrl + '/fb?url=' + encodeURIComponent(url) + '&apikey=' + this.apiKey)
       return json
    }
 

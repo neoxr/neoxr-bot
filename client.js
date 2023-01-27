@@ -1,3 +1,4 @@
+require('./system/config')
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(require('fs').existsSync('./node_modules/bails') ? 'bails' : 'baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
@@ -17,7 +18,6 @@ global.store = makeInMemoryStore({
 })
 
 const connect = async () => {
-   require('./system/config')
    const { state, saveCreds } = await useMultiFileAuthState('session')
    global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await props.fetch() ||{})}
    await props.save(global.db)
