@@ -1,9 +1,9 @@
-require('./system/config')
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(require('fs').existsSync('./node_modules/bails') ? 'bails' : 'baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
+require('./system/config')
 if (process.env.DATABASE_URL) {
    MongoDB.db = global.database
 }
