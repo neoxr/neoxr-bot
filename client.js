@@ -3,12 +3,12 @@ const pino = require('pino'), path = require('path'), fs = require('fs'), colors
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
+global.Func = Function
 require('./system/config')
 if (process.env.DATABASE_URL) {
    MongoDB.db = global.database
 }
 global.props = process.env.DATABASE_URL ? MongoDB : new(require('./system/localdb'))(global.database)
-global.Func = Function
 global.scrap = Scraper
 global.store = makeInMemoryStore({
    logger: pino().child({
