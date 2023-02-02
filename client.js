@@ -1,14 +1,14 @@
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(require('fs').existsSync('./node_modules/bails') ? 'bails' : 'baileys')
 const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
-const { Extra, Function, MongoDB, Scraper } = component
+const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
 global.Func = Function
 require('./system/config')
 if (process.env.DATABASE_URL) {
    MongoDB.db = global.database
 }
-global.props = process.env.DATABASE_URL ? MongoDB : new(require('./system/localdb'))(global.database)
+global.props = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./lib/system/localdb'))(global.database)
 global.scrap = Scraper
 global.store = makeInMemoryStore({
    logger: pino().child({
@@ -88,7 +88,6 @@ const connect = async () => {
    })
 
    client.ev.on('creds.update', saveCreds)
-
    client.ev.on('messages.upsert', async chatUpdate => {
       try {
          m = chatUpdate.messages[0]
