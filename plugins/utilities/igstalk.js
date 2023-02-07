@@ -14,18 +14,18 @@ exports.run = {
          let json = await Api.igstalk(args[0])
          if (!json.status) return client.reply(m.chat, Func.texted('bold', `🚩 Account not found.`), m)
          let caption = `乂  *I G - S T A L K*\n\n`
-         caption += `	◦  *Name* : ${json.data.full_name}\n`
+         caption += `	◦  *Name* : ${json.data.name}\n`
          caption += `	◦  *Username* : ${json.data.username}\n`
-         caption += `	◦  *Posts* : ${Func.formatNumber(json.data.edge_owner_to_timeline_media.count)}\n`
-         caption += `	◦  *Followers* : ${Func.formatNumber(json.data.edge_followed_by.count)}\n`
-         caption += `	◦  *Followings* : ${Func.formatNumber(json.data.edge_follow.count)}\n`
-         caption += `	◦  *Bio* : ${json.data.biography}\n`
-         caption += `	◦  *Private* : ${Func.switcher(json.data.is_private, '√', '×')}\n\n`
+         caption += `	◦  *Posts* : ${json.data.post}\n`
+         caption += `	◦  *Followers* : ${json.data.follower}\n`
+         caption += `	◦  *Followings* : ${json.data.following}\n`
+         caption += `	◦  *Bio* : ${json.data.about}\n`
+         caption += `	◦  *Private* : ${Func.switcher(json.data.private, '√', '×')}\n\n`
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             ads: false,
             largeThumb: true,
-            thumbnail: await Func.fetchBuffer(json.data.profile_pic_url)
+            thumbnail: await Func.fetchBuffer(json.data.photo)
          })
       } catch {
          return client.reply(m.chat, global.status.error, m)
