@@ -114,7 +114,7 @@ module.exports = class NeoxrApi {
       return this.baseUrl + '/effect?style=' + style + '&image=' + image + '&apikey=' + this.apiKey
    }
    
-   nobg = (image) => {
+   nobg = async (image) => {
       let json = await Func.fetchJson(this.baseUrl + '/nobg?image=' + image + '&apikey=' + this.apiKey)
       return json
    }
