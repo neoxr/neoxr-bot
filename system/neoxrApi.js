@@ -218,4 +218,9 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson('https://qq.indocoder.dev/?url=' + url)
       return json
    }
+   
+   spotify = async (url) => {
+      let json = await Func.fetchJson(this.baseUrl + '/spotify?url=' + url + '&apikey=' + this.apiKey)
+      return json
+   }
 }
