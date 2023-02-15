@@ -1,5 +1,5 @@
 // Owner number
-global.owner = '254711107992'
+global.owner = '254771371194'
 // Delay for spamming protection (Default : 3 seconds)
 global.cooldown = 3
 // Time to be temporarily banned and others (Default : 30 minutes)
