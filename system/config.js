@@ -14,7 +14,7 @@ global.chatai_key = 'vE3xJMwXVmWPMJcB'
 // Bot version
 global.version = '2.3.1',
 // Bot name
-global.botname = `🍃 Spike v${global.version} (Self Bot)`
+global.botname = `🍃 Spike v${global.version}`
 // Footer text
 global.footer = 𓂀 N̶a̶r̶u̶t̶o̶ 𓂀'
 // Global status
