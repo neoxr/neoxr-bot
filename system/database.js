@@ -54,7 +54,7 @@ module.exports = (m) => {
       if (!('onlyprefix' in setting)) setting.onlyprefix = '`'
       if (!('owners' in setting)) setting.owners = []
       if (!('viewstory' in setting)) setting.viewstory = false
-      if (!('cover' in setting)) setting.cover = 'https://telegra.ph/file/da25bb27d4575704efd18.jpg'
+      if (!('cover' in setting)) setting.cover = 'https://telegra.ph/file/29184b05eb01b67e97585.jpg'
    } else {
       global.db.setting = {
          chatbot: true,
@@ -67,7 +67,7 @@ module.exports = (m) => {
          onlyprefix: '`',
          owners: [],
          viewstory: false,
-         cover: 'https://telegra.ph/file/da25bb27d4575704efd18.jpg'
+         cover: 'https://telegra.ph/file/29184b05eb01b67e97585.jpg'
       }
    }
 }
