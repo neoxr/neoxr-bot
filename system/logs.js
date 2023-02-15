@@ -1,7 +1,7 @@
 const { yellow, gray, green, blueBright, cyanBright, redBright } = require('chalk')
 const fs = require('fs')
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault('Africa/Nairobi').locale('id')
 
 module.exports = async (client, m, myPrefix) => {
    let who = m.fromMe ? 'Self' : m.pushName || 'No Name'
