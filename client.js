@@ -48,7 +48,7 @@ const connect = async () => {
          }
          return message
       },
-      browser: ['@neoxr / neoxr-bot', 'safari', '1.0.0'],
+      browser: ['mohamed / spike-ai', 'safari', '1.0.0'],
       auth: state,
       getMessage: async (key) => {
          if (store) {
