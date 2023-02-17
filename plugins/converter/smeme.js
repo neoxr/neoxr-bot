@@ -18,8 +18,8 @@ exports.run = {
             let q = m.quoted ? m.quoted.message[type] : m.msg
             if (/image/.test(type)) {
                let img = await client.downloadMediaMessage(q)
-               let url = await scrap.uploadImage(img)
-               let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${url}`
+               let json = await scrap.uploadImageV2(img)
+               let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
                await client.sendSticker(m.chat, res, m, {
                   packname: exif.sk_pack,
                   author: exif.sk_author
@@ -31,8 +31,8 @@ exports.run = {
             if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
             if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
             let img = await q.download()
-            let url = await scrap.uploadImage(img)
-            let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${url}`
+            let json = await scrap.uploadImage(img)
+            let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
             await client.sendSticker(m.chat, res, m, {
                packname: exif.sk_pack,
                author: exif.sk_author

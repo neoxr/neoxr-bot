@@ -1,5 +1,6 @@
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(require('fs').existsSync('./node_modules/bails') ? 'bails' : 'baileys')
-const pino = require('pino'), path = require('path'), fs = require('fs'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
+const fs = require('fs')
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails')
+const pino = require('pino'), path = require('path'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
@@ -59,7 +60,7 @@ const connect = async () => {
          }
       },
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2301, 6]
+      version: [2, 2307, 5]
    })
 
    store.bind(client.ev)

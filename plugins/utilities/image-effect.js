@@ -17,12 +17,12 @@ exports.run = {
             let img = await q.download()
             if (!img) return client.reply(m.chat, Func.texted('bold', `🚩 Give a caption or reply to a photo with the command ${isPrefix + command}`), m)
             client.sendReact(m.chat, '🕒', m.key)
-            let image = await scrap.uploadImage(img)
+            let image = await scrap.uploadImageV2(img)
             const style = ['alien', 'brick', 'bunny', 'caricature', 'clown', 'ink', 'latte', 'letter', 'pencil', 'puzzle', 'roses', 'sketch', 'splash', 'staco']
             let rows = []
             style.map(v => rows.push({
                title: v.toUpperCase(),
-               rowId: `${isPrefix + v} ${image}`,
+               rowId: `${isPrefix + v} ${image.data.url}`,
                description: ``
             }))
             client.sendList(m.chat, '', `Choose style you want 🍟`, '', 'Tap!', [{

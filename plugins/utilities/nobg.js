@@ -16,8 +16,8 @@ exports.run = {
             if (/image/.test(type)) {
            	client.sendReact(m.chat, '🕒', m.key)
                let img = await client.downloadMediaMessage(q)
-               let url = await scrap.uploadImage(img)
-               let json = await Api.nobg(url)
+               let image = await scrap.uploadImageV2(img)
+               let json = await Api.nobg(image.data.url)
                if (!json.status) return m.reply(Func.jsonFormat(json))
                client.sendFile(m.chat, json.data.no_background, '', '', m)
             } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
@@ -28,8 +28,8 @@ exports.run = {
             if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
-            let url = await scrap.uploadImage(img)
-            let json = await Api.nobg(url)
+            let image = await scrap.uploadImageV2(img)
+            let json = await Api.nobg(image.data.url)
             if (!json.status) return m.reply(Func.jsonFormat(json))
             client.sendFile(m.chat, json.data.no_background, '', '', m)
          }
