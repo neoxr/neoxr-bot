@@ -89,7 +89,9 @@ module.exports = async (client, m) => {
       })
       let getPrefix = body ? body.charAt(0) : ''
       let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
-      component.Logs(client, m, myPrefix)
+      // 1 = SHOW ALL ON CONSOLE
+      // 2 = SHOW ONLY COMMAND MSG
+      component.Logs(client, m, myPrefix, 1)
       if (m.isBot || m.chat.endsWith('broadcast')) return
       // let levelAwal = Func.level(users.point)[0]
       // if (users && body && !/profile|menu|help|point|limit/i.test(body)) users.point += Func.randomInt(100, 1500)
