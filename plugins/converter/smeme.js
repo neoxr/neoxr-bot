@@ -31,7 +31,7 @@ exports.run = {
             if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
             if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
             let img = await q.download()
-            let json = await scrap.uploadImage(img)
+            let json = await scrap.uploadImageV2(img)
             let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
             await client.sendSticker(m.chat, res, m, {
                packname: exif.sk_pack,

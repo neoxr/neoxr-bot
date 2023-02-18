@@ -119,6 +119,11 @@ module.exports = class NeoxrApi {
       return json
    }
    
+   ocr = async (image) => {
+      let json = await Func.fetchJson(this.baseUrl + '/ocr?image=' + image + '&apikey=' + this.apiKey)
+      return json
+   }
+   
    brainly = async (query, lang) => {
   	let json = await Func.fetchJson(this.baseUrl + '/brainly?q=' + query + '&iso=' + lang + '&apikey=' + this.apiKey)
       return json
