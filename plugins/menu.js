@@ -239,32 +239,6 @@ exports.run = {
                }, 180000)
             ]
          } else if (style == 5) {
-            let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
-            let cmd = Object.fromEntries(filter)
-            let category = []
-            for (let name in cmd) {
-               let obj = cmd[name].run
-               if (!cmd) continue
-               if (!obj.category) continue
-               if (Object.keys(category).includes(obj.category)) category[obj.category].push(obj)
-               else {
-                  category[obj.category] = []
-                  category[obj.category].push(obj)
-               }
-            }
-            let rows = []
-            const keys = Object.keys(category).sort()
-            for (let k of keys) {
-               rows.push({
-                  title: k.toUpperCase(),
-                  rowId: `${isPrefix}menutype ${k}`,
-                  description: ``
-               })
-            }
-            client.sendList(m.chat, '', message, global.botname, 'Tap!', [{
-               rows
-            }], m)
-         } else if (style == 5) {
             if ((id in client.menu)) {
                await client.sendReact(m.chat, '😡', m.key)
                return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
