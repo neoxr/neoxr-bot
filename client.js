@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails')
-const pino = require('pino'), path = require('path'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios')
+const pino = require('pino'), path = require('path'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios'), spinnies = new (require('spinnies'))()
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
@@ -75,12 +75,20 @@ const connect = async () => {
             small: true
          })
       }
-      if (connection === 'open') {
-         console.log(colors.green(`Connected, you login as ${client.user.name || client.user.verifiedName}`))
+      if (connection === 'connecting') {
+       spinnies.add('start', {
+         text: 'Connecting . . .'
+      })
+     } else if (connection === 'open') {
+         spinnies.succeed('start', {
+            text: `Connected, you login as ${client.user.name || client.user.verifiedName}`
+         })
       } else if (connection === 'close') {
          if (lastDisconnect.error.output.statusCode == DisconnectReason.loggedOut) {
-            console.log(colors.red(`Can't connect to Web Socket`))
-            await props.save()
+            spinnies.fail('start', {
+               text: `Can't connect to Web Socket`
+            })
+            await machine.save()
             process.exit(0)
          } else {
             connect().catch(() => connect())
@@ -94,10 +102,9 @@ const connect = async () => {
          m = chatUpdate.messages[0]
          if (!m.message) return
          Serialize(client, m)
-         Scandir('./plugins').then(files => {
-            global.client.plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
-         }).catch(e => console.error(e))
-         require('./system/baileys'), require('./handler')(client, m)
+         const files = await Scandir('./plugins')
+         const plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
+         require('./system/baileys'), require('./handler')(client, m, plugins)
       } catch (e) {
          console.log(e)
       }

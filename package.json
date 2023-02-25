@@ -30,6 +30,7 @@
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
       "pino": "~7.0.5",
+      "spinnies": "^0.5.1",
       "translate-google-api": "~1.0.4",
       "yt-search": "~2.10.0"
    },

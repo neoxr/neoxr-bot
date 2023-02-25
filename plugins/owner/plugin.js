@@ -6,11 +6,12 @@ exports.run = {
       client,
       args,
       isPrefix,
-      command
+      command,
+      plugins: plugs
    }) => {
 	  let pluginDisable = global.db.setting.pluginDisable
       if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'tiktok'), m)
-      let plugins = Object.keys(global.client.plugins)
+      let plugins = Object.keys(plugs)
       if (!plugins.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 Plugin ${args[0]}.js not found.`), m)
       if (command == 'plugdis') {
          if (pluginDisable.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 Plugin ${args[0]}.js previously has been disabled.`), m)

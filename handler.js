@@ -1,5 +1,5 @@
 const cron = require('node-cron')
-module.exports = async (client, m) => {
+module.exports = async (client, m, plugins) => {
    try {
       require('./system/database')(m)
       const isOwner = [global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
@@ -112,8 +112,8 @@ module.exports = async (client, m) => {
          }
       }
       let isPrefix,
-         usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
-         hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
+         usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
+         hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
          commands = usage.concat(hidden)
       if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && commands.includes((body.split` ` [0]).toLowerCase())) {
          let args = body.replace(isPrefix, '').split` `.filter(v => v)
@@ -122,7 +122,7 @@ module.exports = async (client, m) => {
          let clean = start.trim().split` `.slice(1)
          let text = clean.join` `
          let prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
-         const is_commands = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))
+         const is_commands = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))
          let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
          try {
             if (new Date() * 1 - chats.command > (global.cooldown * 1000)) {
@@ -227,13 +227,14 @@ module.exports = async (client, m) => {
                isPrem,
                isOwner,
                isAdmin,
-               isBotAdmin
+               isBotAdmin,
+               plugins
             })
             break
          }
       } else {
          let prefixes = setting.multiprefix ? setting.prefix : [setting.onlyprefix]
-         const is_events = Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => !prop.run.usage))
+         const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
          for (let name in is_events) {
             let event = is_events[name].run
             if (event.cache && event.location) {
@@ -276,7 +277,8 @@ module.exports = async (client, m) => {
                chats,
                groupSet,
                groupMetadata,
-               setting
+               setting,
+               plugins
             })
          }
       }

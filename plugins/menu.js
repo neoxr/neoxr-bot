@@ -5,7 +5,8 @@ exports.run = {
    async: async (m, {
       client,
       text,
-      isPrefix
+      isPrefix,
+      plugins
    }) => {
       try {
          client.menu = client.menu ? client.menu : {}
@@ -16,7 +17,7 @@ exports.run = {
          const style = global.db.setting.menuStyle
          if (style == 1) {
             if (text) {
-               let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
+               let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Category not available.`), m)
                let commands = []
@@ -38,7 +39,7 @@ exports.run = {
                const print = commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
                return m.reply(print)
             } else {
-               let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
+               let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
                let cmd = Object.fromEntries(filter)
                let category = []
                for (let name in cmd) {
@@ -69,7 +70,7 @@ exports.run = {
                await client.sendReact(m.chat, '😡', m.key)
                return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
             }
-            let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
+            let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
             for (let name in cmd) {
@@ -87,7 +88,7 @@ exports.run = {
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n乂  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
-               let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
+               let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
                let commands = []
@@ -120,7 +121,7 @@ exports.run = {
             ]
          } else if (style == 3) {
             if (text) {
-               let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
+               let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Category not available.`), m)
                let commands = []
@@ -150,7 +151,7 @@ exports.run = {
                }).join('\n')
                return m.reply(print)
             } else {
-               let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
+               let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
                let cmd = Object.fromEntries(filter)
                let category = []
                for (let name in cmd) {
@@ -181,7 +182,7 @@ exports.run = {
                await client.sendReact(m.chat, '😡', m.key)
                return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
             }
-            let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
+            let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
             for (let name in cmd) {
@@ -199,7 +200,7 @@ exports.run = {
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n –  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
-               let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
+               let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
                let commands = []
@@ -243,7 +244,7 @@ exports.run = {
                await client.sendReact(m.chat, '😡', m.key)
                return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
             }
-            let filter = Object.entries(client.plugins).filter(([_, obj]) => obj.run.usage)
+            let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
             for (let name in cmd) {
@@ -261,7 +262,7 @@ exports.run = {
             print += '\n' + String.fromCharCode(8206).repeat(4001)
             for (let k of keys) {
                print += '\n\n –  *' + k.toUpperCase().split('').map(v => v).join(' ') + '*\n\n'
-               let cmd = Object.entries(client.plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
+               let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == k.toLowerCase())
                let usage = Object.keys(Object.fromEntries(cmd))
                if (usage.length == 0) return
                let commands = []
