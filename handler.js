@@ -1,4 +1,5 @@
 const cron = require('node-cron')
+const fs = require('fs')
 module.exports = async (client, m, plugins) => {
    try {
       require('./system/database')(m)
@@ -64,6 +65,13 @@ module.exports = async (client, m, plugins) => {
          setting.lastReset = new Date * 1
          global.db.users.filter(v => v.limit < global.limit && !v.premium).map(v => v.limit = global.limit)
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
+      }, {
+         scheduled: true,
+         timezone: global.timezone
+      })
+      cron.schedule('*/10 * * * *', async () => {
+         const tmpFiles = fs.readdirSync('./temp')
+         if (tmpFiles.length > 0) tmpFiles.map(v => fs.unlinkSync('./temp/' + v))
       }, {
          scheduled: true,
          timezone: global.timezone
