@@ -6,9 +6,7 @@ const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
 global.Func = Function
 require('./system/config')
-if (process.env.DATABASE_URL) {
-   MongoDB.db = global.database
-}
+if (process.env.DATABASE_URL) MongoDB.db = global.database
 global.props = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./system/localdb'))(global.database)
 global.scrap = Scraper
 global.store = makeInMemoryStore({
@@ -162,6 +160,20 @@ const connect = async () => {
          await client.updateBlockStatus(object, 'block')
       }
    })
+   
+   // Auto restart if the ram usage has reached the limit, if you want to use enter the ram size in bytes
+   const ramCheck = setInterval(() => {
+      var ramUsage = process.memoryUsage().rss
+      if (ramUsage >= 2000000000) { // 2 GB
+         clearInterval(ramCheck)
+         process.send('reset')
+      }
+   }, 60 * 1000)
+   
+   setInterval(async () => {
+      const tmpFiles = fs.readdirSync('./temp')
+      if (tmpFiles.length > 0) tmpFiles.map(v => fs.unlinkSync('./temp/' + v))
+   }, 60 * 1000 * 5)
 
    setInterval(async () => {
       if (global.db) await props.save(global.db)
