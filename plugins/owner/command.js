@@ -6,11 +6,12 @@ exports.run = {
       client,
       args,
       isPrefix,
-      command
+      command,
+      plugins
    }) => {
       let cmd = global.db.setting
       if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'tiktok'), m)
-      let commands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(global.client.plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage))
+      let commands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage))
       if (!commands.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 Command ${isPrefix + args[0]} does not exist.`), m)
       if (command == 'disable') {
          if (cmd.error.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 ${isPrefix + args[0]} command was previously disabled.`), m)

@@ -161,14 +161,14 @@ const connect = async () => {
       }
    })
    
-   // Auto restart if the ram usage has reached the limit, if you want to use enter the ram size in bytes
+   // Auto restart if ram usage has reached the limit, if you want to use enter the ram size in bytes
    const ramCheck = setInterval(() => {
       var ramUsage = process.memoryUsage().rss
       if (ramUsage >= 2000000000) { // 2 GB
          clearInterval(ramCheck)
          process.send('reset')
       }
-   }, 60 * 1000)
+   }, 60 * 1000) // Checking every 1 minutes
    
    setInterval(async () => {
       const tmpFiles = fs.readdirSync('./temp')
