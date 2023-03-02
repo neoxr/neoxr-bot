@@ -48,6 +48,7 @@ module.exports = async (client, m, plugins) => {
          return client.reply(m.chat, Func.texted('italic', '🚩 Your premium package has expired, thank you for buying and using our service.')).then(async () => {
             users.premium = false
             users.expired = 0
+            users.limit = global.limit
          })
       }
       if (users) users.lastseen = new Date() * 1
