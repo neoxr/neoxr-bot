@@ -14,7 +14,7 @@ exports.run = {
          teks += '	◦  ' + Func.texted('bold', 'Text') + ' : ' + global.db.sticker[cmdS[i]].text + '\n'
          teks += '	◦  ' + Func.texted('bold', 'Created') + ' : ' + moment(global.db.sticker[cmdS[i]].created).format('DD/MM/YY HH:mm:ss') + '\n\n'
       }
-      client.fakeStory(m.chat, teks + global.db.setting.footer, global.db.setting.header)
+      m.reply(teks + global.db.setting.footer)
    },
    owner: true
 }
