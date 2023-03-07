@@ -170,7 +170,7 @@ const connect = async () => {
    // Auto restart if ram usage has reached the limit, if you want to use enter the ram size in bytes
    const ramCheck = setInterval(() => {
       var ramUsage = process.memoryUsage().rss
-      if (ramUsage >= 2000000000) { // 2 GB
+      if (ramUsage >= 1500000000) { // 1.5 GB
          clearInterval(ramCheck)
          process.send('reset')
       }
