@@ -228,4 +228,9 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/spotify?url=' + url + '&apikey=' + this.apiKey)
       return json
    }
+   
+   play = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/play?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
 }

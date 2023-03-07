@@ -1,5 +1,6 @@
+const { Function: Func } = new (require('@neoxr/neoxr-js'))
 // Owner number
-global.owner = '6285221100126'
+global.owner = 6285887776722
 // Owner name
 global.owner_name = 'Wildan Izzudin'
 // Database name (Default: database)
@@ -15,7 +16,7 @@ global.timer = 1800000
 // Symbols that are excluded when adding a prefix (Don't change it)
 global.evaluate_chars = ['=>', '~>', '<', '>', '$']
 // Country code that will be automatically blocked by the system, when sending messages in private chat
-global.blocks = ['91', '92', '94', '94', '212']
+global.blocks = ['91', '92', '94', '212']
 // Put target jid to forward friends story
 global.forwards = global.owner + '@c.us'
 // Get neoxr apikey by registering at https://api.neoxr.my.id

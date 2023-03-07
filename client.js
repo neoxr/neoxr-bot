@@ -1,14 +1,20 @@
-const fs = require('fs')
-const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails')
-const pino = require('pino'), path = require('path'), colors = require('@colors/colors/safe'), qrcode = require('qrcode-terminal'), axios = require('axios'), spinnies = new (require('spinnies'))()
+require('./system/config'), require('events').EventEmitter.defaultMaxListeners = 50
+const pino = require('pino'),
+   path = require('path'),
+   colors = require('@colors/colors/safe'),
+   qrcode = require('qrcode-terminal'),
+   axios = require('axios'),
+   spinnies = new(require('spinnies'))(),
+   fs = require('fs'),
+   baileys = fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails'
+const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(baileys)
 global.component = new (require('@neoxr/neoxr-js'))
 const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
 const { Socket, Serialize, Scandir } = Extra
-global.Func = Function
-require('./system/config')
 if (process.env.DATABASE_URL) MongoDB.db = global.database
 global.props = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./system/localdb'))(global.database)
 global.scrap = Scraper
+global.Func = Function
 global.store = makeInMemoryStore({
    logger: pino().child({
       level: 'silent',
@@ -58,7 +64,7 @@ const connect = async () => {
          }
       },
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2307, 5]
+      version: [2, 2308, 7]
    })
 
    store.bind(client.ev)
