@@ -1,3 +1,4 @@
+const axios = require('axios')
 exports.run = {
    usage: ['qc'],
    use: 'text',
