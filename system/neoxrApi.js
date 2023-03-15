@@ -233,4 +233,14 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/play?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
+   
+   remini = async (image) => {
+      let json = await Func.fetchJson(this.baseUrl + '/remini?image=' + image + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   ageDetector = async (image) => {
+      let json = await Func.fetchJson(this.baseUrl + '/age?image=' + image + '&apikey=' + this.apiKey)
+      return json
+   }
 }
