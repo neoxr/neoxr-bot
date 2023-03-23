@@ -1,3 +1,4 @@
+const { Converter } = new(require('@neoxr/neoxr-js'))
 const { readFileSync: read, unlinkSync: remove, writeFileSync: create } = require('fs')
 const path = require('path')
 const { exec } = require('child_process')
@@ -52,20 +53,10 @@ exports.run = {
                })
             } else if (/audio|video/.test(mime)) {
                client.sendReact(m.chat, '🕒', m.key)
-               const media = await client.saveMediaMessage(m.quoted ? m.quoted : m.msg)
-               const result = Func.filename('mp3')
-               exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
-                  remove(media)
-                  if (err) return client.reply(m.chat, Func.texted('bold', `🚩 Conversion failed.`), m)
-                  let buff = read(result)
-                  if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
-                     remove(result)
-                  })
-                  if (/tovn/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
-                     ptt: true
-                  }).then(() => {
-                     remove(result)
-                  })
+               const buff = await Converter.toAudio(await m.quoted.download(), 'mp3')
+               if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m)
+               if (/tovn/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
+                  ptt: true
                })
             } else {
                client.reply(m.chat, Func.texted('bold', `🚩 This feature only for audio / video.`), m)
