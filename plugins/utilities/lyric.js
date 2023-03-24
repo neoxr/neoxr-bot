@@ -14,7 +14,7 @@ exports.run = {
          client.sendReact(m.chat, '🕒', m.key)
          let json = await Api.lyric(text.trim())
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
-         if (text.match('musixmatch.com')) return client.reply(m.chat, json.data.lyric, m)
+         if (text.startsWith('https')) return client.reply(m.chat, json.data.lyric, m)
          let rows = []
          json.data.map(v => rows.push({
             title: v.title,
