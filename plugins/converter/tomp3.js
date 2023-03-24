@@ -31,10 +31,11 @@ exports.run = {
                })
             })
          } else {
+            let q = m.quoted ? m.quoted : m
             let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
             if (/ogg/.test(mime)) {
                client.sendReact(m.chat, '🕒', m.key)
-               let buffer = await m.quoted.download()
+               let buffer = await m.download()
                const media = path.join(tmpdir(), Func.filename('mp3'))
                let save = create(media, buffer)
                const result = Func.filename('mp3')
@@ -51,9 +52,9 @@ exports.run = {
                      remove(result)
                   })
                })
-            } else if (/audio|video/.test(mime)) {
+            } else if (/audio|video/.test(mime)) {   	
                client.sendReact(m.chat, '🕒', m.key)
-               const buff = await Converter.toAudio(await m.quoted.download(), 'mp3')
+               const buff = await Converter.toAudio(await q.download(), 'mp3')
                if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m)
                if (/tovn/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
                   ptt: true
