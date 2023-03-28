@@ -136,7 +136,7 @@ const connect = async () => {
          pic = await Func.fetchBuffer(await client.profilePictureUrl(room.id, 'image'))
       }
       if (room.action == 'add') {
-         if (groupSet.localonly) {
+         if (groupSet && groupSet.localonly) {
             if (global.db.users.some(v => v.jid == member) && !global.db.users.find(v => v.jid == member).whitelist && !member.startsWith('62') || !member.startsWith('62')) {
                client.reply(room.id, Func.texted('bold', `Sorry @${member.split`@`[0]}, this group is only for indonesian people and you will removed automatically.`))
                client.updateBlockStatus(member, 'block')

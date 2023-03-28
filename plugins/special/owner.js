@@ -8,7 +8,11 @@ exports.run = {
          name: global.owner_name,
          number: global.owner,
          about: 'Owner & Creator'
-      }], m)
+      }], m, {
+         org: 'Neoxr Network',
+         website: 'https://neoxr.my.id',
+         email: 'admin@neoxr.my.id'
+      })
    },
    error: false,
    cache: true,
