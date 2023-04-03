@@ -24,8 +24,8 @@ exports.run = {
                links.map(async link => {
                   let json = await Api.igs(link)
                   if (!json.status) return client.reply(m.chat, `${global.status.fail} : [ @${link.split('/')[4]} ]`, m)
-                  for (let i = 0; i < json.data.length; i++) {
-                     client.sendFile(m.chat, json.data[i].url, ``, `🍟 *Fetching* : ${((new Date - old) * 1)} ms (${i+1})`, m)
+                  for (let v of json.data) {
+                     client.sendFile(m.chat, v.url, ``, `🍟 *Fetching* : ${((new Date - old) * 1)} ms (${i+1})`, m)
                      await Func.delay(1500)
                   }
                })
