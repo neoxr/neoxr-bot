@@ -7,7 +7,7 @@
       "start": "node ."
    },
    "engines": {
-      "node": "16.x",
+      "node": "14.x",
       "npm": "8.x"
    },
    "repository": {
@@ -22,8 +22,8 @@
    "dependencies": {
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "1.5.0",
-      "@neoxr/neoxr-js": "^1.3.8",
-      "baileys": "github:neoxr-v2/Baileys",
+      "@neoxr/neoxr-js": "^1.4.0",
+      "baileys": "^6.0.7",
       "cfonts": "~2.10.0",
       "express": "~4.16.4",
       "network-speed": "^2.1.1",
