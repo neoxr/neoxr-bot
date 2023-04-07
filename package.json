@@ -19,8 +19,8 @@
    ],
    "author": "Wildan Izzudin",
    "license": "ISC",
-   "dependencies": {
-      "baileys": "6.0.7",
+   "dependencies": {  
+      "@adiwajshing/baileys": "npm:baileys",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "1.5.0",
       "@neoxr/neoxr-js": "^1.4.0",
