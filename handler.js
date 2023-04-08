@@ -98,9 +98,7 @@ module.exports = async (client, m, plugins) => {
       })
       let getPrefix = body ? body.charAt(0) : ''
       let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
-      // 1 = SHOW ALL ON CONSOLE
-      // 2 = SHOW ONLY COMMAND MSG
-      component.Logs(client, m, myPrefix, 1)
+      component.Logs(client, m, myPrefix)
       if (m.isBot || m.chat.endsWith('broadcast')) return
       // let levelAwal = Func.level(users.point)[0]
       // if (users && body && !/profile|menu|help|point|limit/i.test(body)) users.point += Func.randomInt(100, 1500)
@@ -124,7 +122,7 @@ module.exports = async (client, m, plugins) => {
          usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
          hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
          commands = usage.concat(hidden)
-      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && commands.includes((body.split` ` [0]).toLowerCase())) {
+      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && !isPrefix && commands.includes((body.split` ` [0]).toLowerCase()) && setting.noprefix || body && !isPrefix && commands.includes(command) && global.evaluate_chars.includes(command)) {
          let args = body.replace(isPrefix, '').split` `.filter(v => v)
          let command = args.shift().toLowerCase()
          let start = body.replace(isPrefix, '')

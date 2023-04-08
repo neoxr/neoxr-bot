@@ -67,6 +67,7 @@ const statistic = (stats, system) => {
 │  ◦  ${Func.texted('bold', system.groupmode ? '[ √ ]' : '[ × ]')}  Group Mode
 │  ◦  ${Func.texted('bold', system.online ? '[ √ ]' : '[ × ]')}  Always Online
 │  ◦  ${Func.texted('bold', system.self ? '[ √ ]' : '[ × ]')}  Self Mode
+│  ◦  ${Func.texted('bold', system.noprefix ? '[ √ ]' : '[ × ]')}  No Prefix
 │  ◦  Prefix : ${Func.texted('bold', system.multiprefix ? '( ' + system.prefix.map(v => v).join(' ') + ' )' : '( ' + system.onlyprefix + ' )')}
 └  ◦  Reset At : ${moment(system.lastReset).format('DD/MM/YYYY HH:mm')}
 
@@ -92,6 +93,7 @@ ${global.footer}`
 	◦  ${Func.texted('bold', system.groupmode ? '[ √ ]' : '[ × ]')}  Group Mode
 	◦  ${Func.texted('bold', system.online ? '[ √ ]' : '[ × ]')}  Always Online
 	◦  ${Func.texted('bold', system.self ? '[ √ ]' : '[ × ]')}  Self Mode
+	◦  ${Func.texted('bold', system.noprefix ? '[ √ ]' : '[ × ]')}  No Prefix
 	◦  Prefix : ${Func.texted('bold', system.multiprefix ? '( ' + system.prefix.map(v => v).join(' ') + ' )' : '( ' + system.onlyprefix + ' )')}
 	◦  Reset At : ${moment(system.lastReset).format('DD/MM/YYYY HH:mm')}
 
