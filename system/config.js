@@ -1,6 +1,6 @@
 const { Function: Func } = new (require('@neoxr/neoxr-js'))
 // Owner number
-global.owner = '6285887776722'
+global.owner = '994408364923'
 // Owner name
 global.owner_name = 'Wildan Izzudin'
 // Database name (Default: database)
