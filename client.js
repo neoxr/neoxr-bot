@@ -9,12 +9,10 @@ const pino = require('pino'),
    baileys = fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails'
 const { useMultiFileAuthState, DisconnectReason, makeInMemoryStore, msgRetryCounterMap, delay } = require(baileys)
 global.component = new (require('@neoxr/neoxr-js'))
-const { Extra, Function, MongoDB, PostgreSQL, Scraper } = component
+const { Extra, MongoDB, PostgreSQL } = component
 const { Socket, Serialize, Scandir } = Extra
 if (process.env.DATABASE_URL) MongoDB.db = global.database
 global.props = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./system/localdb'))(global.database)
-global.scrap = Scraper
-global.Func = Function
 global.store = makeInMemoryStore({
    logger: pino().child({
       level: 'silent',
@@ -92,7 +90,7 @@ const connect = async () => {
             spinnies.fail('start', {
                text: `Can't connect to Web Socket`
             })
-            await machine.save()
+            await props.save()
             process.exit(0)
          } else {
             connect().catch(() => connect())

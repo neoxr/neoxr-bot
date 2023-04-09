@@ -1,4 +1,4 @@
-const { Function: Func } = new (require('@neoxr/neoxr-js'))
+const { Function, Scraper } = new (require('@neoxr/neoxr-js'))
 // Owner number
 global.owner = '994408364923'
 // Owner name
@@ -32,6 +32,10 @@ global.version = '2.2.2',
 global.botname = `© neoxr-bot v${global.version} (Public Bot)`
 // Footer text
 global.footer = 'ꜱɪᴍᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ ɴᴇᴏxʀ ッ'
+// Scraper
+global.scrap = Scraper
+// Function
+global.Func = Function
 // Global status
 global.status = Object.freeze({
    wait: Func.texted('bold', 'Processed . . .'),

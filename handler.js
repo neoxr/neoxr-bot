@@ -3,7 +3,7 @@ const fs = require('fs')
 module.exports = async (client, m, plugins) => {
    try {
       require('./system/database')(m)
-      const isOwner = [global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      const isOwner = [client.decodeJid(client.user.id).split`@` [0], global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const isPrem = (global.db.users.some(v => v.jid == m.sender) && global.db.users.find(v => v.jid == m.sender).premium) || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []
@@ -11,10 +11,10 @@ module.exports = async (client, m, plugins) => {
       const isAdmin = m.isGroup ? adminList.includes(m.sender) : false
       const isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:` [0]) + '@s.whatsapp.net') : false
       const blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
-      const groupSet = global.db.groups.find(v => v.jid == m.chat)
-      chats = global.db.chats.find(v => v.jid == m.chat)
-      users = global.db.users.find(v => v.jid == m.sender)
-      setting = global.db.setting
+      const groupSet = global.db.groups.find(v => v.jid == m.chat),
+         chats = global.db.chats.find(v => v.jid == m.chat),
+         users = global.db.users.find(v => v.jid == m.sender),
+         setting = global.db.setting
       const body = typeof m.text == 'string' ? m.text : false
       if (!setting.online) await client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) await client.sendPresenceUpdate('available', m.chat)
@@ -23,19 +23,6 @@ module.exports = async (client, m, plugins) => {
       if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
       if (!m.isGroup) await client.readMessages([m.key])
       if (m.isGroup) groupSet.activity = new Date() * 1
-      if (m.chat.endsWith('broadcast') && m.mtype != 'protocolMessage') {
-         let caption = `乂  *S T O R I E S*\n\n`
-         if (/video|image/.test(m.mtype)) {
-            caption += `${body ? body : ''}\n\n`
-            caption += `*From : @${m.sender.replace(/@.+/, '')} (${client.getName(m.sender)})*`
-            const media = await m.download()
-            client.sendFile(global.forwards, media, '', caption)
-         } else if (/extended/.test(m.mtype)) {
-            caption += `${body ? body : ''}\n\n`
-            caption += `*From : @${m.sender.replace(/@.+/, '')} (${client.getName(m.sender)})*`
-            client.reply(global.forwards, caption)
-         }
-      }
       if (m.isGroup && !groupSet.stay && (new Date * 1) >= groupSet.expired && groupSet.expired != 0) {
          return client.reply(m.chat, Func.texted('italic', '🚩 Bot time has expired and will leave from this group, thank you.', null, {
             mentions: participants.map(v => v.id)
@@ -61,8 +48,7 @@ module.exports = async (client, m, plugins) => {
          users.afk = -1
          users.afkReason = ''
       }
-      // reset limit and hitdaily every 12 hours
-      cron.schedule('00 12 * * *', () => {
+      cron.schedule('00 00 * * *', () => {
          setting.lastReset = new Date * 1
          global.db.users.filter(v => v.limit < global.limit && !v.premium).map(v => v.limit = global.limit)
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
@@ -97,15 +83,11 @@ module.exports = async (client, m, plugins) => {
          }
       })
       let getPrefix = body ? body.charAt(0) : ''
-      let myPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
-      component.Logs(client, m, myPrefix)
+      let isPrefix = (setting.multiprefix ? setting.prefix.includes(getPrefix) : setting.onlyprefix == getPrefix) ? getPrefix : undefined
+      component.Logs(client, m, isPrefix)
       if (m.isBot || m.chat.endsWith('broadcast')) return
-      // let levelAwal = Func.level(users.point)[0]
-      // if (users && body && !/profile|menu|help|point|limit/i.test(body)) users.point += Func.randomInt(100, 1500)
-      // let levelAkhir = Func.level(users.point)[0]
-      // if (levelAwal != levelAkhir) client.reply(m.chat, `乂  *L E V E L - U P*\n\nFrom : [ *${levelAwal}* ] ➠ [ *${levelAkhir}* ]\n*Congratulations!*, you have leveled up 🎉🎉🎉`, m)
       if (((m.isGroup && !groupSet.mute) || !m.isGroup) && !users.banned) {
-         if (body && body == myPrefix) {
+         if (body && body == isPrefix) {
             if (m.isGroup && groupSet.mute || !isOwner) return
             let old = new Date()
             let banchat = setting.self ? true : false
@@ -118,17 +100,14 @@ module.exports = async (client, m, plugins) => {
             }
          }
       }
-      let isPrefix,
-         usage = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)),
-         hidden = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)),
-         commands = usage.concat(hidden)
-      if ((body && body.length != 1 && (isPrefix = (myPrefix || '')[0])) || body && !isPrefix && commands.includes((body.split` ` [0]).toLowerCase()) && setting.noprefix || body && !isPrefix && commands.includes(command) && global.evaluate_chars.includes(command)) {
-         let args = body.replace(isPrefix, '').split` `.filter(v => v)
-         let command = args.shift().toLowerCase()
-         let start = body.replace(isPrefix, '')
-         let clean = start.trim().split` `.slice(1)
-         let text = clean.join` `
-         let prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
+      const commands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)).concat(Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)))
+      const args = body.replace(isPrefix, '').split` `.filter(v => v)
+      const command = args.shift().toLowerCase()
+      const start = body.replace(isPrefix, '')
+      const clean = start.trim().split` `.slice(1)
+      const text = clean ? clean.join` ` : undefined
+      const prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
+      if (body && isPrefix && commands.includes(command) || body && !isPrefix && commands.includes(command) && setting.noprefix || body && !isPrefix && commands.includes(command) && global.evaluate_chars.includes(command)) {
          const is_commands = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))
          let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
          try {
@@ -159,13 +138,13 @@ module.exports = async (client, m, plugins) => {
             let cmd = is_commands[name].run
             let turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
             let turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
-            if (body && global.evaluate_chars.some(v => body.startsWith(v)) && !body.startsWith(myPrefix)) return
+            if (body && global.evaluate_chars.some(v => body.startsWith(v)) && !body.startsWith(isPrefix)) return
             if (!turn && !turn_hidden) continue
             if (!m.isGroup && global.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
             if (setting.self && !isOwner && !m.fromMe) return
             if (setting.pluginDisable.includes(name)) return client.reply(m.chat, Func.texted('bold', `🚩 Plugin disabled by Owner.`), m)
             if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < global.timer) continue
-            if (!m.isGroup && !['owner', 'confess', 'create_bot'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) return client.sendMessageModify(m.chat, `🚩 Using bot in private chat only for premium user, upgrade to premium plan only Rp. 10,000,- to get 1K limits for 1 month.\n\nIf you want to buy contact *${prefixes[0]}owner*`, m, {
+            if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) return client.sendMessageModify(m.chat, `🚩 Using bot in private chat only for premium user, upgrade to premium plan only Rp. 20,000,- to get 1K limits for 1 month.\n\nIf you want to buy contact *${prefixes[0]}owner*`, m, {
                largeThumb: true,
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg'),
                url: setting.link
@@ -240,7 +219,6 @@ module.exports = async (client, m, plugins) => {
             break
          }
       } else {
-         let prefixes = setting.multiprefix ? setting.prefix : [setting.onlyprefix]
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
          for (let name in is_events) {
             let event = is_events[name].run
