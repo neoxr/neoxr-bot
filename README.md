@@ -1,6 +1,6 @@
 ### 乂  Readme
 
-BACA READMENYA PILIH "ID" BIAR LU GK BANYAK NANYA DI WA (GANGGU BNGST)
+BACA READMENYA PILIH "ID" BIAR GK BANYAK NANYA DI WA (GANGGU BNGST)
 
 Language :  [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](https://github.com/neoxr/neoxr-bot/blob/master/ID.md) 
 
