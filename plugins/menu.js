@@ -66,10 +66,6 @@ exports.run = {
                }], m)
             }
          } else if (style == 2) {
-            if ((id in client.menu)) {
-               await client.sendReact(m.chat, '😡', m.key)
-               return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
-            }
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
@@ -109,16 +105,11 @@ exports.run = {
                })
                print += commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `	◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
             }
-            client.menu[id] = [
-               await client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-                  ads: false,
-                  largeThumb: true,
-                  url: global.db.setting.link
-               }),
-               setTimeout(() => {
-                  delete client.menu[id]
-               }, 180000)
-            ]
+            client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
+               ads: true,
+               largeThumb: true,
+               url: global.db.setting.link
+            })
          } else if (style == 3) {
             if (text) {
                let cmd = Object.entries(plugins).filter(([_, v]) => v.run.usage && v.run.category == text.toLowerCase())
@@ -178,10 +169,6 @@ exports.run = {
                }], m)
             }
          } else if (style == 4) {
-            if ((id in client.menu)) {
-               await client.sendReact(m.chat, '😡', m.key)
-               return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
-            }
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
@@ -229,21 +216,12 @@ exports.run = {
                   }
                }).join('\n')
             }
-            client.menu[id] = [
-               await client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-                  ads: false,
-                  largeThumb: true,
-                  url: global.db.setting.link
-               }),
-               setTimeout(() => {
-                  delete client.menu[id]
-               }, 180000)
-            ]
+            client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
+               ads: false,
+               largeThumb: true,
+               url: global.db.setting.link
+            })
          } else if (style == 5) {
-            if ((id in client.menu)) {
-               await client.sendReact(m.chat, '😡', m.key)
-               return client.reply(m.chat, `Hi @${m.sender.split`@`[0]} ^\nTo avoid spam, menu is displayed every *3 minutes*.`, client.menu[id][0])
-            }
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
             let cmd = Object.fromEntries(filter)
             let category = []
@@ -298,20 +276,15 @@ exports.run = {
                },
                type: 1
             }, {
-               buttonId: `${isPrefix}botinfo`,
+               buttonId: `${isPrefix}sc`,
                buttonText: {
                   displayText: 'Source'
                },
                type: 1
             }]
-            client.menu[id] = [
-               await client.sendButton(m.chat, global.db.setting.cover, print, global.db.setting.footer, m, buttons, {
-                  document: true
-               }),
-               setTimeout(() => {
-                  delete client.menu[id]
-               }, 180000)
-            ]
+            client.sendButton(m.chat, global.db.setting.cover, print, global.footer, m, buttons, {
+               document: true
+            })
          }
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)

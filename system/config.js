@@ -21,9 +21,6 @@ global.blocks = ['91', '92', '94', '212']
 global.forwards = global.owner + '@c.us'
 // Get neoxr apikey by registering at https://api.neoxr.my.id
 global.Api = new (require('./neoxrApi'))(process.env.API_KEY)
-// Get bid and key configuration for autoreply chat ai feature by registering at https://brainshop.ai
-global.chatai_bid = '164728'
-global.chatai_key = 'MKPsfkgXLZPGrWoH'
 // Timezone (Default : Asia/Jakarta)
 global.timezone = 'Asia/Jakarta'
 // Bot version

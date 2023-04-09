@@ -38,5 +38,6 @@ exports.run = {
       }
    },
    error: false,
-   limit: true
+   limit: true,
+   premium: true
 }
