@@ -101,10 +101,9 @@ module.exports = async (client, m, plugins) => {
          }
       }
       const commands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)).concat(Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)))
-      const args = body.replace(isPrefix, '').split` `.filter(v => v)
-      const command = args.shift().toLowerCase()
-      const start = body.replace(isPrefix, '')
-      const clean = start.trim().split` `.slice(1)
+      const args = body && body.replace(isPrefix, '').split` `.filter(v => v)
+      const command = args && args.shift().toLowerCase()
+      const clean = body && body.replace(isPrefix, '').trim().split` `.slice(1)
       const text = clean ? clean.join` ` : undefined
       const prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
       if (body && isPrefix && commands.includes(command) || body && !isPrefix && commands.includes(command) && setting.noprefix || body && !isPrefix && commands.includes(command) && global.evaluate_chars.includes(command)) {
