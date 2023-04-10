@@ -7,7 +7,7 @@ exports.run = {
    }) => {
       try {
          if (groupSet.antilink && !isAdmin && body) {
-            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || Func.isUrl(body) && !Func.socmed(body)) return client.sendMessage(m.chat, {
+            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat))) return client.sendMessage(m.chat, {
                delete: {
                   remoteJid: m.chat,
                   fromMe: false,
