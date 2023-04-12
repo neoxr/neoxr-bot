@@ -10,7 +10,7 @@ exports.run = {
          let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
          if (/image\/(jpe?g|png)/.test(mime)) {
             client.sendReact(m.chat, '🕒', m.key)
-            const buffer = await q.download
+            const buffer = await q.download()
             const json = await scrap.uploadImageV2(buffer)
             if (!json.status) return m.reply(Func.jsonFormat(json))
             await client.updateProfilePicture(client.user.id, {
