@@ -213,6 +213,7 @@ module.exports = async (client, m, plugins) => {
                isOwner,
                isAdmin,
                isBotAdmin,
+               setting,
                plugins
             })
             break
