@@ -9,7 +9,7 @@ exports.run = {
    }) => {
       try {
          let users = global.db.users.length
-         let chats = global.db.chats.filter(v => v.jid.endsWith('.net')).length
+         let chats = global.db.chats.filter(v => v.jid && v.jid.endsWith('.net')).length
          let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
          let groups = await (await groupList()).map(v => v.id).length
          let banned = global.db.users.filter(v => v.banned).length
