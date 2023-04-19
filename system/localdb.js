@@ -1,4 +1,5 @@
 const fs = require('fs')
+const stable = require('json-stable-stringify')
 
 module.exports = class LocalDB {
    constructor(db) {
@@ -13,7 +14,7 @@ module.exports = class LocalDB {
 
    save = async data => {
       const database = data ? data : global.db
-      fs.writeFileSync(`./${this.file}.json`, JSON.stringify(database, null, 3))
-      fs.writeFileSync(`./${this.file}.bak`, JSON.stringify(database, null, 3))
+      fs.writeFileSync(`./${this.file}.json`, stable(database))
+      fs.writeFileSync(`./${this.file}.bak`, stable(database))
    }
 }
