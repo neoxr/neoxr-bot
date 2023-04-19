@@ -1,3 +1,4 @@
+const { Converter } = new(require('@neoxr/neoxr-js'))
 const fs = require('fs')
 const { exec } = require('child_process')
 exports.run = {
@@ -26,10 +27,11 @@ exports.run = {
          if (/chipmunk/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
          if (/audio/.test(mime)) {
             client.sendReact(m.chat, '🕒', m.key)
-            let media = await client.saveMediaMessage(m.quoted)
+            const buffer = await Converter.toAudio(await m.quoted.download(), 'mp3')
+            const parse = await Func.getFile(buffer)
             let ran = Func.filename('mp3')
-            exec(`ffmpeg -i ${media} ${set} ${ran}`, async (err, stderr, stdout) => {
-               fs.unlinkSync(media)
+            exec(`ffmpeg -i ${parse.file} ${set} ${ran}`, async (err, stderr, stdout) => {
+               fs.unlinkSync(parse.file)
                if (err) return client.reply(m.chat, Func.texted('bold', `🚩 Conversion failed.`), m)
                let buff = fs.readFileSync(ran)
                if (m.quoted.ptt) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
