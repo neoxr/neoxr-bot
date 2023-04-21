@@ -183,7 +183,14 @@ const connect = async () => {
    
    setInterval(async () => {
       const tmpFiles = fs.readdirSync('./temp')
-      if (tmpFiles.length > 0) tmpFiles.map(v => fs.unlinkSync('./temp/' + v))
+      if (tmpFiles.length > 0) {
+         tmpFiles.map(v => fs.unlinkSync('./temp/' + v))
+      }
+      const storeFile = await Func.getFile('./session/neoxr_store.json')
+      let chSize = Func.sizeLimit(storeFile.size, 2)
+      if (chSize.oversize) {
+         fs.unlinkSync('./session/neoxr_store.json')
+      }
    }, 60 * 1000 * 5)
 
    setInterval(async () => {
