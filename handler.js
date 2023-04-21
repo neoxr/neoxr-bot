@@ -1,6 +1,6 @@
 const cron = require('node-cron')
 const fs = require('fs')
-module.exports = async (client, m, plugins) => {
+module.exports = async (client, m, plugins, store) => {
    try {
       require('./system/database')(m)
       const isOwner = [client.decodeJid(client.user.id).split`@` [0], global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
