@@ -13,12 +13,19 @@ const { Extra, MongoDB, PostgreSQL } = component
 const { Socket, Serialize, Scandir } = Extra
 if (process.env.DATABASE_URL) MongoDB.db = global.database
 global.props = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./system/localdb'))(global.database)
-global.store = makeInMemoryStore({
+
+const store = makeInMemoryStore({
    logger: pino().child({
       level: 'silent',
       stream: 'store'
    })
 })
+
+// don't rename "neoxr_store.json" to avoid error!!
+store.readFromFile('./session/neoxr_store.json')
+setInterval(() => {
+   store.writeToFile('./session/neoxr_store.json')
+}, 10000)
 
 const connect = async () => {
    const { state, saveCreds } = await useMultiFileAuthState('session')
@@ -106,7 +113,7 @@ const connect = async () => {
          Serialize(client, m)
          const files = await Scandir('./plugins')
          const plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
-         require('./system/baileys'), require('./handler')(client, m, plugins)
+         require('./system/baileys'), require('./handler')(client, m, plugins, store)
       } catch (e) {
          console.log(e)
       }

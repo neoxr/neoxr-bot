@@ -214,7 +214,8 @@ module.exports = async (client, m, plugins) => {
                isAdmin,
                isBotAdmin,
                setting,
-               plugins
+               plugins,
+               store
             })
             break
          }
@@ -263,7 +264,8 @@ module.exports = async (client, m, plugins) => {
                groupSet,
                groupMetadata,
                setting,
-               plugins
+               plugins,
+               store
             })
          }
       }
