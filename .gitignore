@@ -98,6 +98,3 @@ dist
 
 # TernJS port file
 .tern-port
-
-# Dotenv
-.env

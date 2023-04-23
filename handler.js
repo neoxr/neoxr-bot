@@ -106,6 +106,10 @@ module.exports = async (client, m, plugins, store) => {
       const clean = body && body.replace(isPrefix, '').trim().split` `.slice(1)
       const text = clean ? clean.join` ` : undefined
       const prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]
+      let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
+      if (isPrefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
+         if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + (isPrefix ? isPrefix : '') + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
+      }
       if (body && isPrefix && commands.includes(command) || body && !isPrefix && commands.includes(command) && setting.noprefix || body && !isPrefix && commands.includes(command) && global.evaluate_chars.includes(command)) {
          const is_commands = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))
          let matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
@@ -123,9 +127,6 @@ module.exports = async (client, m, plugins, store) => {
                lastseen: new Date() * 1,
                command: new Date() * 1
             })
-         }
-         if (!commands.includes(command) && matcher.length > 0 && !setting.self) {
-            if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + (isPrefix ? isPrefix : '') + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
          }
          if (setting.error.includes(command) && !setting.self) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${(isPrefix ? isPrefix : '') + command}_ disabled.`), m)
          if (commands.includes(command)) {
