@@ -243,4 +243,9 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/age?image=' + image + '&apikey=' + this.apiKey)
       return json
    }
+   
+   diffusion = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/diffusion?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
 }
