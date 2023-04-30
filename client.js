@@ -4,6 +4,7 @@ const pino = require('pino'),
    colors = require('@colors/colors/safe'),
    qrcode = require('qrcode-terminal'),
    axios = require('axios'),
+   stable = require('json-stable-stringify'),
    spinnies = new(require('spinnies'))(),
    fs = require('fs'),
    baileys = fs.existsSync('./node_modules/baileys') ? 'baileys' : fs.existsSync('./node_modules/@adiwajshing/baileys') ? '@adiwajshing/baileys' : 'bails'
@@ -189,7 +190,7 @@ const connect = async () => {
       const storeFile = await Func.getFile('./session/neoxr_store.json')
       let chSize = Func.sizeLimit(storeFile.size, 2)
       if (chSize.oversize) {
-         fs.unlinkSync('./session/neoxr_store.json')
+         fs.writeFileSync('./session/neoxr_store.json', stable({"chats":[],"contacts":{},"messages":{}}))
       }
    }, 60 * 1000 * 5)
 

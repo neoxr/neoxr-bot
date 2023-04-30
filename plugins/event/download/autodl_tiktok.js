@@ -25,13 +25,7 @@ exports.run = {
                links.map(async link => {
                   let json = await Api.tiktok(Func.ttFixed(link))
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-                  client.sendButton(m.chat, json.data.video, `If you want to get the *original sound* press the button below.\n🍟 *Fetching* : ${((new Date - old) * 1)} ms`, ``, m, [{
-                     buttonId: `${prefixes[0]}tikmp3 ${link}`,
-                     buttonText: {
-                        displayText: 'Backsound'
-                     },
-                     type: 1
-                  }])
+                  client.sendFile(m.chat, json.data.video, 'video.mp4', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
                })
             }
          }
