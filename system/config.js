@@ -4,7 +4,7 @@ global.owner = '994408364923'
 // Owner name
 global.owner_name = 'Wildan Izzudin'
 // Database name (Default: database)
-global.database = 'bot'
+global.database = 'database'
 // Maximum upload file size limit (Default : 100 MB)
 global.max_upload = 100
 // Delay for spamming protection (Default : 3 seconds)

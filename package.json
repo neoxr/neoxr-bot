@@ -20,7 +20,7 @@
    "author": "Wildan Izzudin",
    "license": "ISC",
    "dependencies": {  
-      "@adiwajshing/baileys": "git+https://github.com/Yard-Team/Baileys.git",
+      "@adiwajshing/baileys": "npm:baileys@6.0.8",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "1.5.0",
       "@neoxr/neoxr-js": "^1.4.8",
