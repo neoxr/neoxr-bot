@@ -16,7 +16,7 @@ global.timer = 1800000
 // Symbols that are excluded when adding a prefix (Don't change it)
 global.evaluate_chars = ['=>', '~>', '<', '>', '$']
 // Country code that will be automatically blocked by the system, when sending messages in private chat
-global.blocks = ['91', '92', '94', '212']
+global.blocks = ['91', '92', '212']
 // Put target jid to forward friends story
 global.forwards = global.owner + '@c.us'
 // Get neoxr apikey by registering at https://api.neoxr.my.id
