@@ -2,7 +2,6 @@ const cron = require('node-cron')
 const fs = require('fs')
 module.exports = async (client, m, plugins, store) => {
    try {
-      require('./system/database')(m)
       const isOwner = [client.decodeJid(client.user.id).split`@` [0], global.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const isPrem = (global.db.users.some(v => v.jid == m.sender) && global.db.users.find(v => v.jid == m.sender).premium) || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
@@ -16,8 +15,6 @@ module.exports = async (client, m, plugins, store) => {
          users = global.db.users.find(v => v.jid == m.sender),
          setting = global.db.setting
       const body = typeof m.text == 'string' ? m.text : false
-      if (!setting.online) await client.sendPresenceUpdate('unavailable', m.chat)
-      if (setting.online) await client.sendPresenceUpdate('available', m.chat)
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Func.jsonFormat(m), m)
       if (m.isGroup && !isBotAdmin) groupSet.localonly = false
       if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
@@ -52,13 +49,6 @@ module.exports = async (client, m, plugins, store) => {
          setting.lastReset = new Date * 1
          global.db.users.filter(v => v.limit < global.limit && !v.premium).map(v => v.limit = global.limit)
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
-      }, {
-         scheduled: true,
-         timezone: global.timezone
-      })
-      cron.schedule('*/10 * * * *', async () => {
-         const tmpFiles = fs.readdirSync('./temp')
-         if (tmpFiles.length > 0) tmpFiles.map(v => fs.unlinkSync('./temp/' + v))
       }, {
          scheduled: true,
          timezone: global.timezone

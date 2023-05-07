@@ -112,6 +112,9 @@ const connect = async () => {
          m = chatUpdate.messages[0]
          if (!m.message) return
          Serialize(client, m)
+         require('./system/database')(m)
+         if (!global.db.setting.online) await client.sendPresenceUpdate('unavailable', m.chat)
+         if (global.db.setting.online) await client.sendPresenceUpdate('available', m.chat)
          const files = await Scandir('./plugins')
          const plugins = Object.fromEntries(files.filter(v => v.endsWith('.js')).map(file => [path.basename(file).replace('.js', ''), require(file)]))
          require('./system/baileys'), require('./handler')(client, m, plugins, store)
@@ -149,14 +152,14 @@ const connect = async () => {
                return await Func.delay(2000).then(() => client.groupParticipantsUpdate(room.id, [member], 'remove'))
             }
          }
-         let txt = (groupSet.text_welcome != '' ? groupSet.text_welcome : text_welcome).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
+         let txt = (groupSet && groupSet.text_welcome != '' ? groupSet.text_welcome : text_welcome).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
          if (groupSet.welcome) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
             url: global.db.setting.link
          })
       } else if (room.action == 'remove') {
-         let txt = (groupSet.text_left != '' ? groupSet.text_left : text_left).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
+         let txt = (groupSet && groupSet.text_left != '' ? groupSet.text_left : text_left).replace('+tag', `@${member.split`@`[0]}`).replace('+grup', `${meta.subject}`)
          if (groupSet.left) client.sendMessageModify(room.id, txt, null, {
             largeThumb: true,
             thumbnail: pic,
