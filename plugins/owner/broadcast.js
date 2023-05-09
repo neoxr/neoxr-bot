@@ -10,7 +10,7 @@ exports.run = {
       try {
          let q = m.quoted ? m.quoted : m
          let mime = (q.msg || q).mimetype || ''
-         let chatJid = global.db.chats.filter(v => v.jid.endsWith('.net')).map(v => v.jid)
+         let chatJid = global.db.chats.filter(v => v.jid && v.jid.endsWith('.net')).map(v => v.jid)
          let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
          let groupJid = await (await groupList()).map(v => v.id)
          const id = command == 'bc' ? chatJid : groupJid
