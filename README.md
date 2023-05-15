@@ -1,6 +1,6 @@
 ### 乂  Readme
 
-Language :  [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](https://github.com/neoxr/neoxr-bot/blob/master/ID.md)
+Language : [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](https://github.com/neoxr/neoxr-bot/blob/master/ID.md)
 
 ### 乂  Premium Script v3.0.1
 
@@ -25,8 +25,6 @@ Language :  [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](ht
 - 🏷️ Price : **+Rp. 50.000 / +$6.80**
 Temporary Bot Features (Jadibot)
 - 🏷️ Price : **+Rp. 35.000 / +$5.80**
-Storage (Save All Media)
-- 🏷️ Price : **+Rp. 30.000 / +$4.80**
 Chatroom (Conversation w Bot)
 - 🏷️ Price : **+Rp. 15.000 / +$3.80**
 Menfess (Confess)
@@ -43,7 +41,7 @@ Demo : [neoxr-bot v3.0.1](https://wa.me/6285723215364?text=menu)
 <br>
 Creator : [Wildan Izzudin](https://wa.me/6285887776722)
 <br>
-Official Group : [Chatbot](https://chat.whatsapp.com/Dqb7Z2G5mqnIPSc6xbVWuH)
+Official Group : [Chatbot](https://chat.whatsapp.com/KQX1FY618hRDUhuia11j0e)
 
 ### 乂  Documentation
 

@@ -21,14 +21,10 @@ exports.run = {
       }]
       let type = command.toLowerCase()
       if (!isBotAdmin && /antilink|antivirtex|filter|localonly/.test(type)) return client.reply(m.chat, global.status.botAdmin, m)
-      if (!args || !args[0]) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{
-         rows
-      }], m)
+      if (!args || !args[0]) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]\n\nUse the *on* or *off* argument to use this feature.`, m)
       let option = args[0].toLowerCase()
       let optionList = ['on', 'off']
-      if (!optionList.includes(option)) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{
-         rows
-      }], m)
+      if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]\n\nUse the *on* or *off* argument to use this feature.`, m)
       let status = option != 'on' ? false : true
       if (setting[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       setting[type] = status

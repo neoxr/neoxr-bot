@@ -13,6 +13,5 @@ exports.run = {
       })
    },
    admin: true,
-   group: true,
-   premium: true
+   group: true
 }
