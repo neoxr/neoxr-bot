@@ -15,6 +15,7 @@ module.exports = async (client, m, plugins, store) => {
          users = global.db.users.find(v => v.jid == m.sender),
          setting = global.db.setting
       const body = typeof m.text == 'string' ? m.text : false
+      if (!users || !chats) return require('./system/schema')(m)
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Func.jsonFormat(m), m)
       if (m.isGroup && !isBotAdmin) groupSet.localonly = false
       if (m.isGroup && groupSet.autoread) await client.readMessages([m.key])
