@@ -26,12 +26,13 @@ Language : [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](htt
 - [x] Bonus ApiKey 5K Request (for 2 month)
 
 **Additional Features :**
+
 Temporary Bot Features (Jadibot)
-- 🏷️ Price : **+Rp. 35.000 / +$5.80**
+🏷️ Price : **+Rp. 35.000 / +$5.80**
 Chatroom (Conversation \w Bot)
-- 🏷️ Price : **+Rp. 15.000 / +$3.80**
+🏷️ Price : **+Rp. 15.000 / +$3.80**
 Menfess (Confess)
-- 🏷️ Price : **+Rp. 10.000 / +$2.80**
+🏷️ Price : **+Rp. 10.000 / +$2.80**
 
 **Requirement :**
 - NodeJS v14
