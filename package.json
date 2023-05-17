@@ -23,7 +23,7 @@
       "@adiwajshing/baileys": "git+https://github.com/WhiskeySockets/Baileys.git",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "1.5.0",
-      "@neoxr/neoxr-js": "^1.5.0",
+      "@neoxr/neoxr-js": "^1.5.1",
       "cfonts": "~2.10.0",
       "express": "~4.16.4",
       "json-stable-stringify": "^1.0.2",
