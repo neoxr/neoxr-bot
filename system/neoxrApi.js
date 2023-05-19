@@ -229,11 +229,6 @@ module.exports = class NeoxrApi {
       return json
    }
    
-   play = async (query) => {
-      let json = await Func.fetchJson(this.baseUrl + '/play?q=' + query + '&apikey=' + this.apiKey)
-      return json
-   }
-   
    remini = async (image) => {
       let json = await Func.fetchJson(this.baseUrl + '/remini?image=' + image + '&apikey=' + this.apiKey)
       return json
@@ -244,8 +239,28 @@ module.exports = class NeoxrApi {
       return json
    }
    
+   play = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/play?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   video = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/video?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   youtube = async (url, type = 'video', quality = '480p') => {
+      let json = await Func.fetchJson(this.baseUrl + '/youtube?url=' + url + '&type=' + type + '&quality=' + quality + '&apikey=' + this.apiKey)
+      return json
+   }
+   
    diffusion = async (query) => {
       let json = await Func.fetchJson(this.baseUrl + '/diffusion?q=' + query + '&apikey=' + this.apiKey)
+      return json
+   }
+   
+   npm = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/npm?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
 }

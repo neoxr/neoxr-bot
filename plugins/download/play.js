@@ -14,7 +14,7 @@ exports.run = {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.play(text)
-         if (!json.status || !json.data.url) return client.reply(m.chat, global.status.fail, m)
+         if (!json.status || !json.data.url) return client.reply(m.chat, Func.jsonFormat(json), m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
          caption += `	◦  *Size* : ${json.data.size}\n`
