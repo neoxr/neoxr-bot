@@ -27,13 +27,13 @@ Language : [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](htt
 
 **Additional Features :**
 
-Temporary Bot Features (Jadibot)
-🏷️ Price : **+Rp. 35.000 / +$5.80**
+Temporary Bot Features (Jadibot)<br>
+🏷️ Price : **+Rp. 50.000 / +$6.80**
 
-Chatroom (Conversation \w Bot)
-🏷️ Price : **+Rp. 15.000 / +$3.80**
+Chatroom (Conversation \w Bot)<br>
+🏷️ Price : **+Rp. 30.000 / +$4.80**
 
-Menfess (Confess)
+Menfess (Confess)<br>
 🏷️ Price : **+Rp. 10.000 / +$2.80**
 
 **Requirement :**
