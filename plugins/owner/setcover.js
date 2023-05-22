@@ -14,7 +14,7 @@ exports.run = {
          client.sendReact(m.chat, '🕒', m.key)
          let img = await q.download()
          if (!img) return client.reply(m.chat, global.status.wrong, m)
-         let link = await scrap.uploadFile(img)
+         let link = await scrap.uploadImage(img)
          if (!link.status) return m.reply(Func.jsonFormat(link))
          setting.cover = link.data.url
          client.reply(m.chat, Func.texted('bold', `🚩 Cover successfully set.`), m)
