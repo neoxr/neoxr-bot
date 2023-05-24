@@ -18,7 +18,7 @@ exports.run = {
          client.sendMessageModify(m.chat, caption, m, {
             ads: false,
             largeThumb: true,
-            thumbnail: 'https://telegra.ph/file/eb868fe55ad01a685aba1.jpg'
+            thumbnail: global.db.setting.cover
          })
       } catch {
          return client.reply(m.chat, global.status.error, m)
