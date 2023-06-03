@@ -20,10 +20,10 @@ exports.run = {
       }]
       let check = command.toLowerCase()
       let type = check.startsWith('o') ? check.substring(1) : check
-      if (!args || !args[0]) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{ rows }], m)
+      if (!args || !args[0]) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
       let option = args[0].toLowerCase()
       let optionList = ['on', 'off']
-      if (!optionList.includes(option)) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{ rows }], m)
+      if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
       let status = option != 'on' ? false : true
       if (setting[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       setting[type] = status

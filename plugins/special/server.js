@@ -1,7 +1,7 @@
 const os = require('os')
 exports.run = {
    usage: ['server'],
-   category: 'utilities',
+   category: 'special',
    async: async (m, {
       client
    }) => {
@@ -20,8 +20,8 @@ exports.run = {
             largeThumb: true,
             thumbnail: global.db.setting.cover
          })
-      } catch {
-         return client.reply(m.chat, global.status.error, m)
+      } catch (e) {
+         client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    error: false

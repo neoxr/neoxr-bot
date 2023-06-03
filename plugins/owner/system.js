@@ -19,14 +19,10 @@ exports.run = {
          description: `[ Status : OFF ]`
       }]
       let type = command.toLowerCase()
-      if (!args || !args[0]) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${system[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{
-         rows
-      }], m)
+      if (!args || !args[0]) return client.reply(m.chat, `🚩 *Current status* : [ ${system[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
       let option = args[0].toLowerCase()
       let optionList = ['on', 'off']
-      if (!optionList.includes(option)) return client.sendList(m.chat, '', `🚩 *Current status* : [ ${system[type] ? 'ON' : 'OFF'} ]`, '', 'Tap!', [{
-         rows
-      }], m)
+      if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${system[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
       let status = option != 'on' ? false : true
       if (system[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       system[type] = status
