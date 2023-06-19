@@ -39,13 +39,16 @@ Menfess (Confess)<br>
 **Requirement :**
 - NodeJS v14
 - FFMPEG
-- Ram Min. 1GB
+- Canvas
+- Canvacord
+- Python
+- Server vCPU/RAM 1/2GB (Min)
 
-Demo : [neoxr-bot v3.0.1](https://wa.me/6285723215364?text=menu)
+Demo : [neoxr-bot v3.0.1](https://wa.me/62857035017444?text=menu)
 <br>
 Creator : [Wildan Izzudin](https://wa.me/6285887776722)
 <br>
-Official Group : [Chatbot](https://chat.whatsapp.com/KQX1FY618hRDUhuia11j0e)
+Official Group : [Chatbot](https://chat.whatsapp.com/HYknAquOTrECm9KPJJQO1V)
 
 ### 乂  Documentation
 

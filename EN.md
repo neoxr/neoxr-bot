@@ -31,13 +31,13 @@ $ git clone https://github.com/neoxr/neoxr-bot
 
 And then type this on your console.
 ```
-$ npm i
+$ yarn
 $ node .
 ```
 
 **NOTE :** 
 
-1. Use node version **14.x** or **16.x** to avoid errors.
+1. Use node version **14.x** to avoid errors.
 2. If you find an error you can create an issue on this repo, don't ask me on whatsapp it's very annoying.
 3. This script is free and semi open source, you can get more apikey limit in **[Here](https://api.neoxr.my.id)**.
 
