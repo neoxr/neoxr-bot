@@ -70,7 +70,7 @@ const connect = async () => {
          }
       },
       // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-      version: [2, 2323, 4]
+      version: [2, 2318, 11]
    })
 
    store.bind(client.ev)
