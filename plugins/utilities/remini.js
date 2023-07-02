@@ -18,7 +18,7 @@ exports.run = {
                let image = await scrap.uploadImageV2(img)
                let json = await Api.remini(image.data.url)
                if (!json.status) return m.reply(Func.jsonFormat(json))
-               client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
+               client.sendFile(m.chat, Buffer.from(json.data.image, 'base64'), 'image.jpg', '', m)
             } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
@@ -30,7 +30,7 @@ exports.run = {
             let image = await scrap.uploadImageV2(img)
             let json = await Api.remini(image.data.url)
             if (!json.status) return m.reply(Func.jsonFormat(json))
-            client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
+            client.sendFile(m.chat, Buffer.from(json.data.image, 'base64'), 'image.jpg', '', m)
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
