@@ -28,6 +28,7 @@ module.exports = async (client, m, plugins, store) => {
             await Func.delay(2000).then(() => client.groupLeave(m.chat))
          })
       }
+      if (!users) return require('./system/database')(m)
       if (users && (new Date * 1) >= users.expired && users.expired != 0) {
          return client.reply(m.chat, Func.texted('italic', '🚩 Your premium package has expired, thank you for buying and using our service.')).then(async () => {
             users.premium = false
