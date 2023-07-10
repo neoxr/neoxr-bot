@@ -263,4 +263,10 @@ module.exports = class NeoxrApi {
       let json = await Func.fetchJson(this.baseUrl + '/npm?q=' + query + '&apikey=' + this.apiKey)
       return json
    }
+   
+   // this API is free to use no need apikey
+   gpt = async (query) => {
+      let json = await Func.fetchJson(this.baseUrl + '/gpt?q=' + query)
+      return json
+   }
 }
