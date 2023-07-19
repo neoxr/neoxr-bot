@@ -93,7 +93,7 @@ module.exports = async (client, m, plugins, store) => {
       }
       const commands = Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage)).concat(Func.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.hidden))).map(v => v.run.hidden)))
       const args = body && body.replace(isPrefix, '').split` `.filter(v => v)
-      const command = args && args.shift().toLowerCase()
+      const command = args && /(String|Number)/.test(args.constructor.name) ? args.toLowwrCase() : args && args.constructor.name == 'Array' && args.length > 0 ? args.shift().toLowerCase() : undefined
       const clean = body && body.replace(isPrefix, '').trim().split` `.slice(1)
       const text = clean ? clean.join` ` : undefined
       const prefixes = global.db.setting.multiprefix ? global.db.setting.prefix : [global.db.setting.onlyprefix]

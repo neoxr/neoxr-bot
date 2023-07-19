@@ -4,7 +4,7 @@ module.exports = (m) => {
    if (user) {
       if (!isNumber(user.afk)) user.afk = -1
       if (!('afkReason' in user)) user.afkReason = ''
-      if (!('name' in user)) user.name= m.sender
+      if (!('name' in user)) user.name= m.pushName
       if (!('banned' in user)) user.banned = false
       if (!isNumber(user.banTemp)) user.banTemp = 0
       if (!isNumber(user.banTimes)) user.banTimes = 0
@@ -20,7 +20,7 @@ module.exports = (m) => {
          jid: m.sender,
      	afk: -1,
          afkReason: '',
-         name: m.sender,
+         name: m.pushName,
          banned: false,
          banTemp: 0,
          banTimes: 0,
