@@ -4,6 +4,8 @@
 
 Language : [EN](https://github.com/neoxr/neoxr-bot/blob/master/EN.md) | [ID](https://github.com/neoxr/neoxr-bot/blob/master/ID.md)
 
+> NEW BASE [CLICK HERE](https://github.com/neoxr/wbot) 🤤
+
 ### 乂  Premium Script v3.0.1
 
 🏷️ Price : **Rp. 150.000 / $20.80**
