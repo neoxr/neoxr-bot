@@ -1,0 +1,6 @@
+run = "clear && node ."
+
+# run = "clear && pm2 kill && pm2 start index.js && pm2 save && pm2 logs"
+
+[nix]
+channel = "stable-21_11"
