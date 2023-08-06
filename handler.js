@@ -83,8 +83,8 @@ module.exports = async (client, ctx) => {
       if (body && prefix && commands.includes(command) || body && !prefix && commands.includes(command) && setting.noprefix || body && !prefix && commands.includes(command) && env.evaluate_chars.includes(command)) {
          if (setting.error.includes(command)) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${(prefix ? prefix : '') + command}_ disabled.`), m)
          if (!m.isGroup && env.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
-         if (cache.has(m.sender) && cache.get(m.sender) === 1 && !isOwner) return
-         cache.set(m.sender, 1)
+         if (cache.has(m.sender) && cache.get(m.sender) == 'on_hold' && !isOwner) return
+         cache.set(m.sender, 'on_hold')
          if (commands.includes(command)) {
             users.hit += 1
             users.usebot = new Date() * 1
