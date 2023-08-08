@@ -27,9 +27,8 @@ exports.run = {
          if (command == '+prem') {
             // if (data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 @${user.replace(/@.+/, '')} has become registered as a premium account.`), m)
             data.limit += 1000
-            data.premium = true
             data.expired = data.premium ? (86400000 * 30) : ((new Date() * 1) + (86400000 * 30))
-            client.reply(m.chat, Func.texted('bold', `🚩 Successfully added @${user.replace(/@.+/, '')} to premium user.`), m)
+            client.reply(m.chat, Func.texted('bold', `🚩 Successfully added @${user.replace(/@.+/, '')} to premium user.`), m).then(() => data.premium = true)
          } else if (command == '-prem') {
             if (!data.premium) return client.reply(m.chat, Func.texted('bold', `🚩 Not a premium account.`), m)
             data.limit = env.limit
