@@ -190,7 +190,7 @@ module.exports = async (client, ctx) => {
          }
       }
    } catch (e) {
-      if (/(overlimit|timeout)/ig.test(e.message)) return
+      if (/(overlimit|timeout|users|item|time)/ig.test(e.message)) return
       console.log(e)
       if (!m.fromMe) return m.reply(Func.jsonFormat(new Error('neoxr-bot encountered an error :' + e)))
    }
