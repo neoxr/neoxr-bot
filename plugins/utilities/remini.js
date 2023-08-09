@@ -4,7 +4,6 @@ exports.run = {
    category: 'utilities',
    async: async (m, {
       client,
-      text,
       isPrefix,
       command,
       Func,
@@ -18,11 +17,11 @@ exports.run = {
            	client.sendReact(m.chat, '🕒', m.key)
                let img = await client.downloadMediaMessage(q)
                let image = await Scraper.uploadImageV2(img)
-               const json = await Api.neoxr('/remini', {
+               const json = await Api.neoxr('/remini2', {
                   image: image.data.url
                })
                if (!json.status) return m.reply(Func.jsonFormat(json))
-               client.sendFile(m.chat, Buffer.from(json.data.image, 'base64'), 'image.jpg', '', m)
+               client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
             } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
@@ -32,11 +31,11 @@ exports.run = {
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
-            const json = await Api.neoxr('/remini', {
+            const json = await Api.neoxr('/remini2', {
                image: image.data.url
             })
             if (!json.status) return m.reply(Func.jsonFormat(json))
-            client.sendFile(m.chat, Buffer.from(json.data.image, 'base64'), 'image.jpg', '', m)
+            client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)

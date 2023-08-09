@@ -1,4 +1,4 @@
-## NEOXR-BOT V4.0-RC (BETA)
+## NEOXR-BOT (BETA)
 
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
 
@@ -7,7 +7,7 @@
 🏷️ Price : **Rp. 150.000 / $20.80**
 
 **Special Features & Benefit :**
-- AI & AI Image
+- AI & AI Image (Original OpenAI)
 - Anti Bot
 - Auto Download
 - Porn Detector (Only Image)
@@ -166,7 +166,7 @@ exports.run = {
 
 + ```__filename``` : file path for auto update
 
-*Other* :
+**Other** :
 ```Javascript
 cmd.async(m, { client, args, text, isPrefix: prefix, prefixes, command, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins, blockList, env, ctx, Func, Scraper })
 ```

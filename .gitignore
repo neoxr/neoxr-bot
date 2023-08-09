@@ -98,3 +98,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Session
+session/
