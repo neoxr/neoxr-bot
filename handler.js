@@ -75,7 +75,6 @@ module.exports = async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
-      if (m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) return
       const matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
       if (prefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
          if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + (prefix ? prefix : '') + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
@@ -96,6 +95,7 @@ module.exports = async (client, ctx) => {
             const turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
             const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
             if (!turn && !turn_hidden) continue
+            if (m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
             if (setting.self && !isOwner && !m.fromMe) continue
             if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < env.timeout) continue
             if (!m.isGroup && !['owner', 'menfess', 'scan', 'verify', 'payment', 'premium'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) {
@@ -161,6 +161,7 @@ module.exports = async (client, ctx) => {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
          for (let name in is_events) {
             let event = is_events[name].run
+            if (m.chat.endsWith('broadcast')) continue
             if (!m.isGroup && env.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
             if (setting.self && !['menfess_ev', 'anti_link', 'anti_tagall', 'anti_virtex', 'filter'].includes(event.pluginName) && !isOwner && !m.fromMe) continue
             if (!['anti_link', 'anti_tagall', 'anti_virtex', 'filter'].includes(name) && users && (users.banned || new Date - users.banTemp < env.timeout)) continue
