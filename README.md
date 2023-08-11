@@ -16,7 +16,7 @@
 - Email Verification
 - Captcha Verification
 - Send Email
-- High Optimation (Hemat Ram)
+- High Optimation
 - Free Updates
 - Bonus ApiKey 5K Request (for 2 month)
 
