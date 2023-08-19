@@ -24,7 +24,7 @@ exports.run = {
             for (let name in cmd) {
                let obj = cmd[name].run
                if (!cmd) continue
-               if (!obj.category) continue
+               if (!obj.category || setting.hidden.includes(obj.category)) continue
                if (Object.keys(category).includes(obj.category)) category[obj.category].push(obj)
                else {
                   category[obj.category] = []
@@ -70,7 +70,7 @@ exports.run = {
             for (let name in cmd) {
                let obj = cmd[name].run
                if (!cmd) continue
-               if (!obj.category) continue
+               if (!obj.category || setting.hidden.includes(obj.category)) continue
                if (Object.keys(category).includes(obj.category)) category[obj.category].push(obj)
                else {
                   category[obj.category] = []
