@@ -53,7 +53,11 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
    "timer": 180000,
    "timeout": 1800000,
    "blocks": ["994", "91", "92"],
-   "evaluate_chars":  ["=>", "~>", "<", ">", "$"]
+   "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
+   "pairing": {
+      "state": true, // "true" if you want to use the pairing code
+      "number": 62xxxx // start number with country code
+   }
 }
 ```
 
@@ -71,6 +75,21 @@ DATABASE_URL = ''
 + ```API_KEY``` : some of the features in this script use apikey, especially the downloader feature, to get an apiKey you can get it on the [Neoxr Api's](https://api.neoxr.my.id) with prices that vary according to your needs.
 
 + ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
+
+### Pairing Code
+
+Connecting account without qr scan but using pairing code.
+
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/bf4eb78bbd3a26bedc0e8.jpg" /></p>
+
+```Javascript
+{
+   "pairing": {
+      "state": true, // "true" if you want to use the pairing code
+      "number": 62xxxx // start number with country code
+   }
+}
+```
 
 ### Installation & Run
 

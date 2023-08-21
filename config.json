@@ -10,5 +10,9 @@
    "timer": 180000,
    "timeout": 1800000,
    "blocks": ["994", "91", "92"],
-   "evaluate_chars":  ["=>", "~>", "<", ">", "$"]
+   "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
+   "pairing": {
+      "state": true,
+      "number": 62857035017444
+   }
 }
