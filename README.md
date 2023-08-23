@@ -80,7 +80,7 @@ DATABASE_URL = ''
 
 Connecting account without qr scan but using pairing code.
 
-<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/bf4eb78bbd3a26bedc0e8.jpg" /></p>
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/290abc12a3aefe23bc71b.jpg" /></p>
 
 ```Javascript
 {
