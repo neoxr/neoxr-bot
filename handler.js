@@ -29,7 +29,7 @@ module.exports = async (client, ctx) => {
       if (m.isGroup && !isBotAdmin) {
          groupSet.localonly = false
       }
-      if (!users) global.db.users.push({
+      if (!users) return global.db.users.push({
          jid: m.sender,
          banned: false,
          limit: env.limit,
