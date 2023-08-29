@@ -32,7 +32,7 @@ Menfess (Confess)
 
 ### Requirements
 
-- [x] NodeJS v14
+- [x] NodeJS >= 14
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
@@ -63,6 +63,7 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
 
 ```.env
 ### ApiKey : https://api.neoxr.my.id
+API_ENDPOINT = 'https://api.neoxr.my.id/api'
 API_KEY = 'your_apikey'
 
 ### Database : https://www.mongodb.com/
