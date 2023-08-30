@@ -130,7 +130,7 @@ client.on('group.remove', async ctx => {
       var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    }
    const txt = (groupSet && groupSet.text_left ? groupSet.text_left : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
-   if (groupSet && groupSet.welcome) sock.sendMessageModify(ctx.jid, txt, null, {
+   if (groupSet && groupSet.left) sock.sendMessageModify(ctx.jid, txt, null, {
       largeThumb: true,
       thumbnail: pic,
       url: global.db.setting.link
