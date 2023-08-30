@@ -22,11 +22,13 @@
 
 **Additional Features :**
 - 🏷️ Price : **+Rp. 50.000 / +$6.80**
-Temporary Bot Features (Jadibot)
+Temporary Bot Features (Jadibot \w Pairing)
 - 🏷️ Price : **+Rp. 35.000 / +$5.80**
 Chatroom (Conversation w Bot)
 - 🏷️ Price : **+Rp. 15.000 / +$3.80**
 Menfess (Confess)
+- 🏷️ Price : **+Rp. 80.000 / +$10.80**
+Payment Gateway (Indonesia & Singapore Only)
 
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/JA3VN3XpXQuCBB1uVDUx3x)
 
