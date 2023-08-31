@@ -74,6 +74,9 @@ API_KEY = 'your_apikey'
 
 ### Database : https://www.mongodb.com/
 DATABASE_URL = ''
+
+### Timezone (Important)
+TZ = 'Asia/Jakarta'
 ```
 
 **Notes** :
