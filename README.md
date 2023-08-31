@@ -2,6 +2,10 @@
 
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
 
+### Important
+
+> To use [@neoxr/wb >= v1.17.20](https://www.npmjs.com/package/@neoxr/wb) you must add the following components [Open Commit](https://github.com/neoxr/neoxr-bot/commit/26790679dea49494c25106edbaffc5ae9cb716ec)
+
 ### Premium Script v3.0.1-Optima
 
 🏷️ Price : **Rp. 150.000 / $20.80**
