@@ -15,7 +15,7 @@ exports.run = {
                let chat = global.db.chats.find(x => x.jid == v.jid)
                if (chat) Func.removeItem(global.db.chats, chat)
             })
-            global.db.groups.filter(v => now - v.lastseen > day).map(v => {
+            global.db.groups.filter(v => now - v.activity > day).map(v => {
                let group = global.db.groups.find(x => x.jid == v.jid)
                if (group) Func.removeItem(global.db.groups, group)
             })

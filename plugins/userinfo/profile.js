@@ -40,7 +40,7 @@ exports.run = {
             caption += `	◦  *Warning* : ${((m.isGroup) ? (typeof global.db.groups.find(v => v.jid == m.chat).member[user] != 'undefined' ? global.db.groups.find(v => v.jid == m.chat).member[user].warning : 0) + ' / 5' : target.warning + ' / 5')}\n\n`
             caption += `乂  *U S E R - S T A T U S*\n\n`
             caption += `	◦  *Blocked* : ${(blocked ? '√' : '×')}\n`
-            caption += `	◦  *Banned* : ${(new Date - target.banTemp < env.timer) ? Func.toTime(new Date(target.banTemp + env.timeout) - new Date()) + ' (' + ((env.timer / 1000) / 60) + ' min)' : target.banned ? '√' : '×'}\n`
+            caption += `	◦  *Banned* : ${(new Date - target.banTemp < env.timer) ? Func.toTime(new Date(target.banTemp + env.timeout) - new Date()) + ' (' + ((env.timeout / 1000) / 60) + ' min)' : target.banned ? '√' : '×'}\n`
             caption += `	◦  *Use In Private* : ${(global.db.chats.map(v => v.jid).includes(user) ? '√' : '×')}\n`
             caption += `	◦  *Premium* : ${(target.premium ? '√' : '×')}\n`
             caption += `	◦  *Expired* : ${target.expired == 0 ? '-' : Func.timeReverse(target.expired - new Date() * 1)}\n\n`
