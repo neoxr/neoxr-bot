@@ -25,7 +25,7 @@ exports.run = {
          caption += `	◦  *Warning* : ${((m.isGroup) ? (typeof global.db.groups.find(v => v.jid == m.chat).member[m.sender] != 'undefined' ? global.db.groups.find(v => v.jid == m.chat).member[m.sender].warning : 0) + ' / 5' : user.warning + ' / 5')}\n\n`
          caption += `乂  *U S E R - S T A T U S*\n\n`
          caption += `	◦  *Blocked* : ${(blocked ? '√' : '×')}\n`
-         caption += `	◦  *Banned* : ${(new Date - user.banTemp < env.timer) ? Func.toTime(new Date(user.banTemp + env.timer) - new Date()) + ' (' + ((env.timer / 1000) / 60) + ' min)' : user.banned ? '√' : '×'}\n`
+         caption += `	◦  *Banned* : ${(new Date - user.banTemp < env.timer) ? Func.toTime(new Date(user.banTemp + env.timeout) - new Date()) + ' (' + ((env.timer / 1000) / 60) + ' min)' : user.banned ? '√' : '×'}\n`
          caption += `	◦  *Use In Private* : ${(global.db.chats.map(v => v.jid).includes(m.sender) ? '√' : '×')}\n`
          caption += `	◦  *Premium* : ${(user.premium ? '√' : '×')}\n`
          caption += `	◦  *Expired* : ${user.expired == 0 ? '-' : Func.timeReverse(user.expired - new Date() * 1)}\n\n`
