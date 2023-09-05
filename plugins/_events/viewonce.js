@@ -3,10 +3,11 @@ exports.run = {
       client,
       body,
       isOwner,
+      groupSet,
       Func
    }) => {
       try {
-         if (m.msg && m.msg.viewOnce && !isOwner) {
+         if (m.msg && m.msg.viewOnce && !isOwner && groupSet.viewonce) {
             let media = await client.downloadMediaMessage(m.msg)
             if (/image/.test(m.mtype)) {
                client.sendFile(m.chat, media, Func.filename('jpg'), body ? body : '', m)
@@ -20,6 +21,7 @@ exports.run = {
       }
    },
    error: false,
+   group: true,
    cache: true,
    location: __filename
 }
