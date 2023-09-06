@@ -25,6 +25,9 @@
 - Bonus ApiKey 5K Request (for 2 month)
 
 **Additional Features :**
+
+> Addional Features adalah fitur tambahan yang di jual terpisah / Additional features are features that are sold separately.
+
 - 🏷️ Price : **+Rp. 50.000 / +$6.80**
 Temporary Bot Features (Jadibot \w Pairing)
 - 🏷️ Price : **+Rp. 35.000 / +$5.80**
@@ -34,7 +37,7 @@ Menfess (Confess)
 - 🏷️ Price : **+Rp. 80.000 / +$10.80**
 Payment Gateway (Indonesia & Singapore Only)
 
-**Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/JA3VN3XpXQuCBB1uVDUx3x)
+**Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/DkFsTeMORaq4COqeI8kdv8)
 
 ### Requirements
 
