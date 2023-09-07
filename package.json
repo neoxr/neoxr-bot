@@ -3,8 +3,8 @@
    "version":"4.0-rc",
    "description":"WhatsApp Bot (Base)",
    "main":"index.js",
-   "scripts":{
-      "test":"echo \"Error: no test specified\" && exit 1"
+   "scripts": {
+      "start": "node ."
    },
    "repository":{
       "type":"git",

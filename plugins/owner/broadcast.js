@@ -52,6 +52,19 @@ exports.run = {
                   } : {})
             }
             client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
+         } else if (/audio/.test(mime)) {
+            for (let jid of id) {
+               await Func.delay(1500)
+               let media = await q.download()
+               await client.sendFile(jid, media, '', '', null, null,
+                  command == 'bcgc' ? {
+                     ptt: q.ptt,
+                     contextInfo: {
+                        mentionedJid: await (await client.groupMetadata(jid)).participants.map(v => v.id)
+                     }
+                  } : {})
+            }
+            client.reply(m.chat, Func.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : 'groups'}`), m)
          } else client.reply(m.chat, Func.texted('bold', `🚩 Media / text not found or media is not supported.`), m)
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
