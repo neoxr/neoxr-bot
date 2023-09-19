@@ -69,7 +69,7 @@ module.exports = async (client, ctx) => {
          Object.entries(global.db.statistic).map(([_, prop]) => prop.today = 0)
       }, {
          scheduled: true,
-         timezone: 'Asia/Jakarta'
+         timezone: process.env.TZ
       })
       if (m.isGroup && !m.fromMe) {
          let now = new Date() * 1
