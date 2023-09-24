@@ -1,5 +1,5 @@
 exports.run = {
-  usage: ['listban', 'listprem'],
+  usage: ['listban', 'listprem', 'listblock'],
   category: 'miscs',
   async: async (m, {
     client,
@@ -37,7 +37,10 @@ exports.run = {
         }
       }).join('\n')
       m.reply(text)
-
+    }else if (command === 'listblock') {
+        if (!isOwner) return m.reply(global.status.owner)
+     	  var block = await client.fetchBlocklist()                    
+		  client.reply(m.chat, 'List Block:\n\n' + `Total: ${block == undefined ? '*0* Diblokir' : '*' + block.length + '* Diblokir'}\n` + block.map(v => '乂 @' + v.replace(/@.+/, '')).join`\n`, m, { mentions: block })
     }
   },
   error: false,
