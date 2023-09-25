@@ -104,3 +104,5 @@ session/
 data.*
 .env
 yarn.lock
+temp
+config.json
