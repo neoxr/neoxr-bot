@@ -99,5 +99,8 @@ dist
 # TernJS port file
 .tern-port
 
-# Session
+# Excluded
 session/
+data.*
+.env
+yarn.lock

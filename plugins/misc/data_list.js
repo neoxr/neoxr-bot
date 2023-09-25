@@ -6,6 +6,7 @@ exports.run = {
     command,
     isOwner,
     env,
+    blockList,
     Func
   }) => {
     if (command === 'listban') {
@@ -21,7 +22,7 @@ exports.run = {
           return `│  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
         }
       }).join('\n')
-      m.reply(text)
+      m.reply(text + '\n\n' + global.footer)
     } else if (command === 'listprem') {
       if (!isOwner) return m.reply(global.status.owner)
       const data = global.db.users.filter(v => v.premium)
@@ -36,11 +37,20 @@ exports.run = {
           return `│  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
         }
       }).join('\n')
-      m.reply(text)
-    }else if (command === 'listblock') {
-        if (!isOwner) return m.reply(global.status.owner)
-     	  var block = await client.fetchBlocklist()                    
-		  client.reply(m.chat, 'List Block:\n\n' + `Total: ${block == undefined ? '*0* Diblokir' : '*' + block.length + '* Diblokir'}\n` + block.map(v => '乂 @' + v.replace(/@.+/, '')).join`\n`, m, { mentions: block })
+      m.reply(text + '\n\n' + global.footer)
+    } else if (command === 'listblock') {
+      if (blockList.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
+      let text = `乂 *L I S T B L O C K*\n\n`
+      text += blockList.map((v, i) => {
+        if (i == 0) {
+          return `┌  ◦  @${client.decodeJid(v).replace(/@.+/, '')}`
+        } else if (i == data.length - 1) {
+          return `└  ◦  @${client.decodeJid(v).replace(/@.+/, '')}`
+        } else {
+          return `│  ◦  @${client.decodeJid(v).replace(/@.+/, '')}`
+        }
+      }).join('\n')
+      m.reply(text + '\n\n' + global.footer)
     }
   },
   error: false,
