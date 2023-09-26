@@ -6,7 +6,6 @@ exports.run = {
       Func
    }) => {
       await client.reply(m.chat, Func.texted('bold', 'Restarting . . .'), m).then(async () => {
-         await props.save()
          process.send('reset')
       })
    },

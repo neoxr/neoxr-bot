@@ -30,7 +30,7 @@
 
 🏷️ Cloud Storage (**+Rp. 80.000 / +$10.80**)
 
-> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server bot yang nantinya akan menjadi auto reply. Dalam script ini terdapat **script uploader** yang nanntinya di upload ke replit (10GB) untuk menjadi cloud storage, plugin **storage.js** dan **storage_ev.js**
+> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server bot yang nantinya akan menjadi auto reply. Requirement dari fitur ini harus mempunyai akun replit atau hosting support nodejs
 
 🏷️ Menfess (**+Rp. 15.000 / +$3.80**)
 
@@ -38,7 +38,7 @@
 
 🏷️ Payment Gateway (**+Rp. 80.000 / +$10.80**)
 
-> Payment Gateway ini berfungsi untuk melakukan pembayaran otomatis menggunakan QRIS pada fitur ini terdapat script **payment gateway**, plugin **payment.js**, **sewa.js** dan **buyprem.js** harga dan fee bisa di sesuaikan sesuai keinginan
+> Payment Gateway ini berfungsi untuk melakukan pembayaran otomatis menggunakan QRIS yang sudah terdapat nominal transfer, harga dan fee bisa di sesuaikan sesuai keinginan
 
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/DkFsTeMORaq4COqeI8kdv8)
 
