@@ -30,7 +30,7 @@
 
 🏷️ Cloud Storage (**+Rp. 80.000 / +$10.80**)
 
-> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server bot yang nantinya akan menjadi auto reply. Dalam script ini terdapat **script uploader** yang nanntinya di upload ke replit (10GB) untuk menjadi cloud storage, plugin **storage.js** dan **storage_ev.js**
+> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server bot. Dalam script ini terdapat **script uploader** yang bisa di upload ke replit sebagai tempat menyimpan media, plugin **storage.js** dan **storage_ev.js**
 
 🏷️ Menfess (**+Rp. 15.000 / +$3.80**)
 

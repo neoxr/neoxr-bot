@@ -22,7 +22,7 @@ exports.run = {
             const json = await Api.neoxr('/youtube', {
                url: args[0],
                type: 'audio',
-               quality: args[1] || '128kbps'
+               quality: args[1] || '128k'
             })
             if (!json.status || !json.data.url) return client.reply(m.chat, Func.jsonFormat(json), m)
             let caption = `乂  *Y T - P L A Y*\n\n`
@@ -51,7 +51,7 @@ exports.run = {
             var json = await Api.neoxr('/youtube', {
                url: args[0],
                type: 'video',
-               quality: args[1] || '480p'
+               quality: args[1] || '720p'
             })
             if (!json.status) {
                var json = await Api.neoxr('/youtube', {
