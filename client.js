@@ -59,9 +59,17 @@ client.on('ready', async () => {
       } catch {}
    }, 60 * 1000 * 10)
 
-   /* save database every 30 seconds */
+   /* save database send http-request every 30 seconds */
    setInterval(async () => {
       if (global.db) await machine.save(global.db)
+      if (process.env.APP && process.env.URL && process.env.COOKIE) {
+         axios.get(process.env.URL, {
+            headers: {
+               referer: process.env.APP,
+               cookie: process.env.COOKIE
+            }
+         })
+      }
    }, 30_000)
 })
 

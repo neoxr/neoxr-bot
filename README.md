@@ -92,6 +92,25 @@ TZ = 'Asia/Jakarta'
 
 + ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
 
+### Run on Clovyr
+
+Clovyr is a free cloud compute with vscode based for running bot with specifications of 2 CPU and 4GB RAM (idk storage size)
+
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/879907dac646d1cb4c017.png" /></p>
+
+with vscode it will be very easy to do recode and debugging scripts
+
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/7e33c1e83a872f4f8d363.png" /></p>
+
+**Notes** :
++ ```CLOVYR_APP``` : This is declare with the URL of your Clovyr application
+
+> Specifically for the 2 configurations below, you must carry out an inspect element using a computer to get cookies and keep-alive links
+
++ ```CLOVYR_URL``` : keep-alive link
+
++ ```CLOVYR_COOKIE``` : cookie from clovyr
+
 ### Pairing Code
 
 Connecting account without qr scan but using pairing code.
