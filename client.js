@@ -18,21 +18,25 @@ const client = new Baileys({
    sf: 'session',
    online: true,
    version: [2, 2318, 11]
-}, {
-   generateHighQualityLinkPreview: true
 })
 
 /* starting to connect */
-client.on('connect', async () => {
+client.on('connect', async res => {
    /* load database */
    global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await machine.fetch() ||{})}
    
    /* save database */
    await machine.save(global.db)
+
+   /* write connection log */
+   if (res && typeof res === 'object' && res.message) Func.logFile(res.message)
 })
 
 /* print error */
-client.on('error', async error => console.log(colors.red(error.message)))
+client.on('error', async error => {
+   console.log(colors.red(error.message))
+   if (error && typeof error === 'object' && error.message) Func.logFile(error.message)
+})
 
 /* bot is connected */
 client.on('ready', async () => {
@@ -64,13 +68,14 @@ client.on('ready', async () => {
    /* save database send http-request every 30 seconds */
    setInterval(async () => {
       if (global.db) await machine.save(global.db)
-      if (process.env.CLOVYR_VIEW_APPNAME && process.env.CLOVYR_KEEPALIVE_URL && process.env.COOKIE) {
-         axios.get(process.env.CLOVYR_KEEPALIVE_URL, {
+      if (process.env.CLOVYR_APPNAME && process.env.CLOVYR_URL && process.env.CLOVYR_COOKIE) {
+         const response = await axios.get(process.env.CLOVYR_URL, {
             headers: {
-               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_VIEW_APPNAME,
-               cookie: process.env.COOKIE
+               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_APPNAME,
+               cookie: process.env.CLOVYR_COOKIE
             }
          })
+         Func.logFile('Application wake-up!')
       }
    }, 30_000)
 })
