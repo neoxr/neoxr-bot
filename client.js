@@ -64,10 +64,10 @@ client.on('ready', async () => {
    /* save database send http-request every 30 seconds */
    setInterval(async () => {
       if (global.db) await machine.save(global.db)
-      if (process.env.CLOVYR_APPNAME && process.env.CLOVYR_URL && process.env.COOKIE) {
-         axios.get(process.env.CLOVYR_URL, {
+      if (process.env.CLOVYR_VIEW_APPNAME && process.env.CLOVYR_KEEPALIVE_URL && process.env.COOKIE) {
+         axios.get(process.env.CLOVYR_KEEPALIVE_URL, {
             headers: {
-               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_APPNAME,
+               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_VIEW_APPNAME,
                cookie: process.env.COOKIE
             }
          })
