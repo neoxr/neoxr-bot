@@ -18,6 +18,8 @@ const client = new Baileys({
    sf: 'session',
    online: true,
    version: [2, 2318, 11]
+}, {
+   generateHighQualityLinkPreview: true
 })
 
 /* starting to connect */
@@ -62,10 +64,10 @@ client.on('ready', async () => {
    /* save database send http-request every 30 seconds */
    setInterval(async () => {
       if (global.db) await machine.save(global.db)
-      if (process.env.APP && process.env.URL && process.env.COOKIE) {
-         axios.get(process.env.URL, {
+      if (process.env.CLOVYR_APPNAME && process.env.CLOVYR_URL && process.env.COOKIE) {
+         axios.get(process.env.CLOVYR_URL, {
             headers: {
-               referer: process.env.APP,
+               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_APPNAME,
                cookie: process.env.COOKIE
             }
          })
