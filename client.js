@@ -75,7 +75,7 @@ client.on('ready', async () => {
                cookie: process.env.CLOVYR_COOKIE
             }
          })
-         Func.logFile('Application wake-up!')
+         Func.logFile(`${await response.status} - Application wake-up!`)
       }
    }, 30_000)
 })
