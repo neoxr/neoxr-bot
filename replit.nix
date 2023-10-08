@@ -5,6 +5,7 @@
         pkgs.nodePackages.typescript
         pkgs.nodePackages.pm2
         pkgs.arcan.ffmpeg
+        pkgs.yarn
         pkgs.libwebp
         pkgs.imagemagick
         pkgs.libuuid
