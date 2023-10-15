@@ -105,7 +105,7 @@ with vscode it will be very easy to do recode and debugging scripts
 <p align="center"><img align="center" width="100%" src="https://telegra.ph/file/7e33c1e83a872f4f8d363.png" /></p>
 
 **Notes** :
-+ ```CLOVYR_APP``` : This is declare with the URL of your Clovyr application
++ ```CLOVYR_APPNAME``` : application name on your clovyr
 
 > Specifically for the 2 configurations below, you must carry out an inspect element using a computer to get cookies and keep-alive links
 
