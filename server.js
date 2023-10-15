@@ -3,6 +3,7 @@ const chalk = require('chalk')
 const express = require('express')
 const app = express()
 const http = require('http')
+const env = require('./config.json')
 const PORT = process.env.PORT || 8080
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 let i = 0
@@ -15,11 +16,11 @@ const runServer = async () => {
       i++
       try {
          // add your server link for run 24×7hours. If you are deploying on replit
-         let response = await axios('https://neoxr-bot.peler71.repl.co/')
+         let response = await axios(env.replit_url)
          console.log(chalk.yellowBright.bold('Server wake-up! --', response.status))
          await sleep(30_000)
       } catch {}
    }
 }
 
-runServer().then(() => runServer())
+if (env.replit_url) runServer().then(() => runServer())

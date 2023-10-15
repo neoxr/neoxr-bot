@@ -20,7 +20,7 @@ module.exports = async (client, ctx) => {
          chats = global.db.chats.find(v => v.jid == m.chat),
          users = global.db.users.find(v => v.jid == m.sender),
          setting = global.db.setting
-      Logs(client, m, false, 1) /* 1 = print all message, 0 = print only cmd message */
+      Logs(client, m, false) /* 1 = print all message, 0 = print only cmd message */
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
          client.sendPresenceUpdate('available', m.chat)

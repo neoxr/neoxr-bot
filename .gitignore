@@ -106,4 +106,3 @@ temp/
 data.*
 yarn.*
 package-lock.*
-config.json

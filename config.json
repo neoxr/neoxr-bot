@@ -1,5 +1,5 @@
 {
-   "owner": "62858877767222",
+   "owner": "6285887776722",
    "owner_name": "Wildan Izzudin",
    "database": "data",
    "limit": 15,
@@ -14,5 +14,6 @@
    "pairing": {
       "state": true,
       "number": 62857035017444
-   }
+   },
+   "replit_url": ""
 }
