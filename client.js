@@ -54,7 +54,7 @@ client.on('ready', async () => {
    if (!fs.existsSync('./temp')) fs.mkdirSync('./temp')
 
    /* require all additional functions */
-   require('./lib/system/config'), require('./lib/system/baileys'), require('./lib/system/functions'), require('./lib/system/scraper')
+   require('./lib/system/config'), require('./lib/system/baileys')(client.sock), require('./lib/system/functions'), require('./lib/system/scraper')
 
    /* clear temp folder every 10 minutes */
    setInterval(() => {
