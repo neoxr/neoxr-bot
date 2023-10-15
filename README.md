@@ -92,6 +92,8 @@ TZ = 'Asia/Jakarta'
 
 + ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
 
+> Localdb is only for development state, for production state you must use a cloud database (mongo / postgres)
+
 ### Run on Clovyr
 
 Clovyr is a free cloud compute with vscode based for running bot with specifications of 2 CPU and 4GB RAM (idk storage size)
