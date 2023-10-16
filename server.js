@@ -12,7 +12,7 @@ const runServer = async () => {
    app.get('/', (req, res) => res.send('Server Active!'))
    const server = http.createServer(app)
    server.listen(PORT, () => console.log(chalk.yellowBright.bold('Connected to server --', PORT)))
-   while (true) {
+   while (env.replit_url != '') {
       i++
       try {
          // add your server link for run 24×7hours. If you are deploying on replit
@@ -23,4 +23,4 @@ const runServer = async () => {
    }
 }
 
-if (env.replit_url) runServer().then(() => runServer())
+runServer().then(() => runServer())
