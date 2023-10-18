@@ -14,13 +14,15 @@ RUN apt-get update && \
   nodejs\
   ffmpeg \
   imagemagick \
+  build-essential \
+  python \
   webp && \
   apt-get upgrade -y && \
   rm -rf /var/lib/apt/lists/*
 
 COPY package.json .
 
-RUN npm i
+RUN yarn global add node-pre-gyp@v0.7.x && yarn global add node-pre && yarn install
 
 COPY . .
 
