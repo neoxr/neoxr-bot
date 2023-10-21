@@ -18,7 +18,7 @@ exports.run = {
          const json = await Api.neoxr('/tiktok', {
             url: Func.ttFixed(args[0])
          })
-         if (!json.status || !json.data.video) return client.reply(m.chat, Func.jsonFormat(json), m)
+         //if (!json.status || !json.data.video) return client.reply(m.chat, Func.jsonFormat(json), m)
          let caption = `乂  *T I K T O K*\n\n`
          caption += `	◦  *Author* : ${json.data.author.nickname} (@${json.data.author.username})\n`
          caption += `	◦  *Views* : ${Func.formatter(json.data.stats.play_count)}\n`
@@ -30,13 +30,14 @@ exports.run = {
          caption += `	◦  *Caption* : ${json.data.caption || '-'}\n`
          caption += `	◦  *Fetching* : ${((new Date - old) * 1)} ms\n\n`
          caption += global.footer
-         if (command == 'tiktok' || command == 'tt') {
-            if (json.data.video) return client.sendFile(m.chat, json.data.video, 'video.mp4', caption, m)
-            if (json.data.photo) {
-               for (let p of json.data.photo) {
-                  client.sendFile(m.chat, p, 'image.jpg', caption, m)
-                  await Func.delay(1500)
-               }
+        if (command == 'tiktok' || command == 'tt') {
+            if (json.data.video) {
+        		   return client.sendFile(m.chat, json.data.video, 'video.mp4', caption, m)
+    		   } else if (json.data.photo) {
+           		for (let p of json.data.photo) {
+               		client.sendFile(m.chat, p, 'image.jpg', caption, m)
+               		await Func.delay(1500)
+           		}
             }
          }
          if (command == 'tikwm') return client.sendFile(m.chat, json.data.videoWM, 'video.mp4', caption, m)
