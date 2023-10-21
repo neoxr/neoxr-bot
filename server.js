@@ -16,8 +16,8 @@ const runServer = async () => {
       i++
       try {
          // add your server link on config,json for run 24×7hours. If you are deploying on replit
-         let response = await axios(env.replit_url || 'https://neoxr-bot.peler71.repl.co')
-         console.log(chalk.yellowBright.bold('Server wake-up! --', response.status))
+         let response = await axios(env.replit_url || 'https://google.com')
+         if (env.replit_url) console.log(chalk.yellowBright.bold('Server wake-up! --', response.status))
          await sleep(30_000)
       } catch {}
    }
