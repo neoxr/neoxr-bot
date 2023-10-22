@@ -30,14 +30,13 @@ exports.run = {
          caption += `	◦  *Caption* : ${json.data.caption || '-'}\n`
          caption += `	◦  *Fetching* : ${((new Date - old) * 1)} ms\n\n`
          caption += global.footer
-        if (command == 'tiktok' || command == 'tt') {
-            if (json.data.video) {
-        		   return client.sendFile(m.chat, json.data.video, 'video.mp4', caption, m)
-    		   } else if (json.data.photo) {
-           		for (let p of json.data.photo) {
-               		client.sendFile(m.chat, p, 'image.jpg', caption, m)
-               		await Func.delay(1500)
-           		}
+         if (command == 'tiktok' || command == 'tt') {
+            if (json.data.video) return client.sendFile(m.chat, json.data.video, 'video.mp4', caption, m)
+            if (json.data.photo) {
+               for (let p of json.data.photo) {
+                  client.sendFile(m.chat, p, 'image.jpg', caption, m)
+                  await Func.delay(1500)
+               }
             }
          }
          if (command == 'tikwm') return client.sendFile(m.chat, json.data.videoWM, 'video.mp4', caption, m)
