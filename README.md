@@ -40,6 +40,10 @@
 
 > Payment Gateway ini berfungsi untuk melakukan pembayaran otomatis menggunakan QRIS pada fitur ini terdapat script **payment gateway**, plugin **payment.js**, **sewa.js** dan **buyprem.js** harga dan fee bisa di sesuaikan sesuai keinginan
 
+🏷️ Game Plugins (**+Rp. 70.000 / +$9.80**)
+
+> 23 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
+
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/DkFsTeMORaq4COqeI8kdv8)
 
 ### Requirements
