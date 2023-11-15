@@ -28,7 +28,7 @@ exports.run = {
                   })
                   if (!json.status) return client.reply(m.chat, `${global.status.fail} : [ @${link.split('/')[4]} ]`, m)
                   for (let i = 0; i < json.data.length; i++) {
-                     client.sendFile(m.chat, json.data[i].url, ``, `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+                     client.sendFile(m.chat, json.data[i].url, Func.filename(json.data[i].type), `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
                      await Func.delay(1500)
                   }
                })
