@@ -40,6 +40,7 @@ CFonts.say('NEOXR BOT', {
    align: 'center'
 })
 
+// dont remove this code if you need update notification
 async function checkUpdate() {
 	try {
 		const vcode = require('./version.json').semantic.version
