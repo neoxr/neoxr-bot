@@ -44,9 +44,12 @@ async function checkUpdate() {
 	try {
 		const vcode = require('./version.json').semantic.version
 		const json = await Func.fetchJson('https://neoxr.my.id/check-update/version?type=beta')
-		if (json.status && json.version != vcode) return ({
+		if (json.status && json.data.version != vcode) return ({
 			update: true,
 			...json.data
+		})
+		return ({
+			update: false
 		})
 	} catch (e) {
 		console.log(e)
