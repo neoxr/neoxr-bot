@@ -1,5 +1,6 @@
-require('dotenv').config(), require('rootpath')(), require('./server')
-const { spawn: spawn } = require('child_process'), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts')
+if (process.argv.includes('--server')) require('./server')
+require('dotenv').config(), require('rootpath')()
+const { spawn: spawn } = require('child_process'), { Function: Func } = new(require('@neoxr/wb')), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts'), chalk = require('chalk')
 
 const unhandledRejections = new Map()
 process.on('unhandledRejection', (reason, promise) => {
@@ -37,4 +38,32 @@ CFonts.say('NEOXR BOT', {
    colors: ['system'],
    font: 'console',
    align: 'center'
-}), start()
+})
+
+async function checkUpdate() {
+	try {
+		const vcode = require('./version.json').semantic.version
+		const json = await Func.fetchJson('https://neoxr.my.id/check-update/version?type=beta')
+		if (json.status && json.version != vcode) return ({
+			update: true,
+			...json.data
+		})
+	} catch (e) {
+		console.log(e)
+		return ({
+			update: false
+		})
+	}
+}
+
+checkUpdate().then(json => {
+	if (json.update) {
+		const vcode = require('./version.json').semantic.version
+		let i = chalk.black(chalk.bgGreen(` Update available ${vcode} ~> ${json.version} `))
+		i += `\n\n${json.commit}\n\n`
+		i += chalk.green(json.url)
+		console.log(i)
+	} else {
+		start()
+	}
+})
