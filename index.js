@@ -44,7 +44,7 @@ CFonts.say('NEOXR BOT', {
 async function checkUpdate() {
 	try {
 		const vcode = require('./version.json').semantic.version
-		const json = await Func.fetchJson('https://neoxr.my.id/check-update/version?type=beta')
+		const json = await Func.fetchJson('https://neoxr.my.id/check-update/version?type=premium')
 		if (json.status && json.data.version != vcode) return ({
 			update: true,
 			...json.data
