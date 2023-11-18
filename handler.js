@@ -1,4 +1,4 @@
-const { Function: Func, Logs, Scraper } = new(require('@neoxr/wb'))
+const { Function: Func, Logs, Scraper, InvCloud } = new(require('@neoxr/wb'))
 const env = require('./config.json')
 const cron = require('node-cron')
 const cache = new(require('node-cache'))({
@@ -7,8 +7,9 @@ const cache = new(require('node-cache'))({
 module.exports = async (client, ctx) => {
    const { store, m, body, prefix, plugins, commands, args, command, text, prefixes } = ctx
    try {
-      require('./lib/system/schema')(m, env) /* input database */
-      const isOwner = [client.decodeJid(client.user.id).split`@` [0], env.owner, ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      // "InvCloud" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
+      require('./lib/system/schema')(m, env), InvCloud(store)
+      const isOwner = [env.owner, client.decodeJid(client.user.id).split`@` [0], ...global.db.setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const isPrem = (global.db.users.some(v => v.jid == m.sender) && global.db.users.find(v => v.jid == m.sender).premium)
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []
