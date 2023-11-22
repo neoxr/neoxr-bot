@@ -18,8 +18,9 @@ exports.run = {
             url: args[0]
          })
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
-         for (let i = 0; i < json.data.length; i++) {
-            client.sendFile(m.chat, json.data[i].url, Func.filename(json.data[i].type), `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+         for (let v of json.data) {
+            const file = await Func.getFile(v.url)
+            client.sendFile(m.chat, v.url, Func.filename(/mp4|bin/.test(file.extension) ? 'mp4' : 'jpg'), `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
             await Func.delay(1500)
          }
       } catch (e) {
