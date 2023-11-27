@@ -3,6 +3,7 @@ exports.run = {
    use: '0 / 1',
    category: 'admin tools',
    async: async (m, {
+      client,
       args,
       isPrefix,
       command,
