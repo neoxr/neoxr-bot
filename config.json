@@ -6,14 +6,14 @@
    "ram_limit": "900mb",
    "max_upload": 50,
    "max_upload_free": 10,
-   "cooldown": 3,
+   "cooldown": 5,
    "timer": 180000,
    "timeout": 1800000,
    "blocks": ["994", "91", "92"],
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true,
-      "number": 62857035017444
+      "number": 6285819846892
    },
    "replit_url": ""
 }
