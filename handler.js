@@ -30,7 +30,7 @@ module.exports = async (client, ctx) => {
       if (m.isGroup && !isBotAdmin) {
          groupSet.localonly = false
       }
-      if (!users || !users.limit) return global.db.users.push({
+      if (!users || typeof users.limit === undefined) return global.db.users.push({
          jid: m.sender,
          banned: false,
          limit: env.limit,
@@ -167,6 +167,8 @@ module.exports = async (client, ctx) => {
          }
       } else {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
+         if (cache.has(m.sender) && cache.get(m.sender) == 'on_hold' && !isOwner) return
+         cache.set(m.sender, 'on_hold')
          for (let name in is_events) {
             let event = is_events[name].run
             if (m.fromMe || m.chat.endsWith('broadcast') || /pollUpdate/.test(m.mtype)) continue
