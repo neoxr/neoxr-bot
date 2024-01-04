@@ -100,7 +100,6 @@ dist
 .tern-port
 
 # Ignored component
-.env
 session/
 temp/
 data.*
