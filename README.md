@@ -28,9 +28,9 @@
 
 > Addional Features adalah fitur tambahan yang di jual terpisah / Additional features are features that are sold separately.
 
-🏷️ Cloud Storage (**+Rp. 80.000 / +$10.80**)
+🏷️ Cloud Storage (**+Rp. 35.000 / +$6.80**)
 
-> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server bot. Dalam script ini terdapat **script uploader** yang bisa di upload ke replit sebagai tempat menyimpan media, plugin **storage.js** dan **storage_ev.js**
+> Cloud Storage ini berfungsi untuk menyimpan file media (sticker, foto, video, audio) ke cloud storage tanpa membebani disk space server karena file langsung di simpan kedalam database. Plugin **storage.js** dan **storage_ev.js**
 
 🏷️ Menfess (**+Rp. 15.000 / +$3.80**)
 
@@ -48,7 +48,7 @@
 
 ### Requirements
 
-- [x] NodeJS >= 14
+- [x] NodeJS 14
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 

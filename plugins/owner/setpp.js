@@ -13,11 +13,7 @@ exports.run = {
          if (/image\/(jpe?g|png)/.test(mime)) {
             client.sendReact(m.chat, '🕒', m.key)
             const buffer = await q.download()
-            const json = await Scraper.uploadImageV2(buffer)
-            if (!json.status) return m.reply(Func.jsonFormat(json))
-            await client.updateProfilePicture(client.user.id, {
-               url: json.data.url
-            })
+            await client.updateProfilePicture(client.user.id, buffer)
             await Func.delay(3000).then(() => client.reply(m.chat, Func.texted('bold', `🚩 Profile photo has been successfully changed.`), m))
          } else return client.reply(m.chat, Func.texted('bold', `🚩 Reply to the photo that will be made into the bot's profile photo.`), m)
       } catch (e) {

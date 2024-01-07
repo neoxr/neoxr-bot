@@ -22,7 +22,7 @@
    "homepage":"https://github.com/neoxr/wbot#readme",
    "dependencies":{
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^1.24.37",
+      "@neoxr/wb": "^1.25.37",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
       "express": "~4.16.4",
@@ -31,6 +31,7 @@
       "node-gtts": "^2.0.2",
       "qrcode": "1.5.0",
       "speedtest-net": "1.6.2",
+      "streamifier": "^0.1.1",
       "translate-google-api": "1.0.4"
    },
    "devDependencies": {
