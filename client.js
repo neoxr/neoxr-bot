@@ -18,7 +18,7 @@ const client = new Baileys({
    plugsdir: 'plugins',
    sf: 'session',
    online: true,
-   version: [2, 2318, 11]
+   version: [2, 2329, 9]
 })
 
 /* starting to connect */

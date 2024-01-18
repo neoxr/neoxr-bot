@@ -90,8 +90,8 @@ module.exports = async (client, ctx) => {
       if (body && prefix && commands.includes(command) || body && !prefix && commands.includes(command) && setting.noprefix || body && !prefix && commands.includes(command) && env.evaluate_chars.includes(command)) {
          if (setting.error.includes(command)) return client.reply(m.chat, Func.texted('bold', `🚩 Command _${(prefix ? prefix : '') + command}_ disabled.`), m)
          if (!m.isGroup && env.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
-         if (cache.has(m.sender) && cache.get(m.sender) == 'on_hold' && !isOwner) return
-         cache.set(m.sender, 'on_hold')
+         if (cache.has(m.chat) && cache.get(m.chat) === 'on_hold' && !m.isBot) return
+         cache.set(m.chat, 'on_hold')
          if (commands.includes(command)) {
             users.hit += 1
             users.usebot = new Date() * 1
@@ -167,7 +167,7 @@ module.exports = async (client, ctx) => {
          }
       } else {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
-         if (cache.has(m.sender) && cache.get(m.sender) == 'on_hold' && !isOwner) return
+         if (cache.has(m.chat) && cache.get(m.chat) === 'on_hold' && !m.isBot) return
          cache.set(m.sender, 'on_hold')
          for (let name in is_events) {
             let event = is_events[name].run

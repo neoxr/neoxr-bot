@@ -17,7 +17,7 @@ exports.run = {
          try {
             pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
          } catch {
-            pic = 'https://srv.neoxr.tk/files/z8hI5T.jpg'
+            pic = 'https://i.ibb.co/nsDv3ZJ/image.jpg'
          }
          const obj = {
             "type": "quote",
