@@ -43,7 +43,7 @@ exports.run = {
             if (command == 'tikwm') return client.sendFile(m.chat, json.data.videoWM, 'video.mp4', caption, m)
             if (command == 'tikmp3') return !json.data.audio ? client.reply(m.chat, global.status.fail, m) : client.sendFile(m.chat, json.data.audio, 'audio.mp3', '', m)
          } else {
-            client.sendFile(m.chat, json.data.url, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+            client.sendFile(m.chat, json.data.url, 'video.mp4', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)

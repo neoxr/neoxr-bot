@@ -48,7 +48,7 @@ exports.run = {
                         }
                      }
                   } else {
-                     client.sendFile(m.chat, json.data.url, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+                     client.sendFile(m.chat, json.data.url, 'video.mp4', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
                   }
                })
             }
