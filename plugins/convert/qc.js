@@ -13,6 +13,7 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Hi!'), m)
          if (text.length > 30) return client.reply(m.chat, Func.texted('bold', `🚩 Max 30 character.`), m)
+         client.sendReact(m.chat, '🕒', m.key)
          const exif = global.db.setting
          try {
             pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
@@ -40,7 +41,7 @@ exports.run = {
                "replyMessage": {}
             }]
          }
-         const json = await axios.post('https://quote-api.neoxr.eu/generate', obj, {
+         const json = await axios.post('https://quote-api.replit.app/generate', obj, {
             headers: {
                'Content-Type': 'application/json'
             }

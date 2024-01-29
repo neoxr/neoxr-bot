@@ -13,6 +13,7 @@ exports.run = {
       try {
          let exif = global.db.setting
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, '😳+😩'), m)
+         client.sendReact(m.chat, '🕒', m.key)
          let [emo1, emo2] = text.split`+`
          if (!emo1 || !emo2) return client.reply(m.chat, Func.texted('bold', `🚩 Give 2 emoji to mix.`), m)
          const json = await Api.neoxr('/emoji', {
