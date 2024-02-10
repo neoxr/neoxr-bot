@@ -6,6 +6,8 @@ const cache = new(require('node-cache'))({
 })
 module.exports = async (client, ctx) => {
    const { store, m, body, prefix, plugins, commands, args, command, text, prefixes } = ctx
+   const context = m.message[m.mtype] || m.message.viewOnceMessageV2.message[m.mtype]
+   process.env['E_MSG'] = context.contextInfo ? Number(context.contextInfo.expiration) : 0
    try {
       // "InvCloud" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
       require('./lib/system/schema')(m, env), InvCloud(store)
@@ -37,6 +39,7 @@ module.exports = async (client, ctx) => {
          hit: 0,
          spam: 0
       })
+      if (!setting.multiprefix) setting.noprefix = false
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Func.jsonFormat(m), m)
       if (m.isGroup && !groupSet.stay && (new Date * 1) >= groupSet.expired && groupSet.expired != 0) {
          return client.reply(m.chat, Func.texted('italic', '🚩 Bot time has expired and will leave from this group, thank you.', null, {
@@ -54,7 +57,10 @@ module.exports = async (client, ctx) => {
          })
       }     
       if (m.isGroup) groupSet.activity = new Date() * 1
-      if (users) users.lastseen = new Date() * 1
+      if (users) {
+         users.name = m.pushName
+         users.lastseen = new Date() * 1
+      }
       if (chats) {
          chats.chat += 1
          chats.lastseen = new Date * 1
@@ -83,6 +89,14 @@ module.exports = async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
+      const corePrefix = setting.prefix.concat([setting.onlyprefix])
+      const core = {
+         prefix: body ? Func.isEmojiPrefix(body) ? Func.getEmoji(body)[0] : body.charAt(0) : '',
+         command: body ? corePrefix.some(v => body.startsWith(v)) ? body.replace(corePrefix.find(v => body.startsWith(v)), '').split` `[0] : body.split` `[0] : '',
+         corePrefix
+      }
+      if (body && !setting.noprefix && !core.corePrefix.includes(core.prefix) && commands.includes(core.command) && !env.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Prefix needed!*, this bot uses prefix : *[ ${setting.multiprefix ? setting.prefix.join(', ') : setting.onlyprefix} ]*\n\n➠ ${setting.multiprefix ? setting.prefix[0] : setting.onlyprefix}${core.command} ${text || ''}`, m)
+      if (body && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !env.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
       const matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
       if (prefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
          if (!m.isGroup || (m.isGroup && !groupSet.mute)) return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations :\n\n${matcher.map(v => '➠ *' + (prefix ? prefix : '') + v.string + '* (' + v.accuracy + '%)').join('\n')}`, m)
