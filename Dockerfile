@@ -11,12 +11,8 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
 RUN apt-get update && \
   apt-get install -y \
-  nodejs\
   ffmpeg \
   imagemagick \
-  build-essential \
-  python \
-  webp && \
   apt-get upgrade -y && \
   rm -rf /var/lib/apt/lists/*
 

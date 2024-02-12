@@ -6,8 +6,8 @@ const cache = new(require('node-cache'))({
 })
 module.exports = async (client, ctx) => {
    const { store, m, body, prefix, plugins, commands, args, command, text, prefixes } = ctx
-   const context = m.message[m.mtype] || m.message.viewOnceMessageV2.message[m.mtype]
-   process.env['E_MSG'] = context.contextInfo ? Number(context.contextInfo.expiration) : 0
+   // const context = m.message[m.mtype] || m.message.viewOnceMessageV2.message[m.mtype]
+   // process.env['E_MSG'] = context.contextInfo ? Number(context.contextInfo.expiration) : 0
    try {
       // "InvCloud" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
       require('./lib/system/schema')(m, env), InvCloud(store)
