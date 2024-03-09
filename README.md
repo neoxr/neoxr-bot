@@ -44,11 +44,11 @@
 
 > 23 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
-**Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/DkFsTeMORaq4COqeI8kdv8)
+**Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
 
 ### Requirements
 
-- [x] NodeJS 14
+- [x] NodeJS >= 14
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
@@ -68,6 +68,9 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
    "cooldown": 3,
    "timer": 180000,
    "timeout": 1800000,
+   "permanent_threshold": 3,
+   "notify_threshold": 4,
+   "banned_threshold": 5,
    "blocks": ["994", "91", "92"],
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
@@ -97,6 +100,38 @@ TZ = 'Asia/Jakarta'
 + ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
 
 > Localdb is only for development state, for production state you must use a cloud database (mongo / postgres)
+
+### High Level Spam Detection
+
+This program is equipped with a spam detector (anti-spam) which is very sensitive.
+
+```Javascript
+const { Spam } = new(require('@neoxr/wb))
+
+const spam = new Spam({
+   RESET_TIMER: env.cooldown,
+   HOLD_TIMER: env.timeout,
+   PERMANENT_THRESHOLD: env.permanent_threshold,
+   NOTIFY_THRESHOLD: env.notify_threshold,
+   BANNED_THRESHOLD: env.banned_threshold
+})
+
+const isSpam = spam.detection(client, m, {
+   prefix, command, commands, users, cooldown,
+   show: 'all', // for logger in the terminal, choose 'all' or 'command-only'
+   banned_times: users.ban_times
+})
+
+console.log(isSpam.state)
+```
+
+Look, i tries to spam commands against the bot, and will only respond to 1 command.
+
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/facb21ff04392f5b65442.png" /></p>
+
+and the message gets a red label [ SPM ] as spam message in the terminal.
+
+<p align="center"><img align="center" width="100%" src="https://telegra.ph/file/8929ba9545ecc024bc348.png" /></p>
 
 ### Run on Clovyr
 
@@ -265,4 +300,4 @@ event.async(m, { client, body, prefixes, groupMetadata, participants, users, cha
 
 Others please learn by yourself from other plugins.
 
-Check this repository regularly to get updates because the progress base is not 100% yet, if you find an error, please make an issue. Thanks.
+Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.
