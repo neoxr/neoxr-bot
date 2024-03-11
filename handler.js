@@ -25,7 +25,7 @@ module.exports = async (client, ctx) => {
       const users = global.db.users.find(v => v.jid === m.sender)
       const setting = global.db.setting
       const isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), env.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
-      const isPrem = ussrs && users.premium || isOwner
+      const isPrem = users && users.premium || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
       const participants = m.isGroup ? groupMetadata.participants : [] || []
       const adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
