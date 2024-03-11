@@ -41,7 +41,7 @@ exports.run = {
                "replyMessage": {}
             }]
          }
-         const json = await axios.post('https://quote-api.replit.app/generate', obj, {
+         const json = await axios.post('https://bot.lyo.su/quote/generate', obj, {
             headers: {
                'Content-Type': 'application/json'
             }

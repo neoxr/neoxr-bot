@@ -20,7 +20,7 @@ exports.run = {
          if (!file.status) return m.reply(Func.jsonFormat(file))
          let old = new Date()
          client.sendReact(m.chat, '🕒', m.key)
-         const json = await Api.neoxr('/webp-to-mp4', {
+         const json = await Api.neoxr('/webp2mp4', {
             url: file.data.url
          })
          client.sendFile(m.chat, json.data.url, '', `🍟 *Process* : ${((new Date - old) * 1)} ms`, m)

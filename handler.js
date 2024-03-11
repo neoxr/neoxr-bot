@@ -35,7 +35,8 @@ module.exports = async (client, ctx) => {
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
          show: 'all', // choose 'all' or 'command-only'
-         banned_times: users.ban_times
+         banned_times: users.ban_times,
+         simple: false
       })
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
