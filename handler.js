@@ -139,8 +139,7 @@ module.exports = async (client, ctx) => {
             if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < env.timeout)) continue
             if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
             if (cmd.cache && cmd.location) {
-               let file = require.resolve(cmd.location)
-               Func.reload(file)
+               Func.updateFile(cmd.location)
             }
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
@@ -203,8 +202,7 @@ module.exports = async (client, ctx) => {
                url: setting.link
             }).then(() => chats.lastchat = new Date() * 1)
             if (event.cache && event.location) {
-               let file = require.resolve(event.location)
-               Func.reload(file)
+               Func.updateFile(event.location)
             }
             if (event.error) continue
             if (event.owner && !isOwner) continue

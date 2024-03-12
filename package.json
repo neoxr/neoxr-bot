@@ -22,7 +22,7 @@
    "homepage":"https://github.com/neoxr/wbot#readme",
    "dependencies":{
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^1.34.46",
+      "@neoxr/wb": "^1.35.46",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
       "express": "~4.16.4",
