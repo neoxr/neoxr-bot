@@ -1,4 +1,4 @@
-const { decode } = require('html-entities')
+const decode = require('html-entities').decode
 exports.run = {
    usage: ['mediafire'],
    hidden: ['mf'],
@@ -30,7 +30,7 @@ exports.run = {
          text += '	◦  *Uploaded* : ' + json.data.uploaded + '\n\n'
          text += global.footer
          const chSize = Func.sizeLimit(json.data.size, users.premium ? env.max_upload : env.max_upload_free)
-         const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit, download it by yourself via this link : ${await (await Scraper.shorten(json.data.link)).data.url}` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${env.max_upload_free} MB and for premium users a maximum of ${env.max_upload} MB.`
+         const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${env.max_upload_free} MB and for premium users a maximum of ${env.max_upload} MB.`
          if (chSize.oversize) return client.reply(m.chat, isOver, m)
          client.sendMessageModify(m.chat, text, m, {
             largeThumb: true,
