@@ -8,6 +8,7 @@ exports.run = {
       args,
       isPrefix,
       command,
+      users,
       Func
    }) => {
       try {
