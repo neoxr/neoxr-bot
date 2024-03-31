@@ -7,39 +7,30 @@ exports.run = {
         const isMedia =
             m.msg.hasOwnProperty("imageMessage") ||
             m.msg.hasOwnProperty("videoMessage");
+        const isPersonalChat = !m.isGroup; // Cek apakah pesan diterima dalam obrolan pribadi
         let prompt = fs.readFileSync('./media/personaerrin.txt', 'utf-8');
         let text = ""; 
 
-        if (/(Errin|errin)/.test(body) || isQuotedFromBot) {
-          if (typeof body === "string") {
-            text = prompt + body.replace(/(Errin|errin)/g, "");
+        if (isPersonalChat) {
+          if (isQuotedFromBot || !isMedia) {
+            let quotedMessage = m.quoted ? m.quoted.text || "" : "";
+            //text = prompt + quotedMessage + (m.text || "");
+            text = prompt + (m.text || "")+ (quotedMessage ? quotedMessage : "");
           }
         }
 
-        if (m.quoted && !isMedia) {
-          let quotedMessage = m.quoted.text || "";
-          if (quotedMessage && isQuotedFromBot) {
-            text = prompt + (m.text || "")+ (quotedMessage ? quotedMessage : "");
-            //text = prompt + quotedMessage;
-            //text += ` ${body}`;
-          } else{
-              return;
-          }
-        }
-          
-        if (/image/.test(m.mtype) && body && /(Errin|errin)/i.test(body)) {
+        if (/image/.test(m.mtype) && body && !m.isGroup) {
             let q = m.quoted ? m.quoted : m;
             client.sendReact(m.chat, "🕒", m.key);
             let img = await q.download();
             let image = await Scraper.uploadImageV2(img);
             const json = await Api.neoxr("/koros", {
               image: image.data.url,
-              q: body.replace(/(Errin|errin)/g, "")
+              q: body,
             });
             client.reply(m.chat, json.data.description, m);
-            
-			} else if (/conversation|extended/.test(m.mtype) && text !== "") {
-            client.sendReact(m.chat, "🥰", m.key);
+          } else if (/conversation|extended/.test(m.mtype) && text !== "") {
+            client.sendReact(m.chat, "💬", m.key);
             let json = await Func.fetchJson(
               `https://aemt.me/bard?text=${encodeURIComponent(text)}`
             );
@@ -61,7 +52,6 @@ exports.run = {
     },
   error: false,
   limit: true,
-  group: true,
   cache: true,
   location: __filename
 };
