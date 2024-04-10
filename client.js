@@ -58,7 +58,7 @@ client.on('ready', async () => {
    require('./lib/system/config'), require('./lib/system/baileys')(client.sock), require('./lib/system/functions'), require('./lib/system/scraper')
 
    /* clear temp folder every 10 minutes */
-   setInterval(() => {
+   setInterval(async () => {
       try {
          const tmpFiles = fs.readdirSync('./temp')
          if (tmpFiles.length > 0) {
