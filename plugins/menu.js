@@ -17,7 +17,7 @@ exports.run = {
          const id = m.chat
          const local_size = fs.existsSync('./' + env.database + '.json') ? await Func.getSize(fs.statSync('./' + env.database + '.json').size) : ''
          const library = JSON.parse(require('fs').readFileSync('./package.json', 'utf-8'))
-         const message = setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (/mongo/.test(process.env.DATABASE_URL) ? 'Mongo' : /postgre/.test(process.env.DATABASE_URL) ? 'Postgres' : `Local (${local_size})`)).replace('+version', (library.devDependencies.bails ? library.devDependencies.bails : library.devDependencies['@adiwajshing/baileys'] ? '@adiwajshing/baileys' : library.devDependencies.baileys).replace('^', '').replace('~', ''))
+         const message = setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (/mongo/.test(process.env.DATABASE_URL) ? 'Mongo' : /postgre/.test(process.env.DATABASE_URL) ? 'Postgres' : `Local (${local_size})`)).replace('+version', (library.dependencies.bails ? library.dependencies.bails : library.dependencies['@adiwajshing/baileys'] ? '@adiwajshing/baileys' : library.dependencies.baileys).replace('^', '').replace('~', ''))
          const style = setting.style
          if (style === 1) {
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)

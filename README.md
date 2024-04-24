@@ -1,4 +1,4 @@
-## NEOXR-BOT (BETA)
+## NEOXR-BOT (BETA TEST)
 
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
 
@@ -132,6 +132,17 @@ Look, i tries to spam commands against the bot, and will only respond to 1 comma
 and the message gets a red label [ SPM ] as spam message in the terminal.
 
 <p align="center"><img align="center" width="100%" src="https://telegra.ph/file/8929ba9545ecc024bc348.png" /></p>
+
+### Run on Heroku
+
+To run this bot on Heroku you only need to add 2 buildpacks :
+
++ NodeJS
++ FFMPEG [https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git](https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git)
+
+
+delete the `package.json`, and rename `package-for-heroku.json` to `package.json`
+
 
 ### Run on Clovyr
 
