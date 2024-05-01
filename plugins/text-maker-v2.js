@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['avenger', 'glitch', 'marvel', 'pornhub'],
+   usage: ['avenger', 'marvel', 'pornhub', 'lifebuoys'],
    use: 'text | text',
    category: 'text maker',
    async: async (m, {

@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['blackpink', 'blood', 'breakwall', 'glow', 'joker', 'magma', 'matrix', 'multicolor', 'neon', 'papercut', 'slice', 'transformer', 'naruto'],
+   usage: ['blackpink','blood','breakwall','glow','joker','papercut','flames','matrix','multicolor','neon','slice','naruto','glasses','glitch','typography','eraser','captain','clouds','gradient','sand','puppy','cake','grass','sunset','pig'],
    use: 'text',
    category: 'text maker',
    async: async (m, {
