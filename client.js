@@ -55,9 +55,9 @@ client.on('ready', async () => {
    /* create temp directory if doesn't exists */
    if (!fs.existsSync('./temp')) fs.mkdirSync('./temp')
 
-   /* require all additional functions */
-   require('./lib/system/config'), require('./lib/system/baileys')(client.sock), require('./lib/system/functions'), require('./lib/system/scraper')
-
+   /* additional config */
+   require('./lib/system/config')
+   
    /* clear temp folder every 10 minutes */
    setInterval(async () => {
       try {
@@ -107,7 +107,12 @@ client.on('ready', async () => {
 })
 
 /* print all message object */
-client.on('message', ctx => require('./handler')(client.sock, ctx))
+client.on('message', ctx => {
+   require('./handler')(client.sock, ctx)
+   require('./lib/system/baileys')(client.sock)
+   require('./lib/system/functions')
+   require('./lib/system/scraper')
+})
 
 /* print deleted message object */
 client.on('message.delete', ctx => {
