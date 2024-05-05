@@ -290,7 +290,7 @@ exports.run = {
                   highlight_label: 'Many Used'
                }
                keys.sort((a, b) => a.localeCompare(b)).map((v, i) => sections.push({
-                  ...(/download|util/.test(v) ? label : {}),
+                  ...(/download|conver|util/.test(v) ? label : {}),
                   rows: [{
                      title: Func.ucword(v),
                      description: `There are ${Func.arrayJoin(Object.entries(plugins).filter(([_, x]) => x.run.usage && x.run.category == v.trim().toLowerCase() && !setting.hidden.includes(x.run.category.toLowerCase())).map(([_, x]) => x.run.usage)).length} commands`,

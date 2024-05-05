@@ -22,7 +22,7 @@
    },
    "homepage":"https://github.com/neoxr/wbot#readme",
    "dependencies":{
-      "@adiwajshing/baileys": "npm:@neoxr/baileys",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@6.7.2",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
       "@neoxr/wb": "^1.42.58",
