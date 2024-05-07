@@ -31,6 +31,7 @@
       "jimp": "~0.16.13",
       "json-stable-stringify": "^1.0.2",
       "node-cron": "^3.0.0",
+      "@kenss/kenshin-js": "3.0.3",
       "node-gtts": "^2.0.2",
       "qrcode": "1.5.0",
       "speedtest-net": "1.6.2",
