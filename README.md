@@ -6,6 +6,16 @@
 
 > To use [@neoxr/wb >= v1.17.20](https://www.npmjs.com/package/@neoxr/wb) you must add the following components [Open Commit](https://github.com/neoxr/neoxr-bot/commit/26790679dea49494c25106edbaffc5ae9cb716ec)
 
+### Script Delay 🤣
+
+> Buat yang lapor ke kreator scriptnya delay itu bukan delay melainkan sistem anti spam (cooldown) supaya nomor tahan banned, jika di rasa sistem ini tidak berguna dan nomormu kebal dari banned matikan anti spam di file config.json, cari opsi **cooldown** dan set menjadi 0. (Giliran ke banned nyalahin sc nya lagi gampang ke banned, pler).
+
+```Javascript
+{
+   cooldown: 0
+}
+```
+
 ### Premium Script v3.0.1-Optima
 
 🏷️ Price : **Rp. 150.000 / $20.80**
@@ -65,7 +75,7 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
    "ram_limit": "900mb",
    "max_upload": 50,
    "max_upload_free": 10,
-   "cooldown": 3,
+   "cooldown": 3, // anti spam hold 3 seconds
    "timer": 180000,
    "timeout": 1800000,
    "permanent_threshold": 3,
