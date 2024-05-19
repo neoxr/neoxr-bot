@@ -1,7 +1,4 @@
-const { Youtube } = require('@neoxr/youtube-scraper')
-const yt = new Youtube({
-   fileAsUrl: false
-})
+const { Converter } = new(require('@neoxr/wb'))
 exports.run = {
    usage: ['ytmp3', 'ytmp4'],
    hidden: ['yta', 'ytv'],
@@ -22,7 +19,7 @@ exports.run = {
             if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://youtu.be/zaRFmdtLhQ8'), m)
             if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
             client.sendReact(m.chat, '🕒', m.key)
-            const json = await yt.fetch(args[0])
+            const json = await Scraper.youtube(args[0])
             if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
             let caption = `乂  *Y T - P L A Y*\n\n`
             caption += `	◦  *Title* : ${json.title}\n`
@@ -37,7 +34,8 @@ exports.run = {
                largeThumb: true,
                thumbnail: await Func.fetchBuffer(json.thumbnail)
             }).then(async () => {
-               client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
+               const buffer = await Converter.toAudio(json.data.buffer, 'mp3')
+               client.sendFile(m.chat, buffer, json.data.filename, '', m, {
                   document: true,
                   APIC: await Func.fetchBuffer(json.thumbnail)
                })
@@ -46,10 +44,7 @@ exports.run = {
             if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://youtu.be/zaRFmdtLhQ8'), m)
             if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
             client.sendReact(m.chat, '🕒', m.key)
-            var json = await yt.fetch(args[0], 'video', '720p')
-            if (!json.status) {
-               var json = await yt.fetch(args[0], 'video', '480p')
-            }
+            const json = await Scraper.youtube(args[0], 'video')
             if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
             let caption = `乂  *Y T - M P 4*\n\n`
             caption += `	◦  *Title* : ${json.title}\n`
@@ -65,11 +60,11 @@ exports.run = {
                largeThumb: true,
                thumbnail: await Func.fetchBuffer(json.thumbnail)
             }).then(async () => {
-               await client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
+               await client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m, {
                   document: true
                })
             })
-            client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
+            client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m)
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)

@@ -1,8 +1,12 @@
+const { Youtube } = require('@neoxr/youtube-scraper')
+const yt = new Youtube({
+   fileAsUrl: false
+})
 exports.run = {
    usage: ['video'],
    hidden: ['playvid', 'playvideo'],
    use: 'query',
-   category: 'downloader',
+   category: 'feature',
    async: async (m, {
       client,
       text,
@@ -32,19 +36,18 @@ exports.run = {
             largeThumb: true,
             thumbnail: await Func.fetchBuffer(json.thumbnail)
          }).then(async () => {
-            await client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m, {
+            await client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
                document: true
             })
          })
-         client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m)
+         client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
       } catch (e) {
-         console.log(e)
          return client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,
    limit: true,
-   premium: true,
+   restrict: true,
    cache: true,
    location: __filename
 }

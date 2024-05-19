@@ -145,7 +145,7 @@ and the message gets a red label [ SPM ] as spam message in the terminal.
 
 ### Run on Heroku
 
-To run this bot on Heroku you only need to add 2 buildpacks :
+To run this bot on Heroku you only need to add 2 buildpacks and choose region EU (EUROPE) for your app :
 
 + NodeJS
 + FFMPEG [https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git](https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git)

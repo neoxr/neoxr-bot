@@ -1,9 +1,7 @@
-const { Youtube } = require('@neoxr/youtube-scraper')
-const yt = new Youtube({
-   fileAsUrl: false
-})
+const { Converter } = new(require('@neoxr/wb'))
 exports.run = {
    usage: ['play'],
+   hidden: ['lagu', 'song'],
    use: 'query',
    category: 'downloader',
    async: async (m, {
@@ -19,7 +17,7 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const json = await yt.play(text)
+         const json = await Scraper.play(text)
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
@@ -32,20 +30,22 @@ exports.run = {
          if (chSize.oversize) return client.reply(m.chat, isOver, m)
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
-            thumbnail: json.thumbnail
+            thumbnail: await Func.fetchBuffer(json.thumbnail)
          }).then(async () => {
-            client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
+            const buffer = await Converter.toAudio(json.data.buffer, 'mp3')
+            client.sendFile(m.chat, buffer, json.data.filename, '', m, {
                document: true,
                APIC: await Func.fetchBuffer(json.thumbnail)
             })
          })
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         console.log(e)
+         return client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
    error: false,
-   restrict: true,
    limit: true,
+   restrict: true,
    cache: true,
    location: __filename
 }

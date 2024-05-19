@@ -11,10 +11,10 @@ exports.run = {
    }) => {
       if (typeof body === 'object' || !isOwner) return
       let command, text
-      let x = body.trim().split`\n`,
+      let x = body && body.trim().split`\n`,
          y = ''
-      command = x[0].split` ` [0]
-      y += x[0].split` `.slice`1`.join` `, y += x.slice`1`.join`\n`
+      command = x[0] ? x[0].split` ` [0] : ''
+      y += x[0] ? x[0].split` `.slice`1`.join` ` : '', y += x ? x.slice`1`.join`\n` : ''
       text = y.trim()
       if (!text) return
       if (command === '=>') {

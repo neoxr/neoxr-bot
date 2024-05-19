@@ -1,7 +1,4 @@
-const { Youtube } = require('@neoxr/youtube-scraper')
-const yt = new Youtube({
-   fileAsUrl: false
-})
+const { Converter } = new(require('@neoxr/wb'))
 exports.run = {
    usage: ['ytlist'],
    hidden: ['ytplaylist', 'playlist', 'getmp3', 'getmp4'],
@@ -26,9 +23,9 @@ exports.run = {
             if (Number(args[0]) > check.results.length) return m.reply(Func.texted('bold', `🚩 Exceed amount of data.`))
             client.sendReact(m.chat, '🕒', m.key)
             if (command === 'getmp3') {
-               const json = await yt.fetch(check.results[Number(args[0]) - 1])
+               const json = await Scraper.youtube(check.results[Number(args[0]) - 1])
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-               let caption = `乂  *Y T - M P 3*\n\n`
+               let caption = `乂  *Y T - P L A Y*\n\n`
                caption += `	◦  *Title* : ${json.title}\n`
                caption += `	◦  *Size* : ${json.data.size}\n`
                caption += `	◦  *Duration* : ${json.duration}\n`
@@ -41,16 +38,14 @@ exports.run = {
                   largeThumb: true,
                   thumbnail: await Func.fetchBuffer(json.thumbnail)
                }).then(async () => {
-                  client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
+                  const buffer = await Converter.toAudio(json.data.buffer, 'mp3')
+                  client.sendFile(m.chat, buffer, json.data.filename, '', m, {
                      document: true,
                      APIC: await Func.fetchBuffer(json.thumbnail)
                   })
                })
             } else if (command === 'getmp4') {
-               var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '720p')
-               if (!json.status) {
-                  var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '480p')
-               }
+               const json = await Scraper.youtube(check.results[Number(args[0]) - 1], 'video')
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                let caption = `乂  *Y T - M P 4*\n\n`
                caption += `	◦  *Title* : ${json.title}\n`
@@ -66,11 +61,11 @@ exports.run = {
                   largeThumb: true,
                   thumbnail: await Func.fetchBuffer(json.thumbnail)
                }).then(async () => {
-                  await client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
+                  await client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m, {
                      document: true
                   })
                })
-               client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
+               client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m)
             }
          } else if (['ytplaylist', 'playlist', 'ytlist'].includes(command)) {
             client.sendReact(m.chat, '🕒', m.key)
