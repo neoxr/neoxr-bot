@@ -1,7 +1,7 @@
 "use strict";
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
-const { Baileys, MongoDB, PostgreSQL, Scandir, Function: Func } = new(require('@neoxr/wb'))
+const { Baileys, MongoDB, PostgreSQL, Scraper, Scandir, Function: Func } = new(require('@neoxr/wb'))
 const spinnies = new(require('spinnies'))(),
    fs = require('fs'),
    path = require('path'),
@@ -139,50 +139,6 @@ client.on('presence.update', update => {
          }
       }
    } else {}
-})
-
-client.on('group.add', async ctx => {
-   const sock = client.sock
-   const text = `Thanks +tag for joining into +grup group.`
-   const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
-   try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
-   } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
-   }
-
-   /* localonly to remove new member when the number not from indonesia */
-   if (groupSet && groupSet.localonly) {
-      if (global.db.users.some(v => v.jid == ctx.member) && !global.db.users.find(v => v.jid == ctx.member).whitelist && !ctx.member.startsWith('62') || !ctx.member.startsWith('62')) {
-         sock.reply(ctx.jid, Func.texted('bold', `Sorry @${ctx.member.split`@`[0]}, this group is only for indonesian people and you will removed automatically.`))
-         sock.updateBlockStatus(member, 'block')
-         return await Func.delay(2000).then(() => sock.groupParticipantsUpdate(ctx.jid, [ctx.member], 'remove'))
-      }
-   }
-
-   const txt = (groupSet && groupSet.text_welcome ? groupSet.text_welcome : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
-   if (groupSet && groupSet.welcome) sock.sendMessageModify(ctx.jid, txt, null, {
-      largeThumb: true,
-      thumbnail: pic,
-      url: global.db.setting.link
-   })
-})
-
-client.on('group.remove', async ctx => {
-   const sock = client.sock
-   const text = `Good bye +tag :)`
-   const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
-   try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
-   } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
-   }
-   const txt = (groupSet && groupSet.text_left ? groupSet.text_left : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
-   if (groupSet && groupSet.left) sock.sendMessageModify(ctx.jid, txt, null, {
-      largeThumb: true,
-      thumbnail: pic,
-      url: global.db.setting.link
-   })
 })
 
 client.on('caller', ctx => {
