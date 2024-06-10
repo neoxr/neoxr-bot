@@ -8,22 +8,14 @@ exports.run = {
       chats,
       setting
    }) => {
-const buttons = [{
-   name: "cta_url",
-   buttonParamsJson: JSON.stringify({
-      display_text: "Follow🐱🥰",
-      url: "https://whatsapp.com/channel/0029VadUeuZ65yDFmlgJSX37",
-      merchant_url: "https://whatsapp.com/channel/0029VadUeuZ65yDFmlgJSX37"
-   })
-}]
    	try {
 //just reply
-if (!m.fromMe && body && body.match(/(a)/gi)) return client.sendIAMessage(m.chat, buttons, m, {
-            header: '',
-            content: `*hello* @${m.pushName}\nplise follow my channel WhatsApp You can learn to make a Whatsapp bot and you can also get a free credit card for any registration🥰\n\nhttps://whatsapp.com/channel/0029VadUeuZ65yDFmlgJSX37\n\n*or click the button 👇🥰*`,
-            footer: global.footer,
-            media: global.db.setting.cover
-         })
+if (!m.fromMe && body && body.match(/(a|b|c)/gi)) return client.sendMessageModify(m.chat, `*hello* @${m.pushName}\nplise follow my channel WhatsApp You can learn to make a Whatsapp bot and you can also get a free credit card for any registration🥰\n\nhttps://whatsapp.com/channel/0029VadUeuZ65yDFmlgJSX37`, m, {
+   title: '',
+   largeThumb: true,
+   ads: true,
+   thumbnail: 'https://s4.neoxr.eu/get/Mfh1qh.jpg'
+})
       } catch (e) {
          console.log(e)
          client.reply(m.chat, Func.jsonFormat(e), m)
