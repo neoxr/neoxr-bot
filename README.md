@@ -8,13 +8,7 @@
 
 ### Script Delay 🤣
 
-> Buat yang lapor ke kreator scriptnya delay itu bukan delay melainkan sistem anti spam (cooldown) supaya nomor tahan banned, jika di rasa sistem ini tidak berguna dan nomormu kebal dari banned matikan anti spam di file config.json, cari opsi **cooldown** dan set menjadi 0. (Giliran ke banned nyalahin sc nya lagi gampang ke banned, pler).
-
-```Javascript
-{
-   cooldown: 0
-}
-```
+> Buat yang lapor ke kreator scriptnya delay itu bukan delay melainkan sistem anti spam (cooldown) supaya nomor tahan banned, jika di rasa sistem ini tidak berguna dan nomormu kebal dari banned matikan anti spam : **.antispam off*
 
 ### Premium Script v3.0.1-Optima
 

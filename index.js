@@ -38,36 +38,4 @@ CFonts.say('NEOXR BOT', {
    colors: ['system'],
    font: 'console',
    align: 'center'
-})
-
-// dont remove this code if you need update notification
-async function checkUpdate() {
-	try {
-		const vcode = require('./version.json').semantic.version
-		const json = await Func.fetchJson('https://neoxr.my.id/check-update/version?type=beta')
-		if (json.status && json.data.version != vcode) return ({
-			update: true,
-			...json.data
-		})
-		return ({
-			update: false
-		})
-	} catch (e) {
-		console.log(e)
-		return ({
-			update: false
-		})
-	}
-}
-
-checkUpdate().then(json => {
-	if (json.update) {
-		const vcode = require('./version.json').semantic.version
-		let i = chalk.black(chalk.bgGreen(` Update available ${vcode} ~> ${json.version} `))
-		i += `\n\n${json.commit}\n\n`
-		i += chalk.green(json.url)
-		console.log(i)
-	} else {
-		start()
-	}
-})
+}), start()
