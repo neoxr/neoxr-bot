@@ -19,7 +19,7 @@ exports.run = {
          if (!json.status) return client.reply(m.chat, global.status.fail, m)
          for (let i = 0; i < 3; i++) {
             var rand = Math.floor(json.data.length * Math.random())
-            client.sendFile(m.chat, json.data[rand].url, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+            client.sendFile(m.chat, json.data[rand], '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
             await Func.delay(2000)
          }
       } catch (e) {
