@@ -1,6 +1,6 @@
 exports.run = {
    usage: ['twitter'],
-   hidden: ['tw', 'twdl'],
+   hidden: ['tw', 'twdl', 'x'],
    use: 'link',
    category: 'downloader',
    async: async (m, {
@@ -12,6 +12,7 @@ exports.run = {
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://twitter.com/mosidik/status/1475812845249957889?s=20'), m)
+         if (args[0].match(/(x.com)/gi)) args[0] = args[0].replace(/(x.com)/gi, 'twitter.com')
          if (!args[0].match(/(twitter.com)/gi)) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/twitter', {
