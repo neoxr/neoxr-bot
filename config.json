@@ -16,7 +16,7 @@
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true,
-      "number": 6283847497849
+      "number": 6283132988099
    },
    "replit_url": ""
 }
