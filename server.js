@@ -23,4 +23,4 @@ const runServer = async () => {
    }
 }
 
-runServer().then(() => runServer())
+runServer().catch(() => runServer())

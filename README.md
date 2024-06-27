@@ -15,18 +15,19 @@
 🏷️ Price : **Rp. 150.000 / $20.80**
 
 **Special Features & Benefit :**
-- AI & AI Image (Original OpenAI)
-- Anti Bot
 - Auto Download
-- Porn Detector (Only Image)
-- 9 Mini Games
+- Porn Detector (Image Only)
+- 24 Mini Games
 - Leveling & Roles
 - Email Verification
-- Captcha Verification
 - Send Email
+- Cloud Storage
+- Menfess w/ Session
+- Store Plugin (Product)
+- Mistery Box
 - High Optimation
 - Free Updates
-- Bonus ApiKey 5K Request (for 2 month)
+- Bonus ApiKey 30K Request (for 3 month)
 
 **Additional Features :**
 
@@ -42,17 +43,17 @@
 
 🏷️ Payment Gateway (**+Rp. 80.000 / +$10.80**)
 
-> Payment Gateway ini berfungsi untuk melakukan pembayaran otomatis menggunakan QRIS pada fitur ini terdapat script **payment gateway**, plugin **payment.js**, **sewa.js** dan **buyprem.js** harga dan fee bisa di sesuaikan sesuai keinginan
+> Payment Gateway ini berfungsi untuk melakukan pembayaran otomatis menggunakan QRIS pada fitur ini terdapat script **payment gateway**, plugin **payment.js**, **sewa.js** dan **buyprem.js** harga dan fee bisa di sesuaikan sesuai keinginan, dalam pembelian mendapat 2 script payment gateway yaitu dari saweria dan paydisini yang mendukung all payment
 
 🏷️ Game Plugins (**+Rp. 70.000 / +$9.80**)
 
-> 23 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
+> 24 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
 
 ### Requirements
 
-- [x] NodeJS >= 14
+- [x] NodeJS >= 14 (Recommended v14)
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
@@ -85,8 +86,7 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
 ```
 
 ```.env
-### ApiKey : https://api.neoxr.my.id
-API_ENDPOINT = 'https://api.neoxr.my.id/api'
+### Neoxr API : https://api.neoxr.my.id
 API_KEY = 'your_apikey'
 
 ### Database : https://www.mongodb.com/
