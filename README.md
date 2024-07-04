@@ -10,7 +10,7 @@
 
 > Buat yang lapor ke kreator scriptnya delay itu bukan delay melainkan sistem anti spam (cooldown) supaya nomor tahan banned, jika di rasa sistem ini tidak berguna dan nomormu kebal dari banned matikan anti spam : **.antispam off*
 
-### Premium Script v3.0.1-Optima
+### Premium Script v4.1
 
 🏷️ Price : **Rp. 150.000 / $20.80**
 
@@ -56,6 +56,13 @@
 - [x] NodeJS >= 14 (Recommended v14)
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
+
+### Recommended Server
+
+- [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/)
+- [x] Hosting Panel [Voxy Host](https://voxyhost.com/)
+- [x] VPS [OVH Hosting](https://www.ovhcloud.com/asia/vps/)
+- [x] RDP Windows [RDP Win](https://www.rdpwin.com/rdpbot.php)
 
 ### Configuration
 
@@ -187,15 +194,16 @@ Connecting account without qr scan but using pairing code.
 Make sure the configuration and server meet the requirements so that there are no problems during installation or when this bot is running, type this on your console :
 
 ```
-$ yarn
+$ npm -i g yarn
+$ yarn install --ignore-engines
 $ node .
 ```
 
 or want to use pm2
 
 ```
-$ yarn
-$ npm i -g pm2
+$ npm -i g pm2 yarn
+$ yarn install --ignore-engines
 $ pm2 start index.js && pm2 save && pm2 logs
 ```
 
