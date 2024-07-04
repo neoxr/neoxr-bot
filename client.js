@@ -25,6 +25,9 @@ const client = new Baileys({
 
 /* starting to connect */
 client.on('connect', async res => {
+   /* for all groups */
+   client.sock.groups = client.sock.groups ? client.sock.groups : []
+  
    /* load database */
    global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await machine.fetch() ||{})}
    
@@ -105,7 +108,6 @@ client.on('ready', async () => {
       // }
    }, 30_000)
 
-   client.sock.groups = client.sock.groups ? client.sock.groups : []
    try {
       client.sock.groups = Object.values(await client.sock.groupFetchAllParticipating())
       setInterval(async () => {
