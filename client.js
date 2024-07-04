@@ -94,16 +94,25 @@ client.on('ready', async () => {
    /* save database send http-request every 30 seconds */
    setInterval(async () => {
       if (global.db) await machine.save(global.db)
-      if (process.env.CLOVYR_APPNAME && process.env.CLOVYR_URL && process.env.CLOVYR_COOKIE) {
-         const response = await axios.get(process.env.CLOVYR_URL, {
-            headers: {
-               referer: 'https://clovyr.app/view/' + process.env.CLOVYR_APPNAME,
-               cookie: process.env.CLOVYR_COOKIE
-            }
-         })
-         Func.logFile(`${await response.status} - Application wake-up!`)
-      }
+      // if (process.env.CLOVYR_APPNAME && process.env.CLOVYR_URL && process.env.CLOVYR_COOKIE) {
+      //    const response = await axios.get(process.env.CLOVYR_URL, {
+      //       headers: {
+      //          referer: 'https://clovyr.app/view/' + process.env.CLOVYR_APPNAME,
+      //          cookie: process.env.CLOVYR_COOKIE
+      //       }
+      //    })
+      //    Func.logFile(`${await response.status} - Application wake-up!`)
+      // }
    }, 30_000)
+
+   client.groups = client.groups ? client.groups : []
+   try {
+      client.groups = Object.values(await client.sock.groupFetchAllParticipating())
+      setInterval(async () => {
+         const fetchAll = Object.values(await client.sock.groupFetchAllParticipating())
+         if (json.length > 1) client.groups = fetchAll
+      }, 60_000)
+   } catch {}
 })
 
 /* print all message object */
