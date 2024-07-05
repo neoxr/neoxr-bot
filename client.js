@@ -109,12 +109,15 @@ client.on('ready', async () => {
    }, 30_000)
 
    try {
+      client.sock.groups = client.sock.groups ? client.sock.groups : []
       client.sock.groups = Object.values(await client.sock.groupFetchAllParticipating())
       setInterval(async () => {
          const fetchAll = Object.values(await client.sock.groupFetchAllParticipating())
          if (fetchAll.length > 1) client.sock.groups = fetchAll
       }, 60_000)
-   } catch {}
+   } catch {
+      client.sock.groups = client.sock.groups ? client.sock.groups : []
+   }
 })
 
 /* print all message object */
