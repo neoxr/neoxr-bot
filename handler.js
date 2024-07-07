@@ -27,7 +27,7 @@ module.exports = async (client, ctx) => {
       const isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), env.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
       const isPrem = users && users.premium || isOwner
       const groupMetadata = m.isGroup ? await client.groupMetadata(m.chat) : {}
-      const participants = m.isGroup ? groupMetadata.participants : [] || []
+      const participants = m.isGroup ? groupMetadata ? groupMetadata.participants : [] : [] || []
       const adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
       const isAdmin = m.isGroup ? adminList.includes(m.sender) : false
       const isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:` [0]) + '@s.whatsapp.net') : false
