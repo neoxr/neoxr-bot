@@ -57,12 +57,18 @@
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
-### Recommended Server
+### Server
 
-- [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/)
+- [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/)  (Recommended)
 - [x] Hosting Panel [Voxy Host](https://voxyhost.com/)
 - [x] VPS [OVH Hosting](https://www.ovhcloud.com/asia/vps/)
 - [x] RDP Windows [RDP Win](https://www.rdpwin.com/rdpbot.php)
+
+### Cloud Database
+
+- [x] PostgreSQL [Supabase](https://supabase.com/pricing) ~ [Setup Tutorial](https://youtu.be/kdyF7cP9E7k?si=YjlxI5OMHBdkSxkw) (Recommended)
+- [x] PostgreSQL [Aiven](https://aiven.io) ~ Remove ```?sslmode=required```
+- [x] MongoDB [MongoDB](https://www.mongodb.com) ~ [Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmyA6qeBYKbO4R45)
 
 ### Configuration
 

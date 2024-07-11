@@ -1,8 +1,8 @@
 const { MongoDB, PostgreSQL } = new(require('@neoxr/wb'))
-const { writeFileSync: create, readFileSync: read }= require('fs')
+const { readFileSync: read }= require('fs')
 const env = require('config.json')
 exports.run = {
-   usage: ['backup'],
+   usage: ['restore'],
    category: 'owner',
    async: async (m, {
       client,
@@ -13,10 +13,14 @@ exports.run = {
       try {
          if (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) MongoDB.db = env.database
          const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('lib/system/localdb'))(env.database)
-         await client.sendReact(m.chat, '🕒', m.key)
-         await machine.save(global.db)
-         create(env.database + '.json', JSON.stringify(global.db, null, 3), 'utf-8')
-         await client.sendFile(m.chat, read('./' + env.database + '.json'), env.database + '.json', '', m)
+         if (m.quoted && /document/.test(m.quoted.mtype) && m.quoted.mimetype === 'application/json') {
+            const fn = await Func.getFile(await m.quoted.download())
+            if (!fn.status) return m.reply(Func.texted('bold', '🚩 File cannot be downloaded.'))
+            global.db = JSON.parse(read(fn.file, 'utf-8'))
+            m.reply('✅ Database was successfully restored.').then(async () => {
+               await machine.save(JSON.parse(read(fn.file, 'utf-8')))
+            })
+         } else m.reply(Func.texted('bold', '🚩 Reply to the backup file first then reply with this feature.'))
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }
