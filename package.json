@@ -8,7 +8,7 @@
    },
    "repository":{
       "type":"git",
-      "url":"git+https://github.com/neoxr/wbot.git"
+      "url":"git+https://github.com/neoxr/neoxr-bot.git"
    },
    "keywords":[
       "wb",
@@ -17,11 +17,11 @@
    "author":"Wildan Izzudin",
    "license":"ISC",
    "bugs":{
-      "url":"https://github.com/neoxr/wbot/issues"
+      "url":"https://github.com/neoxr/neoxr-bot/issues"
    },
-   "homepage":"https://github.com/neoxr/wbot#readme",
+   "homepage":"https://github.com/neoxr/neoxr-bot#readme",
    "dependencies":{
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@latest",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@6.8.2",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
       "@neoxr/wb": "^2.1.1",

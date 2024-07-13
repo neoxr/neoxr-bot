@@ -103,7 +103,7 @@ client.on('ready', async () => {
       //    })
       //    Func.logFile(`${await response.status} - Application wake-up!`)
       // }
-   }, 30_000)
+   }, 60_000)
 })
 
 /* print all message object */
@@ -145,6 +145,7 @@ client.on('group.add', async ctx => {
    const sock = client.sock
    const text = `Thanks +tag for joining into +grup group.`
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
+   if (!global.db || !global.db.groups) return
    try {
       var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
    } catch {
@@ -171,6 +172,7 @@ client.on('group.add', async ctx => {
 client.on('group.remove', async ctx => {
    const sock = client.sock
    const text = `Good bye +tag :)`
+   if (!global.db || !global.db.groups) return
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
    try {
       var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
