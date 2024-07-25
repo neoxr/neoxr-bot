@@ -1,6 +1,6 @@
 {
    "name":"neoxr-bot",
-   "version":"4.0-rc",
+   "version":"4.0.0",
    "description":"WhatsApp Bot (Base)",
    "main":"index.js",
    "scripts": {
