@@ -34,7 +34,7 @@ exports.run = {
             largeThumb: true,
             thumbnail: json.thumbnail
          }).then(async () => {
-            client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
+            client.sendFile(m.chat, json.data.url, json.data.filename, 'audio.mp3', m, {
                document: true,
                APIC: await Func.fetchBuffer(json.thumbnail)
             })
