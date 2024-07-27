@@ -114,7 +114,7 @@ client.on('message', ctx => {
    require('./lib/system/scraper')
 })
 
-/* print deleted message object */
+/* print deleted message object 
 client.on('message.delete', ctx => {
    const sock = client.sock  
    if (!ctx || ctx.origin.fromMe || ctx.origin.isBot || !ctx.origin.sender) return
@@ -122,7 +122,7 @@ client.on('message.delete', ctx => {
    cache.set(ctx.origin.sender, 1)
  //  if (ctx.origin.isGroup && global.db.groups.some(v => v.jid == ctx.origin.chat) && global.db.groups.find(v => v.jid == ctx.origin.chat).antidelete) return sock.copyNForward(ctx.origin.chat, ctx.delete)
 })
-
+*/
 /* AFK detector */
 client.on('presence.update', update => {
    if (!update) return
@@ -140,7 +140,7 @@ client.on('presence.update', update => {
       }
    } else {}
 })
-
+/*
 client.on('group.add', async ctx => {
    const sock = client.sock
    const text = `Thanks +tag for joining into +grup group.`
@@ -152,7 +152,7 @@ client.on('group.add', async ctx => {
       var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    }
 
-   /* localonly to remove new member when the number not from indonesia */
+   /* localonly to remove new member when the number not from indonesia 
    if (groupSet && groupSet.localonly) {
       if (global.db.users.some(v => v.jid == ctx.member) && !global.db.users.find(v => v.jid == ctx.member).whitelist && !ctx.member.startsWith('62') || !ctx.member.startsWith('62')) {
          sock.reply(ctx.jid, Func.texted('bold', `Sorry @${ctx.member.split`@`[0]}, this group is only for indonesian people and you will removed automatically.`))
@@ -186,7 +186,7 @@ client.on('group.remove', async ctx => {
       url: global.db.setting.link
    })
 })
-
+*/
 client.on('caller', ctx => {
 	if (typeof ctx === 'boolean') return
 	client.sock.updateBlockStatus(ctx.jid, 'block')
