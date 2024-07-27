@@ -32,7 +32,7 @@ exports.run = {
             largeThumb: true,
             thumbnail: await Func.fetchBuffer(json.thumbnail)
          }).then(async () => {
-            const buffer = await Converter.toAudio(json.data.buffer, 'mp3')
+            const buffer = await Converter.toAudio(json.data.buffer, 'mp4')
             client.sendFile(m.chat, buffer, json.data.filename, '', m, {
                document: true,
                APIC: await Func.fetchBuffer(json.thumbnail)
