@@ -12,7 +12,7 @@ exports.run = {
       Func
    }) => {
       if (m.quoted) {
-         if (m.quoted.isBot) return client.reply(m.chat, Func.texted('bold', `🚩 Can't make the bot a premium user.`), m)
+         // if (m.quoted.isBot) return client.reply(m.chat, Func.texted('bold', `🚩 Can't make the bot a premium user.`), m)
          if (args && isNaN(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 Day must be a number.`), m)
          let days = args[0] ? parseInt(args[0]) : 30
          let jid = client.decodeJid(m.quoted.sender)
