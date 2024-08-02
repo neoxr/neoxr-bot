@@ -15,15 +15,14 @@ exports.run = {
          if (text.length > 30) return client.reply(m.chat, Func.texted('bold', `🚩 Max 30 character.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const exif = global.db.setting
-         try {
-            pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
-         } catch {
-            pic = 'https://i.ibb.co/nsDv3ZJ/image.jpg'
+         var pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
+         if (!pic) {
+            var pic = 'https://i.ibb.co/nsDv3ZJ/image.jpg'
          }
-         const obj = {
+         const json = {
             "type": "quote",
             "format": "png",
-            "backgroundColor": "#FFFFFF",
+            "backgroundColor": "#252525",
             "width": 512,
             "height": 768,
             "scale": 2,
@@ -41,12 +40,12 @@ exports.run = {
                "replyMessage": {}
             }]
          }
-         const json = await axios.post('https://bot.lyo.su/quote/generate', obj, {
+         const result = await axios.post('https://s.neoxr.eu/api/generate', json, {
             headers: {
                'Content-Type': 'application/json'
             }
          })
-         const buffer = Buffer.from(json.data.result.image, 'base64')
+         const buffer = Buffer.from(result.data.image, 'base64')
          client.sendSticker(m.chat, buffer, m, {
             packname: exif.sk_pack,
             author: exif.sk_author
