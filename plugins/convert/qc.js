@@ -12,7 +12,7 @@ exports.run = {
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Hi!'), m)
-         if (text.length > 30) return client.reply(m.chat, Func.texted('bold', `🚩 Max 30 character.`), m)
+         if (text.length > 30) return client.reply(m.chat, Func.texted('bold', `🚩 Max 30 characters.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const exif = global.db.setting
          var pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
