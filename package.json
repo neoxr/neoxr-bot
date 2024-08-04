@@ -1,6 +1,6 @@
 {
    "name":"neoxr-bot",
-   "version":"4.0-rc",
+   "version":"4.0",
    "description":"WhatsApp Bot (Base)",
    "main":"index.js",
    "scripts": {
@@ -21,10 +21,10 @@
    },
    "homepage":"https://github.com/neoxr/neoxr-bot#readme",
    "dependencies":{
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@6.8.2",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^2.1.1",
+      "@neoxr/wb": "^2.1.2",
       "@neoxr/youtube-scraper": "^2.2.3",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
