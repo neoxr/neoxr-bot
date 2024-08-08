@@ -2,7 +2,7 @@ exports.run = {
    usage: ['removebg'],
    hidden: ['nobg'],
    use: 'reply photo',
-   category: 'utilities',
+   category: 'editer',
    async: async (m, {
       client,
       text,
@@ -19,11 +19,9 @@ exports.run = {
            	client.sendReact(m.chat, '🕒', m.key)
                let img = await client.downloadMediaMessage(q)
                let image = await Scraper.uploadImageV2(img)
-               const json = await Api.neoxr('/nobg3', {
-                  image: image.data.url
-               })
+               const json = await Func.fetchJson(`https://api.betabotz.eu.org/api/tools/removebg?url=${image.data.url}&apikey=beta-Ibrahim1209`)
                if (!json.status) return m.reply(Func.jsonFormat(json))
-               client.sendFile(m.chat, json.data.no_background, '', '', m)
+               client.sendFile(m.chat, json.url.result, '', '', m)
             } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
@@ -33,11 +31,9 @@ exports.run = {
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
-            const json = await Api.neoxr('/nobg3', {
-               image: image.data.url
-            })
+            const json = await Func.fetchJson(`https://api.betabotz.eu.org/api/tools/removebg?url=${image.data.url}&apikey=beta-Ibrahim1209`)
             if (!json.status) return m.reply(Func.jsonFormat(json))
-            client.sendFile(m.chat, json.data.no_background, '', '', m)
+            client.sendFile(m.chat, json.url.result, '', '', m)
          }
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
@@ -45,7 +41,8 @@ exports.run = {
    },
    error: false,
    limit: true,
-   premium: true,
+   premium: false,
    cache: true,
+   verified: true,
    location: __filename
 }
