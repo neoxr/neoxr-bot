@@ -1,4 +1,4 @@
-"use strict";
+"use strict";x
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
 const { Baileys, MongoDB, PostgreSQL, Scandir, Function: Func } = new(require('@neoxr/wb'))
@@ -10,7 +10,7 @@ const spinnies = new(require('spinnies'))(),
    env = require('./config.json'),
    { platform } = require('os')
 const cache = new(require('node-cache'))({
-   stdTTL: env.cooldown
+   stdTTL: env.cooldownasd
 })
 if (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) MongoDB.db = env.database
 const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./lib/system/localdb'))(env.database)
