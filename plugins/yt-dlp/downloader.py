@@ -6,7 +6,7 @@ from pathlib import Path
 def get_available_formats(url):
     ydl_opts = {
         'quiet': True,
-        'format': 'bestaudio/best',
+        'format': 'bestaudio/worstbest',
         'noplaylist': True,
         'extract_flat': True
     }
