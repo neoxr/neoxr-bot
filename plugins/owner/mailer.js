@@ -2,39 +2,17 @@ const nodemailer = require('nodemailer');
 
 exports.run = {
     usage: ['mail'],
-    use: 'no | subject | message',
+    use: 'email | subject | message',
     category: 'owner',
     owner: true,
     async: async (m, { client, args, isPrefix, text, command, Func }) => {
         try {
-            if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'no | subject | message'), m);
+            if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'email | subject | message'), m);
 
             client.sendReact(m.chat, '🕒', m.key);
 
-            const [no, subject, msg] = text.split('|').map(str => str.trim());
-            if (!no || !subject || !msg) return client.reply(m.chat, Func.example(isPrefix, command, 'no | subject | message'), m);
-
-            const numbers = no.split(',');
-            const emails = [];
-
-            for (const number of numbers) {
-                const p = await client.onWhatsApp(number.trim());
-                if (p.length == 0) {
-                    client.reply(m.chat, Func.texted('bold', `🚩 Invalid number: ${number}`), m);
-                    continue;
-                }
-                const jid = client.decodeJid(p[0].jid);
-                const user = global.db.users.find(v => v.jid == jid);
-                if (!user) {
-                    client.reply(m.chat, Func.texted('bold', `🚩 User not found for number: ${number}`), m);
-                    continue;
-                }
-                if (!user.verified) {
-                    client.reply(m.chat, Func.texted('bold', `🚩 User not verified for number: ${number}`), m);
-                    continue;
-                }
-                emails.push(user.email);
-            }
+            const [email, subject, msg] = text.split('|').map(str => str.trim());
+            if (!email || !subject || !msg) return client.reply(m.chat, Func.example(isPrefix, command, 'email | subject | message'), m);
 
             const transporter = nodemailer.createTransport({
                 host: 'smtp.zoho.com',
@@ -57,27 +35,25 @@ exports.run = {
                 </div>
             `;
 
-            for (const email of emails) {
-                const mailOptions = {
-                    from: {
-                        name: 'Lucifer - MD (WhatsApp Bot)',
-                        address: 'no-reply@verify.lucifercloud.me'
-                    },
-                    to: email,
-                    subject: subject,
-                    html: template
-                };
+            const mailOptions = {
+                from: {
+                    name: 'Lucifer - MD (WhatsApp Bot)',
+                    address: 'no-reply@verify.lucifercloud.me'
+                },
+                to: email,
+                subject: subject,
+                html: template
+            };
 
-                transporter.sendMail(mailOptions, function(err, data) {
-                    if (err) {
-                        console.error(err);
-                        client.reply(m.chat, Func.texted('bold', `❌ Error sending email to ${email}`), m);
-                    } else {
-                        console.log('Email sent:', data.response);
-                        client.reply(m.chat, `✅ Successfully sent email`, m);
-                    }
-                });
-            }
+            transporter.sendMail(mailOptions, function(err, data) {
+                if (err) {
+                    console.error(err);
+                    client.reply(m.chat, Func.texted('bold', `❌ Error sending email to ${email}`), m);
+                } else {
+                    console.log('Email sent:', data.response);
+                    client.reply(m.chat, `✅ Successfully sent email`, m);
+                }
+            });
         } catch (e) {
             console.error(e);
             client.reply(m.chat, Func.jsonFormat(e), m);
