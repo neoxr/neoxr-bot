@@ -56,7 +56,7 @@ exports.run = {
                     return;
                 }
 
-                const uploadSizeLimit = 400 * 1024 * 1024; // 900 MB
+                const uploadSizeLimit = 700 * 1024 * 1024; // 900 MB
                 if (fileSize > uploadSizeLimit) {
                     // Split and upload in parts
                     const parts = Math.ceil(fileSize / uploadSizeLimit);
