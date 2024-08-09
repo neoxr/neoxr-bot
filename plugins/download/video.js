@@ -1,59 +1,84 @@
+
 const axios = require('axios'); // Import axios library
+const { Youtube } = require('@neoxr/youtube-scraper');
+const { ytdown } = require("nayan-media-downloader");
+const fs = require('fs');
+const path = require('path');
 
 exports.run = {
-    usage: ['play'],
-    hidden: ['lagu', 'song'],
+    usage: ['video'],
+    hidden: ['playvid', 'playvideo'],
     use: 'query',
-    category: 'downloader',
-    async: async (m, { client, text, isPrefix, command, users, env, Func, Scraper }) => {
+    category: 'feature',
+    async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m);
             client.sendReact(m.chat, '🕒', m.key);
 
-            // Step 1: Perform YouTube search using the API
-            
-            const response = await axios.get(`https://api.lolhuman.xyz/api/ytsearch?apikey=GataDiosV2&query=${encodeURIComponent(text)}`)
+            // Step 1: Perform YouTube search using the search API
+            const searchResponse = await axios.get(`https://api.betabotz.eu.org/api/search/yts?query=${text}&apikey=beta-Ibrahim1209`);
 
-            // Check if the request was successful
-            if (response.data.status === 200) {
-                const searchResults = response.data.result;
+            // Get the first search result
+            const firstResult = searchResponse.data.result[0];
 
-                // Get the first search result
-                const firstResult = searchResults[0];
+            // Step 2: Use the first search result's URL to fetch the download link
+            let URL = await ytdown(firstResult.url);
 
-                // Step 2: Use the first search result's videoId to fetch the download link
-                const downloadResponse = await axios.get(`https://api.betabotz.eu.org/api/download/ytmp3?url=https://www.youtube.com/watch?v=${firstResult.videoId}&apikey=beta-Ibrahim1209`);
-                const downloadUrl = downloadResponse.data.result.mp3;
+            // Check for HD video first, if not available, use the regular video
+            const downloadUrl = URL.data.video_hd ? URL.data.video_hd : URL.data.video;
 
-                let caption = `乂  *Y T - P L A Y*\n\n`;
-                caption += `    ◦  *Title* : ${firstResult.title}\n`;
-                caption += `    ◦  *Uploader* : N/A\n`;  // Uploader information isn't available, so this is set to N/A
-                caption += `    ◦  *Duration* : N/A\n`;  // Duration information isn't available from this API
-                caption += `    ◦  *Views* : ${firstResult.views}\n`;
-                caption += `    ◦  *Uploaded* : ${firstResult.published}\n`;
-                caption += global.footer;
+            // Estimate file size before downloading
+            const { headers } = await axios.head(downloadUrl);
+            const fileSizeInBytes = parseInt(headers['content-length'], 10);
+            const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
-                client.sendMessageModify(m.chat, caption, m, {
-                    largeThumb: true,
-                    thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
-                }).then(async () => {
-                    client.sendFile(m.chat, downloadUrl, `${firstResult.title}.mp3`, '', m, {
-                        document: false,
-                        APIC: await Func.fetchBuffer(firstResult.thumbnail)
-                    });
-                });
-            } else {
-                client.reply(m.chat, 'Failed to retrieve data from the API.', m);
+            const sizeLimit = users.premium ? env.max_upload : env.max_upload_free;
+            if (fileSizeInMB > sizeLimit) {
+                const warningMessage = users.premium
+                    ? `💀 File size (${fileSizeInMB.toFixed(2)} MB) exceeds the maximum limit. Download it yourself via this link: ${await (await Scraper.shorten(downloadUrl)).data.url}`
+                    : `⚠️ File size (${fileSizeInMB.toFixed(2)} MB) exceeds the maximum limit of ${env.max_upload_free} MB for free users and ${env.max_upload} MB for premium users.`;
+                return client.reply(m.chat, warningMessage, m);
             }
+
+            // Download the video file
+            const videoPath = path.join(__dirname, `${firstResult.title}.mp4`);
+            const videoResponse = await axios.get(downloadUrl, { responseType: 'stream' });
+            const writer = fs.createWriteStream(videoPath);
+
+            videoResponse.data.pipe(writer);
+
+            writer.on('finish', async () => {
+                if (fileSizeInMB > 99) {
+                    await client.sendFile(m.chat, videoPath, `${firstResult.title}.mp4`, `乂  *Y T - V I D E O*\n\n` +
+                        `    ◦  *Title* : ${firstResult.title}\n` +
+                        `    ◦  *Uploader* : ${firstResult.author.name}\n` +
+                        `    ◦  *Duration* : ${firstResult.duration}\n` +
+                        `    ◦  *Views* : ${firstResult.views}\n` +
+                        `    ◦  *Uploaded* : ${firstResult.published_at}\n`, m, { document: true });
+                } else {
+                    await client.sendFile(m.chat, videoPath, `${firstResult.title}.mp4`, `乂  *Y T - V I D E O*\n\n` +
+                        `    ◦  *Title* : ${firstResult.title}\n` +
+                        `    ◦  *Uploader* : ${firstResult.author.name}\n` +
+                        `    ◦  *Duration* : ${firstResult.duration}\n` +
+                        `    ◦  *Views* : ${firstResult.views}\n` +
+                        `    ◦  *Uploaded* : ${firstResult.published_at}\n`, m);
+                }
+
+                fs.unlinkSync(videoPath); // Delete the downloaded file after sending
+            });
+
+            writer.on('error', (error) => {
+                console.error('Download failed', error);
+                client.reply(m.chat, Func.jsonFormat(error), m);
+            });
+
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return client.reply(m.chat, Func.jsonFormat(e), m);
         }
     },
     error: false,
-    limit: true,
     restrict: true,
-    verified: true,
     cache: true,
     location: __filename
 };
