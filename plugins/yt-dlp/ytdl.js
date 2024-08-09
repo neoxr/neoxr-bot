@@ -1,7 +1,6 @@
 const path = require('path');
-const { exec } = require('child_process');
 const fs = require('fs');
-
+const { exec } = require('child_process');
 const sizeUnits = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4 };
 const defaultQualityOption = 'best'; // Default quality option
 
@@ -18,19 +17,16 @@ exports.run = {
         const outputDir = path.resolve(__dirname, 'mydownloads'); // Directory for downloaded files
         const tempFilePath = path.join(outputDir, `video_${Date.now()}.mp4`); // Temporary file path
 
-        // Ensure the output directory exists
-        if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
-
         // Notify user that the download is starting
         await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
 
-        exec(`python3 "${scriptPath}" "${url}" "${tempFilePath}" "${quality}"`, async (error, stdout, stderr) => {
+        exec(`python3 ${scriptPath} ${url} ${tempFilePath} ${quality}`, async (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error.message}`);
                 await client.reply(m.chat, `Error downloading video: ${error.message}`, m);
                 // Delete the file if an error occurs
                 if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
-                return;
+                return; // Send error to user
             }
 
             if (stderr) {
@@ -38,7 +34,7 @@ exports.run = {
                 await client.reply(m.chat, `Error downloading video: ${stderr}`, m);
                 // Delete the file if stderr is present
                 if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
-                return;
+                return; // Send error to user
             }
 
             console.log(`stdout: ${stdout}`);
@@ -49,55 +45,35 @@ exports.run = {
                 const fileName = path.basename(tempFilePath);
                 const fileSizeStr = `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
 
-                if (fileSize > 2 * 1024 * 1024 * 1024) { // 2 GB
-                    // Notify user that the file is too large and delete the file
-                    await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 2GB`, m);
+                if (fileSize > 930 * 1024 * 1024) { // 999 MB
+                    // File is too large to upload
+                    await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 999MB`, m);
+                    // Delete the file
                     if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
                     return;
                 }
 
-                const uploadSizeLimit = 900 * 1024 * 1024; // 900 MB
-                if (fileSize > uploadSizeLimit) {
-                    // Split and upload in parts
-                    const parts = Math.ceil(fileSize / uploadSizeLimit);
-                    for (let i = 0; i < parts; i++) {
-                        const partSize = Math.min(uploadSizeLimit, fileSize - i * uploadSizeLimit);
-                        const partFilePath = path.join(outputDir, `part_${i + 1}.mp4`);
-                        const readStream = fs.createReadStream(tempFilePath, { start: i * uploadSizeLimit, end: (i + 1) * uploadSizeLimit - 1 });
-                        const writeStream = fs.createWriteStream(partFilePath);
-                        readStream.pipe(writeStream);
+                const maxUpload = users.premium ? env.max_upload : env.max_upload_free;
+                const chSize = Func.sizeLimit(fileSize.toString(), maxUpload.toString());
 
-                        // Wait for part to be written
-                        await new Promise(resolve => writeStream.on('finish', resolve));
-
-                        // Notify user that the upload is starting
-                        await client.reply(m.chat, `Your file part ${i + 1} (${(partSize / (1024 * 1024)).toFixed(2)} MB) is being uploaded.`, m);
-
-                        const extname = path.extname(partFilePath).toLowerCase();
-                        const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
-                        const isDocument = isVideo && partSize / (1024 * 1024) > 99; // 99 MB threshold
-
-                        await client.sendFile(m.chat, partFilePath, path.basename(partFilePath), '', m, { document: isDocument });
-
-                        // Delete the part file after sending
-                        fs.unlinkSync(partFilePath);
-
-                        // Add delay between uploads
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                    }
-                } else {
-                    // Upload the single file
-                    await client.reply(m.chat, `Your file (${fileSizeStr}) is being uploaded.`, m);
-
-                    const extname = path.extname(fileName).toLowerCase();
-                    const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
-                    const isDocument = isVideo && fileSize / (1024 * 1024) > 99; // 99 MB threshold
-
-                    await client.sendFile(m.chat, tempFilePath, fileName, '', m, { document: isDocument });
-
-                    // Optionally, delete the file after sending
-                    fs.unlinkSync(tempFilePath);
+                if (chSize.oversize) {
+                    await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit`, m);
+                    // Delete the file
+                    if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+                    return;
                 }
+
+                // Notify user that the upload is starting
+                await client.reply(m.chat, `Your file (${fileSizeStr}) is being uploaded.`, m);
+
+                const extname = path.extname(fileName).toLowerCase();
+                const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
+                const isDocument = isVideo && fileSize / (1024 * 1024) > 99; // 99 MB threshold
+
+                await client.sendFile(m.chat, tempFilePath, fileName, '', m, { document: isDocument });
+
+                // Optionally, delete the file after sending
+                fs.unlinkSync(tempFilePath);
             } catch (parseError) {
                 console.error(`Error handling file: ${parseError.message}`);
                 await client.reply(m.chat, `Error handling file: ${parseError.message}`, m);
