@@ -19,31 +19,23 @@ exports.run = {
             // Get the first search result
             const firstResult = searchResults[0];
 
-            // Step 2: Use the first search result's videoId to fetch the download link using the new API
-            const downloadUrl = await Func.fetchJson(`https://api.lolhuman.xyz/api/ytaudio2?apikey=GataDiosV2&url=https://www.youtube.com/watch?v=${firstResult.videoId}`);
+            // Step 2: Use the first search result's videoId to fetch the download link using the Betabotz API
+            const downloadResponse = await axios.get(`https://api.betabotz.eu.org/api/download/ytmp3?url=https://www.youtube.com/watch?v=${firstResult.videoId}&apikey=beta-Ibrahim1209`);
+            const downloadUrl = downloadResponse.data.result.mp3;
 
-            if (!downloadUrl.message) return client.reply(m.chat, Func.jsonFormat(downloadUrl), m);
-            const downloadResult = downloadUrl.result;
-            const audioLink = downloadResult.link;
-
-            // Step 3: Buffer the audio file
-            const audioBuffer = await axios.get(audioLink, {
-                responseType: 'arraybuffer'
-            }).then(response => response.data);
+            if (!downloadResponse.data.result) return client.reply(m.chat, 'Failed to retrieve download link.', m);
 
             let caption = `乂  *Y T - P L A Y*\n\n`;
-            caption += `    ◦  *Title* : ${downloadResult.title}\n`;
-            
+            caption += `    ◦  *Title* : ${downloadResponse.title}\n`;
+            caption += `    ◦  *Duration* : ${downloadResponse.duration}\n\n`;
             caption += global.footer;
 
-            // Step 4: Send the buffered audio file to the user
             client.sendMessageModify(m.chat, caption, m, {
                 largeThumb: true,
-                thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
+                thumbnail: downloadResponse.thumb // Use the thumbnail URL directly
             }).then(async () => {
-                client.sendFile(m.chat, audioBuffer, `${firstResult.title}.mp3`, '', m, {
-                    document: false,
-                    APIC: await Func.fetchBuffer(firstResult.thumbnail)
+                client.sendFile(m.chat, downloadUrl, `${downloadResponse.title}.mp3`, '', m, {
+                    document: false
                 });
             });
 
