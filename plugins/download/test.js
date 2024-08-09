@@ -6,8 +6,8 @@ exports.run = {
     category: 'downloader',
     async: async (m, { client, args, text, isPrefix, command, Func }) => {
         try {
-            const ArrObj = await youtube.search("Hardy sindu ki bat ha");
-console.log(ArrObj);
+            const Obj = await youtube.download("https://www.youtube.com/watch?v=E8rpY2FwKkY");
+console.log(Obj);
 
         } catch (e) {
             console.error(e);
