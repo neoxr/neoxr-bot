@@ -9,11 +9,11 @@ exports.run = {
       client.sendContact(m.chat, [{
          name: env.owner_name,
          number: env.owner,
-         about: 'Owner & Creator'
+         about: 'Ibrahim'
       }], m, {
-         org: 'Neoxr Network',
-         website: 'https://api.neoxr.my.id',
-         email: 'contact@neoxr.my.id'
+         org: 'Lucfier cloud',
+         website: 'https://lucifercloud.app',
+         email: 'contact@lucifercloud.app'
       })
    },
    error: false,

@@ -1,3 +1,4 @@
+
 const { MongoDB, PostgreSQL } = new(require('@neoxr/wb'))
 const { readFileSync: read }= require('fs')
 const env = require('config.json')
@@ -28,4 +29,5 @@ exports.run = {
    owner: true,
    cache: true,
    location: __filename
+
 }

@@ -14,20 +14,18 @@ exports.run = {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://twitter.com/mosidik/status/1475812845249957889?s=20'), m)
          if (!args[0].match(/(twitter.com)/gi)) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
-         const json = await Api.neoxr('/twitter', {
-            url: args[0]
-         })
+         const json = await Func.fetchJson(`https://api.betabotz.eu.org/api/download/twitter2?url=${args[0]}&apikey=beta-Ibrahim1209`);
          let old = new Date()
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-         for (let i = 0; i < json.data.length; i++) {
-            if (/jpg|mp4/.test(json.data[i].type)) {
-               client.sendFile(m.chat, json.data[i].url, `file.${json.data[i].type}`, '', m)
-               await Func.delay(1500)
-            } else if (json.data[i].type == 'gif') {
-               client.sendFile(m.chat, json.data[i].url, 'file.mp4', m, {
-                  gif: true
-               })
+         
+         const mediaURLs = json.result.mediaURLs;
+         for (let url of mediaURLs) {
+            if (url.match(/\.(jpg|jpeg|png)$/i)) {
+               client.sendFile(m.chat, url, 'image.jpg', '', m)
+            } else if (url.match(/\.(mp4|gif)$/i)) {
+               client.sendFile(m.chat, url, 'video.mp4', '', m)
             }
+            await Func.delay(1500)
          }
       } catch (e) {
          console.log(e)

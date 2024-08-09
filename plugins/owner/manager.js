@@ -58,8 +58,8 @@ exports.run = {
             is_user.find(v => v.jid == jid).banned = false
             let banned = is_user.filter(v => v.banned).length
             client.reply(m.chat, `乂  *U N B A N N E D*\n\n*“Succesfully removing @${jid.split`@`[0]} from banned list.”*\n\n*Total : ${banned}*`, m)
-         }
-      } catch (e) {
+         } 
+       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },

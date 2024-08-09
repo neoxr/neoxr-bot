@@ -25,5 +25,6 @@ exports.run = {
    limit: true,
    restrict: true,
    cache: true,
+   verified: true,
    location: __filename
 }

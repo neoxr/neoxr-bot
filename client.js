@@ -10,7 +10,7 @@ const spinnies = new(require('spinnies'))(),
    env = require('./config.json'),
    { platform } = require('os')
 const cache = new(require('node-cache'))({
-   stdTTL: env.cooldown
+   stdTTL: env.cooldownasd
 })
 if (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) MongoDB.db = env.database
 const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./lib/system/localdb'))(env.database)
@@ -20,7 +20,7 @@ const client = new Baileys({
    sf: 'session',
    online: true,
    // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-   version: [2, 2413, 51]
+   version: [2, 2413, 51]//iok
 })
 
 /* starting to connect */
