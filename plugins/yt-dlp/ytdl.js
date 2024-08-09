@@ -1,3 +1,6 @@
+const path = require('path');
+const fs = require('fs');
+const { exec } = require('child_process');
 const sizeUnits = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4 };
 const defaultQualityOption = 'best'; // Default quality option
 
