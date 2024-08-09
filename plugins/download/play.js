@@ -26,13 +26,13 @@ exports.run = {
             if (!downloadResponse.data.result) return client.reply(m.chat, 'Failed to retrieve download link.', m);
 
             let caption = `乂  *Y T - P L A Y*\n\n`;
-            caption += `    ◦  *Title* : ${downloadResponse.title}\n`;
-            caption += `    ◦  *Duration* : ${downloadResponse.duration}\n\n`;
+            caption += `    ◦  *Title* : ${downloadUrl.title}\n`;
+            caption += `    ◦  *Duration* : ${downloadUrl.duration}\n\n`;
             caption += global.footer;
 
             client.sendMessageModify(m.chat, caption, m, {
                 largeThumb: true,
-                thumbnail: downloadResponse.thumb // Use the thumbnail URL directly
+                thumbnail: downloadUrl.thumb // Use the thumbnail URL directly
             }).then(async () => {
                 client.sendFile(m.chat, downloadUrl, `${downloadResponse.title}.mp3`, '', m, {
                     document: false
