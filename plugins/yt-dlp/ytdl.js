@@ -10,9 +10,9 @@ exports.run = {
 
         const url = args[0];
         const quality = args[1] || defaultQualityOption; // Get quality from args or use default
-        const scriptPath = path.resolve(__dirname, 'downloader.py');
-        const outputDir = path.resolve(__dirname, 'mydownloads');
-        const tempFilePath = path.join(outputDir, `video_${Date.now()}.mp4`);
+        const scriptPath = path.resolve(__dirname, 'downloader.py'); // Path to Python script
+        const outputDir = path.resolve(__dirname, 'mydownloads'); // Directory for downloaded files
+        const tempFilePath = path.join(outputDir, `video_${Date.now()}.mp4`); // Temporary file path
 
         // Notify user that the download is starting
         await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
