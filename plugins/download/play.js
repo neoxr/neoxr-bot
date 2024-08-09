@@ -10,35 +10,33 @@ exports.run = {
             if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m);
             client.sendReact(m.chat, '🕒', m.key);
 
-            // Step 1: Perform YouTube search using the API
-            const json = await Func.fetchJson(`https://api.lolhuman.xyz/api/ytsearch?apikey=GataDiosV2&query=${encodeURIComponent(text)}`);
-
-            if (!json.message) return client.reply(m.chat, Func.jsonFormat(json), m);
-            const searchResults = json.result;
+            // Step 1: Perform YouTube search using the search API
+            const searchResponse = await axios.get(`https://api.betabotz.eu.org/api/search/yts?query=${text}&apikey=beta-Ibrahim1209`);
 
             // Get the first search result
-            const firstResult = searchResults[0];
+            const firstResult = searchResponse.data.result[0];
 
-            // Step 2: Use the first search result's videoId to fetch the download link using the Betabotz API
-            const downloadResponse = await axios.get(`https://api.betabotz.eu.org/api/download/ytmp3?url=https://www.youtube.com/watch?v=${firstResult.videoId}&apikey=beta-Ibrahim1209`);
+            // Step 2: Use the first search result's URL to fetch the download link
+            const downloadResponse = await axios.get(`https://api.betabotz.eu.org/api/download/ytmp3?url=${firstResult.url}&apikey=beta-Ibrahim1209`);
             const downloadUrl = downloadResponse.data.result.mp3;
 
-            if (!downloadResponse.data.result) return client.reply(m.chat, 'Failed to retrieve download link.', m);
-
             let caption = `乂  *Y T - P L A Y*\n\n`;
-            caption += `    ◦  *Title* : ${downloadUrl.title}\n`;
-            caption += `    ◦  *Duration* : ${downloadUrl.duration}\n\n`;
+            caption += `    ◦  *Title* : ${firstResult.title}\n`;
+            caption += `    ◦  *Uploader* : ${firstResult.author.name}\n`;
+            caption += `    ◦  *Duration* : ${firstResult.duration}\n`;
+            caption += `    ◦  *Views* : ${firstResult.views}\n`;
+            caption += `    ◦  *Uploaded* : ${firstResult.published_at}\n`;
             caption += global.footer;
 
             client.sendMessageModify(m.chat, caption, m, {
                 largeThumb: true,
-                thumbnail: downloadUrl.thumb // Use the thumbnail URL directly
+                thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
             }).then(async () => {
-                client.sendFile(m.chat, downloadUrl, `${downloadResponse.title}.mp3`, '', m, {
-                    document: false
+                client.sendFile(m.chat, downloadUrl, `${firstResult.title}.mp3`, '', m, {
+                    document: false,
+                    APIC: await Func.fetchBuffer(firstResult.thumbnail)
                 });
             });
-
         } catch (e) {
             console.log(e);
             return client.reply(m.chat, Func.jsonFormat(e), m);
@@ -47,7 +45,9 @@ exports.run = {
     error: false,
     limit: true,
     restrict: true,
+    restrict: true,
     verified: true,
+    cache: true,
     cache: true,
     location: __filename
 };
