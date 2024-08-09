@@ -29,15 +29,12 @@ exports.run = {
             caption += `    ◦  *Uploaded* : ${firstResult.uploaded}\n`;
             caption += global.footer;
 
-            client.sendMessageModify(m.chat, caption, m, {
-                largeThumb: true,
-                thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
-            }).then(async () => {
+            
                 client.sendFile(m.chat, downloadUrl, `${firstResult.title}.mp3`, '', m, {
                     document: false,
                     APIC: await Func.fetchBuffer(firstResult.thumbnail)
                 });
-            });
+            
         } catch (e) {
             console.log(e);
             return client.reply(m.chat, Func.jsonFormat(e), m);
