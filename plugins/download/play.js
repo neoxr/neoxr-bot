@@ -1,4 +1,6 @@
-const axios = require('axios'); // Import axios library
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 exports.run = {
     usage: ['play'],
@@ -26,18 +28,32 @@ exports.run = {
             const downloadResult = downloadUrl.result;
             const audioLink = downloadResult.link;
 
-            let caption = `乂  *Y T - P L A Y*\n\n`;
-            caption += `    ◦  *Title* : ${downloadResult.title}\n`;
-            caption += global.footer;
+            // Step 3: Download the audio file
+            const tempFilePath = path.join(__dirname, `${firstResult.videoId}.mp3`);
+            const writer = fs.createWriteStream(tempFilePath);
 
-            client.sendMessageModify(m.chat, caption, m, {
-                largeThumb: true,
-                thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
-            }).then(async () => {
-                client.sendFile(m.chat, audioLink, `${firstResult.title}.mp3`, '', m, {
+            const response = await axios({
+                url: audioLink,
+                method: 'GET',
+                responseType: 'stream'
+            });
+
+            response.data.pipe(writer);
+
+            writer.on('finish', async () => {
+                // Step 4: Send the file to the user
+                await client.sendFile(m.chat, tempFilePath, `${firstResult.title}.mp3`, '', m, {
                     document: false,
                     APIC: await Func.fetchBuffer(firstResult.thumbnail)
                 });
+
+                // Step 5: Delete the file after sending
+                fs.unlinkSync(tempFilePath);
+            });
+
+            writer.on('error', (error) => {
+                console.error('Error writing file:', error);
+                client.reply(m.chat, 'Failed to download or send the file.', m);
             });
 
         } catch (e) {
