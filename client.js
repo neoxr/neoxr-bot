@@ -1,4 +1,4 @@
-"use strict";x
+"use strict";
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
 const { Baileys, MongoDB, PostgreSQL, Scandir, Function: Func } = new(require('@neoxr/wb'))
@@ -20,7 +20,7 @@ const client = new Baileys({
    sf: 'session',
    online: true,
    // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-   version: [2, 2413, 51]
+   version: [2, 2413, 51]//iok
 })
 
 /* starting to connect */
