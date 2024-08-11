@@ -1,5 +1,6 @@
 
-const apk_dl = require('apk-dl.js');
+const { download} = require('aptoide-scraper')
+    
 exports.run = {
     usage: ['test'],
     hidden: ['playvid', 'playvideo'],
@@ -8,8 +9,8 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-           let wwwe = await  apk_dl.aptoide.search("com.groundhog.mcpemaster")
-                console.log(wwwe);
+            let data = await download('com.whatsapp')
+            console.log(data)
               
         } catch (e) {
             console.error(e);
