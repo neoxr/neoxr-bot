@@ -15,16 +15,12 @@ def get_available_formats(url):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             formats = info_dict.get('formats', [])
-            
-            # Extract format IDs and heights
-            format_list = []
-            for fmt in formats:
-                format_id = fmt.get('format_id')
-                height = fmt.get('height')
-                if height:
-                    format_list.append(f"{format_id}: {height}p")
-                else:
-                    format_list.append(f"{format_id}: Audio")  # For formats with no height information
+
+            # Use list comprehension for faster processing
+            format_list = [
+                f"{fmt['format_id']}: {fmt['height']}p" if 'height' in fmt else f"{fmt['format_id']}: Audio"
+                for fmt in formats
+            ]
 
             return format_list, None
     except Exception as e:
@@ -37,14 +33,17 @@ def download_video(url, output_path, quality='best', start_time=None):
     
     print(f"Available formats: {formats}")  # Debug log
 
-    # Find the format ID that matches the desired quality
+    # Optimize format selection using a generator expression
     format_code = next((fmt.split(':')[0] for fmt in formats if quality in fmt), 'best')
 
-    # Construct yt-dlp options
+    # Use recommended yt-dlp options for faster and more reliable downloads
     ydl_opts = {
         'outtmpl': output_path,
         'format': format_code,
-        'quiet': True
+        'quiet': True,
+        'noprogress': True,  # Disable progress bar for faster execution in some cases
+        'noplaylist': True,  # Ensures only one video is downloaded
+        'concurrent_fragment_downloads': 4  # Speeds up downloads by using multiple connections
     }
 
     try:
@@ -58,8 +57,8 @@ def download_video(url, output_path, quality='best', start_time=None):
 
     file_size = Path(output_path).stat().st_size  # size in bytes
     if start_time is None:
-        start_time = time.time()  # Default to current time if not provided
-    download_speed = file_size / (time.time() - start_time)  # bytes per second
+        start_time = time.time()
+    download_speed = file_size / (time.time() - start_time)
 
     return None, None, output_path, download_speed, file_size
 
@@ -72,10 +71,10 @@ def main(url, output_path, quality='best'):
         return
 
     upload_speed = download_speed
-    estimated_upload_time = file_size / upload_speed  # seconds
+    estimated_upload_time = file_size / upload_speed
 
     print(f"File path: {output_path}")
-    print(f"Estimated upload time: {estimated_upload_time}")
+    print(f"Estimated upload time: {estimated_upload_time:.2f} seconds")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
