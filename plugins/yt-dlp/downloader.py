@@ -32,7 +32,7 @@ def download_video(url, output_path, quality='best', start_time=None):
     format_code = next((fmt.split(':')[0] for fmt in formats if quality in fmt), 'best')
 
     ydl_opts = {
-        'outtmpl': output_path,
+        'outtmpl': str(output_path),
         'format': format_code,
         'quiet': True,
         'noprogress': True,
@@ -71,7 +71,7 @@ def main(url, output_dir, quality='best'):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python downloader.py <url> <output_dir> [<quality>]")
+        print(json.dumps({"error": "Usage: python downloader.py <url> <output_dir> [<quality>]"}))
         sys.exit(1)
 
     url = sys.argv[1]

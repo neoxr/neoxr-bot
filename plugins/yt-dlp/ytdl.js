@@ -1,8 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
-const sizeUnits = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4 };
-const defaultQualityOption = 'best'; // Default quality option
 
 exports.run = {
     usage: ['cvbi'],
@@ -12,29 +10,40 @@ exports.run = {
         if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
 
         const url = args[0];
-        const quality = args[1] || defaultQualityOption; // Get quality from args or use default
+        const quality = args[1] || 'best'; // Get quality from args or use default
+        const outputDir = path.resolve(__dirname, 'downloads'); // Directory to save the download
         const scriptPath = path.resolve(__dirname, 'downloader.py'); // Path to Python script
+
+        // Ensure the downloads directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
 
         // Notify user that the download is starting
         await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
 
-        exec(`python3 ${scriptPath} ${url} ${quality}`, async (error, stdout, stderr) => {
+        exec(`python3 ${scriptPath} ${url} ${outputDir} ${quality}`, async (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error.message}`);
                 await client.reply(m.chat, `Error downloading video: ${error.message}`, m);
-                return; // Send error to user
+                return;
             }
 
             if (stderr) {
                 console.error(`stderr: ${stderr}`);
                 await client.reply(m.chat, `Error downloading video: ${stderr}`, m);
-                return; // Send error to user
+                return;
             }
 
             console.log(`stdout: ${stdout}`);
             
             // Parse the stdout to get the original file name and path
             const output = JSON.parse(stdout.trim());
+            if (output.error) {
+                await client.reply(m.chat, `Download failed: ${output.message}`, m);
+                return;
+            }
+
             const filePath = output.filePath; // The full path to the downloaded file
             const fileName = path.basename(filePath); // Extract file name from path
 
