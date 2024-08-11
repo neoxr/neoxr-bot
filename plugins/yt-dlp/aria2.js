@@ -15,7 +15,9 @@ exports.run = {
     use: 'url [quality]',
     category: 'special',
     async: async (m, { client, args, isPrefix, command, users, env, Func, Scraper }) => {
-        if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        if (!args || !args[0]) {
+            return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        }
 
         const url = args[0];
         const outputDir = path.resolve(__dirname, 'downloads'); // Directory to save the download
@@ -26,67 +28,89 @@ exports.run = {
         }
 
         // Notify user that the download is starting
-        await client.reply(m.chat, 'Your file is being downloaded via Aria2. This may take some time.', m);
+        await client.reply(m.chat, 'Checking file size before downloading...', m);
 
         try {
             await aria2.open();
 
-            const options = {
-                dir: outputDir,
-                // The downloaded file will keep its original name
-            };
+            // Get file size before downloading
+            const tempGid = await aria2.call('addUri', [url], { dir: outputDir, 'header': ['Range: bytes=0-1'] });
+            let fileSize = 0;
 
-            const gid = await aria2.call('addUri', [url], options);
-
-            // Monitor the download progress
+            // Monitor the file size
             const intervalId = setInterval(async () => {
                 try {
-                    const status = await aria2.call('tellStatus', gid);
+                    const status = await aria2.call('tellStatus', tempGid);
 
                     if (status.status === 'complete') {
+                        fileSize = status.files[0].size; // Get the file size in bytes
                         clearInterval(intervalId);
-                        const filePath = status.files[0].path;
-                        const fileName = path.basename(filePath); // Get the original file name
 
-                        const fileSize = fs.statSync(filePath).size;
                         const fileSizeMB = fileSize / (1024 * 1024); // Convert bytes to MB
                         const fileSizeStr = `${fileSizeMB.toFixed(2)} MB`;
 
                         if (fileSizeMB > 900) { // 900 MB
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB`, m);
-                            fs.unlinkSync(filePath); // Delete the file
+                            await aria2.call('remove', [tempGid]); // Abort the download
+                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB. Download aborted.`, m);
                             return;
                         }
 
-                        const maxUpload = users.premium ? env.max_upload : env.max_upload_free;
-                        const chSize = Func.sizeLimit(fileSize.toString(), maxUpload.toString());
+                        // Proceed with the actual download if size is acceptable
+                        const gid = await aria2.call('addUri', [url], { dir: outputDir });
+                        await client.reply(m.chat, `Your file (${fileSizeStr}) is being downloaded.`, m);
 
-                        if (chSize.oversize) {
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit`, m);
-                            fs.unlinkSync(filePath); // Delete the file
-                            return;
-                        }
+                        const downloadIntervalId = setInterval(async () => {
+                            try {
+                                const downloadStatus = await aria2.call('tellStatus', gid);
 
-                        await client.reply(m.chat, `Your file (${fileSizeStr}) is being uploaded.`, m);
+                                if (downloadStatus.status === 'complete') {
+                                    clearInterval(downloadIntervalId);
+                                    const filePath = downloadStatus.files[0].path;
+                                    const fileName = path.basename(filePath); // Get the original file name
 
-                        const extname = path.extname(fileName).toLowerCase();
-                        const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
+                                    const fileSize = fs.statSync(filePath).size;
+                                    const fileSizeMB = fileSize / (1024 * 1024); // Convert bytes to MB
+                                    const fileSizeStr = `${fileSizeMB.toFixed(2)} MB`;
 
-                        // Determine if file should be sent as a document or video
-                        const isDocument = fileSizeMB > 99; // Upload as document if file size is greater than 99 MB
+                                    const maxUpload = users.premium ? env.max_upload : env.max_upload_free;
+                                    const chSize = Func.sizeLimit(fileSize.toString(), maxUpload.toString());
 
-                        await client.sendFile(m.chat, filePath, fileName, '', m, {
-                            document: !isVideo || isDocument
-                        });
+                                    if (chSize.oversize) {
+                                        await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit`, m);
+                                        fs.unlinkSync(filePath); // Delete the file
+                                        return;
+                                    }
 
-                        fs.unlinkSync(filePath); // Delete the file after sending
+                                    await client.reply(m.chat, `Your file (${fileSizeStr}) is being uploaded.`, m);
+
+                                    const extname = path.extname(fileName).toLowerCase();
+                                    const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
+
+                                    // Determine if file should be sent as a document or video
+                                    const isDocument = fileSizeMB > 99; // Upload as document if file size is greater than 99 MB
+
+                                    await client.sendFile(m.chat, filePath, fileName, '', m, {
+                                        document: !isVideo || isDocument
+                                    });
+
+                                    fs.unlinkSync(filePath); // Delete the file after sending
+                                } else if (downloadStatus.status === 'error') {
+                                    clearInterval(downloadIntervalId);
+                                    await client.reply(m.chat, `Download failed: ${downloadStatus.errorMessage}`, m);
+                                }
+                            } catch (error) {
+                                clearInterval(downloadIntervalId);
+                                await client.reply(m.chat, `Error fetching download status: ${error.message}`, m);
+                            }
+                        }, 5000);
+
                     } else if (status.status === 'error') {
                         clearInterval(intervalId);
-                        await client.reply(m.chat, `Download failed: ${status.errorMessage}`, m);
+                        await client.reply(m.chat, `Failed to fetch file size: ${status.errorMessage}`, m);
                     }
                 } catch (error) {
                     clearInterval(intervalId);
-                    await client.reply(m.chat, `Error fetching status: ${error.message}`, m);
+                    await client.reply(m.chat, `Error checking file size: ${error.message}`, m);
                 }
             }, 5000);
 
