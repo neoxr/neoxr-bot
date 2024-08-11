@@ -8,7 +8,7 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-           let wwwe = await apk_dl.aptoide.search('minecraft')
+           let wwwe = await  apk_dl.aptoide.search("com.groundhog.mcpemaster")
                 console.log(wwwe);
               
         } catch (e) {
