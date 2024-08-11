@@ -76,7 +76,7 @@ async function handleUserRequest(m, { client, text, isPrefix, command, Func }) {
                     id: `${isPrefix}cvbi ${url} best`
                 },
                 ...formats.map(format => ({
-                    title: format.label,
+                    title: `${format.label} - ${format.size}`, // Include size in the title
                     id: `${isPrefix}cvbi ${url} ${format.id}`
                 }))
             ]
