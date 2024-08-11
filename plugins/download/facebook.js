@@ -40,7 +40,7 @@ exports.run = {
          if (chSize.oversize) return client.reply(m.chat, isOver, m);
          
          // Send the video file to the user
-         await client.sendFile(m.chat, result, Func.filename('mp4'), `◦ *Quality* : SD`, m);
+         await client.sendFile(m.chat, result, Func.filename('mp4'), '', m);
          
       } catch (e) {
          console.log(e);
