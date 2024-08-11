@@ -8,13 +8,10 @@ def is_youtube_url(url):
 def fetch_qualities(url):
     ydl_opts = {
         'quiet': True,
-        'format': 'bestaudio/best'
+        'format': 'bestaudio/best',
+        'cookiefile': 'cookies.txt' if is_youtube_url(url) else None
     }
 
-    # Use cookies.txt only for YouTube URLs
-    if is_youtube_url(url):
-        ydl_opts['cookiefile'] = 'cookies.txt'
-    
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
             info_dict = ydl.extract_info(url, download=False)
