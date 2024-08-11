@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Aria2 = require('aria2');
 
+// Initialize Aria2 with appropriate settings
 const aria2 = new Aria2({
     host: '142.93.224.50', // VPS IP address
     port: 6800,
@@ -15,7 +16,9 @@ exports.run = {
     use: 'url [quality]',
     category: 'special',
     async: async (m, { client, args, isPrefix, command, users, env, Func, Scraper }) => {
-        if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        if (!args || !args[0]) {
+            return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        }
 
         const url = args[0];
         const outputDir = path.resolve(__dirname, 'downloads'); // Directory to save the download
@@ -33,27 +36,27 @@ exports.run = {
 
             const options = {
                 dir: outputDir,
-                // The downloaded file will keep its original name
             };
 
             const gid = await aria2.call('addUri', [url], options);
 
             // Monitor the download progress
-            const intervalId = setInterval(async () => {
+            const checkInterval = 3000; // Check every 3 seconds
+            const maxSizeMB = 900; // Max file size in MB
+
+            const checkStatus = async () => {
                 try {
                     const status = await aria2.call('tellStatus', gid);
 
                     if (status.status === 'complete') {
-                        clearInterval(intervalId);
                         const filePath = status.files[0].path;
-                        const fileName = path.basename(filePath); // Get the original file name
-
+                        const fileName = path.basename(filePath);
                         const fileSize = fs.statSync(filePath).size;
                         const fileSizeMB = fileSize / (1024 * 1024); // Convert bytes to MB
                         const fileSizeStr = `${fileSizeMB.toFixed(2)} MB`;
 
-                        if (fileSizeMB > 900) { // 900 MB
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB`, m);
+                        if (fileSizeMB > maxSizeMB) {
+                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of ${maxSizeMB}MB`, m);
                             fs.unlinkSync(filePath); // Delete the file
                             return;
                         }
@@ -81,14 +84,22 @@ exports.run = {
 
                         fs.unlinkSync(filePath); // Delete the file after sending
                     } else if (status.status === 'error') {
-                        clearInterval(intervalId);
                         await client.reply(m.chat, `Download failed: ${status.errorMessage}`, m);
                     }
                 } catch (error) {
-                    clearInterval(intervalId);
                     await client.reply(m.chat, `Error fetching status: ${error.message}`, m);
                 }
-            }, 5000);
+            };
+
+            // Check download status at intervals
+            const intervalId = setInterval(() => {
+                checkStatus().then(() => {
+                    // Clear interval if download is complete or failed
+                    if (aria2.call('tellStatus', gid).status === 'complete' || aria2.call('tellStatus', gid).status === 'error') {
+                        clearInterval(intervalId);
+                    }
+                });
+            }, checkInterval);
 
         } catch (error) {
             await client.reply(m.chat, `Error initializing Aria2 download: ${error.message}`, m);
