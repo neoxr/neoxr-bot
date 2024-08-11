@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const Aria2 = require('aria2');
+const axios = require('axios'); // Make sure to install axios for HTTP requests
 
 const aria2 = new Aria2({
     host: '142.93.224.50', // VPS IP address
@@ -27,10 +28,20 @@ exports.run = {
             fs.mkdirSync(outputDir);
         }
 
-        // Notify user that the download is starting
-        await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
-
         try {
+            // Fetch file size (hypothetical API call; adjust based on actual method)
+            const { data: fileInfo } = await axios.head(url); // Make sure the URL supports HEAD requests
+
+            const fileSizeMB = parseInt(fileInfo['content-length'], 10) / (1024 * 1024); // Convert bytes to MB
+
+            if (fileSizeMB > 900) { // 900 MB limit
+                await client.reply(m.chat, `💀 File size (${fileSizeMB.toFixed(2)} MB) exceeds the maximum limit of 900MB. Download aborted.`, m);
+                return;
+            }
+
+            // Notify user that the download is starting
+            await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
+
             await aria2.open();
 
             const options = {
@@ -51,24 +62,8 @@ exports.run = {
 
                         const fileSize = fs.statSync(filePath).size;
                         const fileSizeMB = fileSize / (1024 * 1024); // Convert bytes to MB
-                        const fileSizeStr = `${fileSizeMB.toFixed(2)} MB`;
 
-                        if (fileSizeMB > 900) { // 900 MB
-                            await aria2.call('remove', [gid]); // Abort the download
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB. Download aborted.`, m);
-                            return;
-                        }
-
-                        const maxUpload = users.premium ? env.max_upload : env.max_upload_free;
-                        const chSize = Func.sizeLimit(fileSize.toString(), maxUpload.toString());
-
-                        if (chSize.oversize) {
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit`, m);
-                            fs.unlinkSync(filePath); // Delete the file
-                            return;
-                        }
-
-                        await client.reply(m.chat, `Your file (${fileSizeStr}) is being uploaded.`, m);
+                        await client.reply(m.chat, `Your file (${fileSizeMB.toFixed(2)} MB) is being uploaded.`, m);
 
                         const extname = path.extname(fileName).toLowerCase();
                         const isVideo = ['.mp4', '.avi', '.mov', '.mkv', '.webm'].includes(extname);
@@ -92,7 +87,7 @@ exports.run = {
             }, 5000);
 
         } catch (error) {
-            await client.reply(m.chat, `Error initializing Aria2 download: ${error.message}`, m);
+            await client.reply(m.chat, `Error initializing download or fetching file size: ${error.message}`, m);
         } finally {
             try {
                 await aria2.close();
