@@ -3,10 +3,10 @@ const fs = require('fs');
 const Aria2 = require('aria2');
 
 const aria2 = new Aria2({
-    host: 'localhost',
+    host: '142.93.224.50', // VPS IP address
     port: 6800,
     secure: false,
-    secret: '', // Set your RPC secret if any
+    secret: 'ibrahim', // Set your RPC secret if any
     path: '/jsonrpc'
 });
 
