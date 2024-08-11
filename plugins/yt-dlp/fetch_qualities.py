@@ -13,18 +13,26 @@ def fetch_qualities(url):
             info_dict = ydl.extract_info(url, download=False)
             formats = info_dict.get('formats', [])
             
-            # Extract all format options with their quality and format type
+            # Extract all format options with their quality, format type, and size
             format_list = []
             for fmt in formats:
                 height = fmt.get('height')
                 format_id = fmt.get('format_id', 'unknown')
                 format_label = fmt.get('format', 'Unknown Format')
+                file_size = fmt.get('filesize', 'Unknown Size')
+                
                 if height:
                     label = f"{height}p ({format_label})"
                 else:
                     label = f"Audio ({format_label})"
                 
-                format_list.append({'id': format_id, 'label': label})
+                size_str = f"{file_size / (1024 * 1024):.2f} MB" if file_size else 'Size not available'
+                
+                format_list.append({
+                    'id': format_id,
+                    'label': label,
+                    'size': size_str
+                })
 
             return json.dumps(format_list)
         except Exception as e:
