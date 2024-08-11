@@ -19,14 +19,21 @@ def fetch_qualities(url):
                 height = fmt.get('height')
                 format_id = fmt.get('format_id', 'unknown')
                 format_label = fmt.get('format', 'Unknown Format')
-                file_size = fmt.get('filesize', 'Unknown Size')
+                file_size = fmt.get('filesize')
+                
+                if file_size is not None:
+                    try:
+                        file_size = int(file_size)
+                        size_str = f"{file_size / (1024 * 1024):.2f} MB"
+                    except ValueError:
+                        size_str = 'Size not available'
+                else:
+                    size_str = 'Size not available'
                 
                 if height:
                     label = f"{height}p ({format_label})"
                 else:
                     label = f"Audio ({format_label})"
-                
-                size_str = f"{file_size / (1024 * 1024):.2f} MB" if file_size else 'Size not available'
                 
                 format_list.append({
                     'id': format_id,
