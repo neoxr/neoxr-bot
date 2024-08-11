@@ -48,11 +48,8 @@ exports.run = {
             messageText += `	◦  *Size* : ${size}\n`;
             messageText += global.footer;
 
-            // Send the APK icon and details
-            await client.sendFile(m.chat, json.result.apk_icon, '', messageText, m);
-
-            // Send the APK file itself
-            await client.sendFile(m.chat, json.result.apk_link, `${json.result.apk_name}.apk`, json.result.apk_name, m);
+            
+             client.sendFile(m.chat, json.result.apk_link, `${json.result.apk_name}.apk`, messageText, m);
 
         } catch (e) {
             console.error(e);
