@@ -15,7 +15,9 @@ exports.run = {
     use: 'url [quality]',
     category: 'special',
     async: async (m, { client, args, isPrefix, command, users, env, Func, Scraper }) => {
-        if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        if (!args || !args[0]) {
+            return client.reply(m.chat, Func.example(isPrefix, command, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'), m);
+        }
 
         const url = args[0];
         const outputDir = path.resolve(__dirname, 'downloads'); // Directory to save the download
@@ -26,14 +28,13 @@ exports.run = {
         }
 
         // Notify user that the download is starting
-        await client.reply(m.chat, 'Your file is being downloaded via Aria2. This may take some time.', m);
+        await client.reply(m.chat, 'Your file is being downloaded. This may take some time.', m);
 
         try {
             await aria2.open();
 
             const options = {
-                dir: outputDir,
-                // The downloaded file will keep its original name
+                dir: outputDir
             };
 
             const gid = await aria2.call('addUri', [url], options);
@@ -53,8 +54,8 @@ exports.run = {
                         const fileSizeStr = `${fileSizeMB.toFixed(2)} MB`;
 
                         if (fileSizeMB > 900) { // 900 MB
-                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB`, m);
-                            fs.unlinkSync(filePath); // Delete the file
+                            await aria2.call('remove', [gid]); // Abort the download
+                            await client.reply(m.chat, `💀 File size (${fileSizeStr}) exceeds the maximum limit of 900MB. Download aborted.`, m);
                             return;
                         }
 
