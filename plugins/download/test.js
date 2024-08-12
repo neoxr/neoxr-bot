@@ -8,7 +8,7 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-           let wwwe =  await apk_dl.apkdl.search('minecraft')
+            await apk_dl.aptoide.search('minecraft')
                 console.log(wwwe);
               
         } catch (e) {
