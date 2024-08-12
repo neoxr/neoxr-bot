@@ -8,9 +8,9 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-            apk_dl.apkdl.search('Tiktok').then((response) => {
-                console.log(response.message);
-              });
+           let wwwe =  await apk_dl.apkdl.search('minecraft')
+                console.log(wwwe);
+              
         } catch (e) {
             console.error(e);
             return client.reply(m.chat, Func.jsonFormat(e), m);
