@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+
 exports.run = {
    usage: ['attp', 'attp2'],
    use: 'text',
