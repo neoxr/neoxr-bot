@@ -4,7 +4,7 @@ const Aria2 = require('aria2');
 
 const aria2 = new Aria2({
     host: '142.93.224.50', // VPS IP address
-    port: 6800,
+    port: 6888, // New port number
     secure: false,
     secret: 'ibrahim', // Set your RPC secret if any
     path: '/jsonrpc'
