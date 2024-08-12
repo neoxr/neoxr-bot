@@ -53,7 +53,7 @@
       "aptoide-scraper": "1.0.1",
       "@xct007/frieren-scraper": "0.0.2",
       "yt-search": "2.11.1",
-      "@queenanya/apkdl": "2.0.0"
+      "apk-dl.js": "1.0.0"
       },
    "devDependencies": {
       "@adiwajshing/baileys": "npm:@neoxr/baileys",
