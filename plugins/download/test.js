@@ -8,7 +8,7 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-            apk_dl.apkdl.search('minecraft').then((response) => {
+            apk_dl.apkdl.search('Tiktok').then((response) => {
                 console.log(response.message);
               });
         } catch (e) {
