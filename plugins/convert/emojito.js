@@ -1,5 +1,4 @@
-
-
+const fetch = require('node-fetch')
 exports.run = {
    usage: ['emojito'],
    use: 'emoji',
