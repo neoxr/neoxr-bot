@@ -1,5 +1,5 @@
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
+moment.tz.setDefault('Asia/Karachi').locale('id')
 exports.run = {
    usage: ['hitstat', 'hitdaily'],
    category: 'miscs',

@@ -1,42 +1,40 @@
+const { decode } = require('html-entities');
+
 exports.run = {
    usage: ['pin'],
-   hidden: ['pinterest'],
-   use: 'link / query',
+   use: 'link',
    category: 'downloader',
    async: async (m, {
       client,
-      text,
+      args,
       isPrefix,
       command,
       Func
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'https://pin.it/5fXaAWE'), m)
-         client.sendReact(m.chat, '🕒', m.key)
-         if (Func.isUrl(text.trim())) {
-            if (!text.match(/pin(?:terest)?(?:\.it|\.com)/)) return m.reply(global.status.invalid)
-            const json = await Api.neoxr('/pin', {
-               url: text.trim()
-            })
-            if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-            if (/jpg|mp4/.test(json.data.type)) return client.sendFile(m.chat, json.data.url, '', '', m)
-            if (json.data.type == 'gif') return client.sendFile(m.chat, json.data.url, '', ``, m, {
-               gif: true
-            })
+         if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://pin.it/5fXaAWE'), m);
+         if (!args[0].match(/pin(?:terest)?(?:\.it|\.com)/)) return client.reply(m.chat, global.status.invalid, m);
+         
+         client.sendReact(m.chat, '🕒', m.key);
+         
+         const json = await Func.fetchJson(`https://api.betabotz.eu.org/api/download/pinterest?url=${encodeURIComponent(args[0])}&apikey=beta-Ibrahim1209`);
+         if (!json.result.success) return client.reply(m.chat, Func.jsonFormat(json), m);
+         
+         const { data } = json.result;
+         let mediaUrl = data.image;
+
+         if (/image/.test(data.media_type)) {
+            client.sendFile(m.chat, mediaUrl, '', '', m);
          } else {
-            const json = await Api.neoxr('/pinterest', {
-               q: text.trim()
-            })
-            if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-            const imgUrl = Func.random(json.data)
-            client.sendFile(m.chat, imgUrl, '', '', m)
+            return client.reply(m.chat, global.status.invalid, m);
          }
       } catch {
-         client.reply(m.chat, global.status.error, m)
+         return client.reply(m.chat, global.status.error, m);
       }
    },
    error: false,
    limit: true,
    cache: true,
+   verified: true,
    location: __filename
 }

@@ -1,5 +1,5 @@
 exports.run = {
-  usage: ['listban', 'listprem', 'listblock'],
+  usage: ['listban', 'listprem', 'listblock', 'listverified'],
   category: 'miscs',
   async: async (m, {
     client,
@@ -28,6 +28,22 @@ exports.run = {
       const data = global.db.users.filter(v => v.premium)
       if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
       let text = `乂 *L I S T P R E M*\n\n`
+      text += data.map((v, i) => {
+        if (i == 0) {
+          return `┌  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
+        } else if (i == data.length - 1) {
+          return `└  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
+        } else {
+          return `│  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
+        }
+      }).join('\n')
+      m.reply(text + '\n\n' + global.footer)
+    } 
+    else if (command === 'listverified') {
+      if (!isOwner) return m.reply(global.status.owner)
+      const data = global.db.users.filter(v => v.verified)
+      if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
+      let text = `乂 *L I S T  V E R I F I E D*\n\n`
       text += data.map((v, i) => {
         if (i == 0) {
           return `┌  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
