@@ -23,8 +23,12 @@ exports.run = {
          var json = await yt.play(text, 'video', '720p')
          if (!json.status) {
             var json = await yt.play(text, 'video', '480p')
+            if (!json.status) {
+               var json = await Api.neoxr('/video', {
+                  q: text
+               })
+            }
          }
-         if (!json.status) return client.reply(m.chat, global.status.fail, m)
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
          let caption = `乂  *Y T - V I D E O*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`

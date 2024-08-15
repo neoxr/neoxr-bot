@@ -26,9 +26,16 @@ exports.run = {
             if (Number(args[0]) > check.results.length) return m.reply(Func.texted('bold', `🚩 Exceed amount of data.`))
             client.sendReact(m.chat, '🕒', m.key)
             if (command === 'getmp3') {
-               const json = await yt.fetch(check.results[Number(args[0]) - 1])
+               var json = await yt.fetch(check.results[Number(args[0]) - 1])
+               if (!json.status) {
+                  var json = await Api.neoxr('/youtube', {
+                     url: check.results[Number(args[0]) - 1],
+                     type: 'audio',
+                     quality: '128kbps'
+                  })
+               }
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-               let caption = `乂  *Y T - M P 3*\n\n`
+               let caption = `乂  *Y T - P L A Y*\n\n`
                caption += `	◦  *Title* : ${json.title}\n`
                caption += `	◦  *Size* : ${json.data.size}\n`
                caption += `	◦  *Duration* : ${json.duration}\n`
@@ -50,6 +57,20 @@ exports.run = {
                var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '720p')
                if (!json.status) {
                   var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '480p')
+                  if (!json.status) {
+                     var json = await Api.neoxr('/youtube', {
+                        url: check.results[Number(args[0]) - 1],
+                        type: 'video',
+                        quality: '720p'
+                     })
+                     if (!json.status) {
+                        var json = await Api.neoxr('/youtube', {
+                           url: check.results[Number(args[0]) - 1],
+                           type: 'video',
+                           quality: '480p'
+                        })
+                     }
+                  }
                }
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                let caption = `乂  *Y T - M P 4*\n\n`

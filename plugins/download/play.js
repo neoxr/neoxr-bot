@@ -19,7 +19,12 @@ exports.run = {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const json = await yt.play(text)
+         var json = await yt.play(text)
+         if (!json.status) {
+            var json = await Api.neoxr('/play', {
+               q: text
+            })
+         }
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
          let caption = `乂  *Y T - P L A Y*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
@@ -45,7 +50,6 @@ exports.run = {
    },
    error: false,
    restrict: true,
-   limit: true,
    cache: true,
    location: __filename
 }

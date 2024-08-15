@@ -22,7 +22,14 @@ exports.run = {
             if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://youtu.be/zaRFmdtLhQ8'), m)
             if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) return client.reply(m.chat, global.status.invalid, m)
             client.sendReact(m.chat, '🕒', m.key)
-            const json = await yt.fetch(args[0])
+            var json = await yt.fetch(args[0])
+            if (!json.status) {
+               var json = await Api.neoxr('/youtube', {
+                  url: args[0],
+                  type: 'audio',
+                  quality: '128kbps'
+               })
+            }
             if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
             let caption = `乂  *Y T - P L A Y*\n\n`
             caption += `	◦  *Title* : ${json.title}\n`
@@ -49,6 +56,20 @@ exports.run = {
             var json = await yt.fetch(args[0], 'video', '720p')
             if (!json.status) {
                var json = await yt.fetch(args[0], 'video', '480p')
+               if (!json.status) {
+                  var json = await Api.neoxr('/youtube', {
+                     url: args[0],
+                     type: 'video',
+                     quality: '720p'
+                  })
+                  if (!json.status) {
+                     var json = await Api.neoxr('/youtube', {
+                        url: args[0],
+                        type: 'video',
+                        quality: '480p'
+                     })
+                  }
+               }
             }
             if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
             let caption = `乂  *Y T - M P 4*\n\n`
