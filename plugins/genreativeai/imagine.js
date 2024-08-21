@@ -12,7 +12,7 @@ const models = {
 
 exports.run = {
     usage: ['imagine'],
-    hidden: Object.keys(models),
+    hidden: ['dreamshaperXL', 'dynavisionXL', 'juggernautXL', 'realismEngineSDXL', 'sd_xl_base', 'sd_xl_inpainting', 'turbovisionXL'],
     use: 'query <premium>',
     category: 'generativeai',
     async: async (m, { client, text, args, isPrefix, command, Func }) => {
@@ -27,7 +27,7 @@ exports.run = {
                 const sections = [{
                     rows: Object.keys(models).map(key => ({
                         title: key,
-                        id: `${isPrefix}${key} ${text}`
+                        id: `${isPrefix}${command} ${text}`
                     }))
                 }];
 
