@@ -17,12 +17,12 @@ exports.run = {
     category: 'generativeai',
     async: async (m, { client, text, args, isPrefix, command, Func }) => {
         try {
-            // Step 1: Check if the command /imagine is given without text, prompt for text.
+            // Step 1: If /imagine is given without text, prompt for text.
             if (!text) {
-                return client.reply(m.chat, Func.example(isPrefix, command, 'cat, fish'), m);
+                return client.reply(m.chat, Func.example(isPrefix, command, 'cat,fish'), m);
             }
 
-            // Step 2: Handle the /imagine command and prompt for model selection.
+            // Step 2: If the command is /imagine, prompt for model selection.
             if (command === 'imagine') {
                 const sections = [{
                     rows: Object.keys(models).map(key => ({
@@ -43,91 +43,14 @@ exports.run = {
                 });
             }
 
-            // Step 3: Process the selected model command.
+            // Step 3: Handle each model command.
             if (Object.keys(models).includes(command)) {
-                client.sendReact(m.chat, '🕒', m.key);
-
-                const selectedModel = models[command];
-                const curlPostCommand = `curl --request POST \
-                    --url https://api.prodia.com/v1/sdxl/generate \
-                    --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-                    --header 'accept: application/json' \
-                    --header 'content-type: application/json' \
-                    --data '{
-                        "model": "${selectedModel}",
-                        "prompt": "${text}",
-                        "negative_prompt": "badly drawn",
-                        "style_preset": "cinematic",
-                        "steps": 20,
-                        "cfg_scale": 7,
-                        "seed": -1,
-                        "sampler": "DPM++ 2M Karras",
-                        "width": 1024,
-                        "height": 1024
-                    }'`;
-
-                exec(curlPostCommand, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`exec error: ${error}`);
-                        return client.reply(m.chat, 'Failed to initiate image generation. Please try again.', m);
-                    }
-
-                    let postResponse;
-                    try {
-                        postResponse = JSON.parse(stdout);
-                    } catch (parseError) {
-                        console.error(`JSON parse error: ${parseError}`);
-                        return client.reply(m.chat, 'Error processing server response.', m);
-                    }
-
-                    const jobId = postResponse.job;
-
-                    client.reply(m.chat, `Your image generation job has been created.`, m);
-
-                    const pollStatus = async () => {
-                        try {
-                            const curlStatusCommand = `curl --request GET \
-                                --url https://api.prodia.com/v1/job/${jobId} \
-                                --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-                                --header 'accept: application/json'`;
-
-                            exec(curlStatusCommand, (error, stdout, stderr) => {
-                                if (error) {
-                                    console.error(`exec error: ${error}`);
-                                    return client.reply(m.chat, 'Failed to fetch job status. Please try again.', m);
-                                }
-
-                                let statusResponse;
-                                try {
-                                    statusResponse = JSON.parse(stdout);
-                                } catch (parseError) {
-                                    console.error(`JSON parse error: ${parseError}`);
-                                    return client.reply(m.chat, 'Error processing status response.', m);
-                                }
-
-                                const status = statusResponse.status;
-
-                                if (status === 'succeeded') {
-                                    const imageUrl = statusResponse.imageUrl;
-                                    client.sendFile(m.chat, imageUrl, '', `◦  *Prompt* : ${text}`, m);
-                                } else if (status === 'failed') {
-                                    client.reply(m.chat, 'Image generation failed. Please try again.', m);
-                                } else {
-                                    setTimeout(pollStatus, 9000);
-                                }
-                            });
-                        } catch (e) {
-                            client.reply(m.chat, 'Error fetching job status.', m);
-                        }
-                    };
-
-                    pollStatus();
-                });
+                await handleModelCommand(command, text, client, m);
             } else {
-                // Handle unrecognized commands.
                 return client.reply(m.chat, 'Command not recognized. Please select a valid model.', m);
             }
         } catch (e) {
+            console.error('Error:', e);
             return client.reply(m.chat, global.status.error, m);
         }
     },
@@ -136,4 +59,83 @@ exports.run = {
     premium: true,
     verified: true,
     location: __filename
+};
+
+const handleModelCommand = async (modelKey, promptText, client, message) => {
+    const selectedModel = models[modelKey];
+    const curlPostCommand = `curl --request POST \
+        --url https://api.prodia.com/v1/sdxl/generate \
+        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
+        --header 'accept: application/json' \
+        --header 'content-type: application/json' \
+        --data '{
+            "model": "${selectedModel}",
+            "prompt": "${promptText}",
+            "negative_prompt": "badly drawn",
+            "style_preset": "cinematic",
+            "steps": 20,
+            "cfg_scale": 7,
+            "seed": -1,
+            "sampler": "DPM++ 2M Karras",
+            "width": 1024,
+            "height": 1024
+        }'`;
+
+    exec(curlPostCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return client.reply(message.chat, 'Failed to initiate image generation. Please try again.', message);
+        }
+
+        let postResponse;
+        try {
+            postResponse = JSON.parse(stdout);
+        } catch (parseError) {
+            console.error(`JSON parse error: ${parseError}`);
+            return client.reply(message.chat, 'Error processing server response.', message);
+        }
+
+        const jobId = postResponse.job;
+
+        client.reply(message.chat, `Your image generation job has been created.`, message);
+
+        const pollStatus = async () => {
+            try {
+                const curlStatusCommand = `curl --request GET \
+                    --url https://api.prodia.com/v1/job/${jobId} \
+                    --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
+                    --header 'accept: application/json'`;
+
+                exec(curlStatusCommand, (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`exec error: ${error}`);
+                        return client.reply(message.chat, 'Failed to fetch job status. Please try again.', message);
+                    }
+
+                    let statusResponse;
+                    try {
+                        statusResponse = JSON.parse(stdout);
+                    } catch (parseError) {
+                        console.error(`JSON parse error: ${parseError}`);
+                        return client.reply(message.chat, 'Error processing status response.', message);
+                    }
+
+                    const status = statusResponse.status;
+
+                    if (status === 'succeeded') {
+                        const imageUrl = statusResponse.imageUrl;
+                        client.sendFile(message.chat, imageUrl, '', `◦  *Prompt* : ${promptText}`, message);
+                    } else if (status === 'failed') {
+                        client.reply(message.chat, 'Image generation failed. Please try again.', message);
+                    } else {
+                        setTimeout(pollStatus, 9000);
+                    }
+                });
+            } catch (e) {
+                client.reply(message.chat, 'Error fetching job status.', message);
+            }
+        };
+
+        pollStatus();
+    });
 };
