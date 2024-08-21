@@ -22,13 +22,25 @@ exports.run = {
                 return client.reply(m.chat, Func.example(isPrefix, command, 'cat,fish'), m);
             }
 
-            // Step 2: Debugging - Check the recognized command
-            console.log(`Received command: ${command}`);
+            // Step 2: If the command is /imagine, prompt for model selection.
+            if (command === 'imagine') {
+                const sections = [{
+                    rows: Object.keys(models).map(key => ({
+                        title: key,
+                        id: `${isPrefix}${key} ${text}`
+                    }))
+                }];
 
-            // If the command doesn't match any model, suggest a correction
-            if (!Object.keys(models).includes(command)) {
-                const suggestions = Object.keys(models).map(key => `/${key} (${(similarity(command, key) * 100).toFixed(1)}%)`).join('\n➠ ');
-                return client.reply(m.chat, `🚩 Command you are using is wrong, try the following recommendations:\n➠ ${suggestions}`, m);
+                const buttonParamsJson = JSON.stringify({
+                    title: 'Select a Model',
+                    sections: sections
+                });
+
+                const buttons = [{ name: 'single_select', buttonParamsJson }];
+                return await client.sendIAMessage(m.chat, buttons, m, {
+                    header: 'Select a Model for Image Generation',
+                    content: 'Choose one of the models below to generate an image.'
+                });
             }
 
             // Step 3: When the user selects a model, execute the corresponding model command.
@@ -106,42 +118,3 @@ exports.run = {
     verified: true,
     location: __filename
 };
-
-// Utility function to calculate similarity between two strings
-function similarity(s1, s2) {
-    let longer = s1;
-    let shorter = s2;
-    if (s1.length < s2.length) {
-        longer = s2;
-        shorter = s1;
-    }
-    const longerLength = longer.length;
-    if (longerLength === 0) {
-        return 1.0;
-    }
-    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
-}
-
-function editDistance(s1, s2) {
-    s1 = s1.toLowerCase();
-    s2 = s2.toLowerCase();
-
-    const costs = [];
-    for (let i = 0; i <= s1.length; i++) {
-        let lastValue = i;
-        for (let j = 0; j <= s2.length; j++) {
-            if (i === 0) costs[j] = j;
-            else {
-                if (j > 0) {
-                    let newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                }
-            }
-        }
-        if (i > 0) costs[s2.length] = lastValue;
-    }
-    return costs[s2.length];
-}
