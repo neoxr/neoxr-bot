@@ -27,7 +27,7 @@ exports.run = {
                 const sections = [{
                     rows: Object.keys(models).map(key => ({
                         title: key,
-                        id: `${isPrefix}${command} ${text}`
+                        id: `${isPrefix}${models} ${text}`
                     }))
                 }];
 
