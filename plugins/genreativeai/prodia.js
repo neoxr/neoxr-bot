@@ -72,7 +72,14 @@ exports.run = {
                         return client.reply(m.chat, 'Failed to initiate image generation. Please try again.', m);
                     }
 
-                    const postResponse = JSON.parse(stdout);
+                    let postResponse;
+                    try {
+                        postResponse = JSON.parse(stdout);
+                    } catch (parseError) {
+                        console.error(`JSON parse error: ${parseError}`);
+                        return client.reply(m.chat, 'Error processing server response.', m);
+                    }
+
                     const jobId = postResponse.job;
 
                     client.reply(m.chat, `Your image generation job has been created.`, m);
@@ -90,7 +97,14 @@ exports.run = {
                                     return client.reply(m.chat, 'Failed to fetch job status. Please try again.', m);
                                 }
 
-                                const statusResponse = JSON.parse(stdout);
+                                let statusResponse;
+                                try {
+                                    statusResponse = JSON.parse(stdout);
+                                } catch (parseError) {
+                                    console.error(`JSON parse error: ${parseError}`);
+                                    return client.reply(m.chat, 'Error processing status response.', m);
+                                }
+
                                 const status = statusResponse.status;
 
                                 if (status === 'succeeded') {
