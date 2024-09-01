@@ -53,7 +53,7 @@
 
 ### Requirements
 
-- [x] NodeJS >= 14 (Recommended v14)
+- [x] NodeJS >= 14 (Recommended v18)
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 

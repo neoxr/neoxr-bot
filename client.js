@@ -147,9 +147,10 @@ client.on('group.add', async ctx => {
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
    if (!global.db || !global.db.groups) return
    try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      const photo = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      var pic = photo ? await Func.fetchBuffer(photo) : await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
+      var pic = await Func.fetchBuffer('./media/image/default.jpg')
    }
 
    /* localonly to remove new member when the number not from indonesia */
@@ -175,9 +176,10 @@ client.on('group.remove', async ctx => {
    if (!global.db || !global.db.groups) return
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
    try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      const photo = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      var pic = photo ? await Func.fetchBuffer(photo) : await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
+      var pic = await Func.fetchBuffer('./media/image/default.jpg')
    }
    const txt = (groupSet && groupSet.text_left ? groupSet.text_left : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
    if (groupSet && groupSet.left) sock.sendMessageModify(ctx.jid, txt, null, {
