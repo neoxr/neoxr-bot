@@ -15,7 +15,7 @@ exports.run = {
          let meta = await (await client.groupMetadata(m.chat))
          let admin = await client.groupAdmin(m.chat)
          let member = participants.map(u => u.id)
-         var pic = await Func.fetchBuffer(await client.profilePictureUrl(m.chat, 'image'))
+         var pic = await client.profilePictureUrl(m.chat, 'image')
          let caption = `乂  *G R O U P - I N F O*\n\n`
          caption += `	◦  *Name* : ${meta.subject}\n`
          caption += `	◦  *Member* : ${member.length}\n`

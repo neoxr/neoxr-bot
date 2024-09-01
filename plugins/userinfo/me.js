@@ -10,7 +10,7 @@ exports.run = {
    }) => {
       let user = global.db.users.find(v => v.jid == m.sender)
       let _own = [...new Set([env.owner, ...global.db.setting.owners])]
-      var pic = await Func.fetchBuffer(await client.profilePictureUrl(m.sender, 'image'))
+      var pic = await client.profilePictureUrl(m.sender, 'image')
       let blocked = blockList.includes(m.sender) ? true : false
       let now = new Date() * 1
       let lastseen = (user.lastseen == 0) ? 'Never' : Func.toDate(now - user.lastseen)
