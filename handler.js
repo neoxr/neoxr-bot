@@ -41,8 +41,8 @@ module.exports = async (client, ctx) => {
       
       // stories reaction
       client.storyJid = client.storyJid ? client.storyJid  : []
-      if (m.chat.endsWith('broadcast') && m.sender != client.decodeJid(client.user.id)) client.storyJid.push(m.sender)
-      if (m.chat.endsWith('broadcast') && [...new Set(client.storyJid)].includes(m.sender)) {
+      if (m.chat.endsWith('broadcast') && !client.storyJid.includes(m.sender) && m.sender != client.decodeJid(client.user.id)) client.storyJid.push(m.sender)
+      if (m.chat.endsWith('broadcast') && [...new Set(client.storyJid)].includes(m.sender) && !/protocol/.test(m.mtype)) {
          await client.sendMessage('status@broadcast', {
             react: {
                text: Func.random(['🤣', '🥹', '😂', '😋', '😎', '🤓', '🤪', '🥳', '😠', '😱', '🤔']),
