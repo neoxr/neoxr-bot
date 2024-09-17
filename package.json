@@ -1,26 +1,26 @@
 {
-   "name":"neoxr-bot",
-   "version":"4.0-rc",
-   "description":"WhatsApp Bot (Base)",
-   "main":"index.js",
+   "name": "neoxr-bot",
+   "version": "4.0-rc",
+   "description": "WhatsApp Bot (Base)",
+   "main": "index.js",
    "scripts": {
       "start": "node ."
    },
-   "repository":{
-      "type":"git",
-      "url":"git+https://github.com/neoxr/wbot.git"
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/neoxr/wbot.git"
    },
-   "keywords":[
+   "keywords": [
       "wb",
       "bot"
    ],
-   "author":"Wildan Izzudin",
-   "license":"ISC",
-   "bugs":{
-      "url":"https://github.com/neoxr/wbot/issues"
+   "author": "Wildan Izzudin",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/neoxr/wbot/issues"
    },
-   "homepage":"https://github.com/neoxr/neoxr-bot#readme",
-   "dependencies":{
+   "homepage": "https://github.com/neoxr/neoxr-bot#readme",
+   "dependencies": {
       "@adiwajshing/baileys": "npm:@neoxr/baileys",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
@@ -38,24 +38,19 @@
       "translate-google-api": "1.0.4",
       "hercai": "^12.2.0",
       "nodemailer": "^6.9.0",
-      "rsnchat": "^4.0.1 ",
+      "rsnchat": "^4.0.1",
       "gpti": "^2.1.7",
       "g4f": "1.4.6",
-      "y2mate-dl":  "1.0.4 ",
+      "y2mate-dl": "1.0.4",
       "readline": "1.3.0",
-      "node-schedule": "^2.1.1" ,
+      "node-schedule": "^2.1.1",
       "nayan-bing-api": "1.0.1",
       "nayan-server": "2.2.8",
       "custom-google-play-scraper": "1.0.5",
       "nayan-media-downloader": "2.4.5",
-      "pornhub.js": "1.12.1 ",
+      "pornhub.js": "1.12.1",
       "aptoide-scraper": "1.0.1",
       "@xct007/frieren-scraper": "0.0.2",
       "yt-search": "2.11.1"
-      },
-   "devDependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys",
-      "@adiwajshing/keyed-db": "^0.2.4",
-      "jimp": "^0.16.13"
    }
 }
