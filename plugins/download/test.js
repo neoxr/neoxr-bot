@@ -9,7 +9,7 @@ exports.run = {
     async: async (m, { client, text, isPrefix, command, env, users, Scraper, Func }) => {
         try {
             
-            let data = await download('com.whatsapp')
+            let data = yt.play('wide awake').then(console.log)
             console.log(data)
               
         } catch (e) {
