@@ -1,5 +1,8 @@
 
-const { download} = require('aptoide-scraper')
+const { Youtube } = require('@neoxr/youtube-scraper')
+const yt = new Youtube({
+   fileAsUrl: false
+})
     
 exports.run = {
     usage: ['test'],
