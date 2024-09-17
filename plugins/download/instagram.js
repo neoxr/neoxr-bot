@@ -1,4 +1,7 @@
-const { ndown } = require("nayan-media-downloader");
+const { Youtube } = require('@neoxr/youtube-scraper')
+const yt = new Youtube({
+   fileAsUrl: false
+})
 
 exports.run = {
    usage: ['ig'],
