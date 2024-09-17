@@ -14,6 +14,8 @@ exports.run = {
 
             // Step 1: Play the song using the YouTube scraper
             const song = await yt.play(text);
+            console.log(song); // Log the song response for debugging
+
             if (!song || !song.status) {
                 return client.reply(m.chat, 'Audio not found.', m);
             }
@@ -31,17 +33,17 @@ exports.run = {
             caption += global.footer;
 
             // Send the message with details
-            client.sendMessageModify(m.chat, caption, m, {
+            await client.sendMessageModify(m.chat, caption, m, {
                 largeThumb: true,
                 thumbnail: result.thumbnail // Thumbnail from the response
-            }).then(async () => {
-                client.sendFile(m.chat, downloadUrl, `${result.filename}`, '', m, {
-                    document: false,
-                    APIC: result.thumbnail // Use thumbnail for cover art
-                });
+            });
+
+            await client.sendFile(m.chat, downloadUrl, `${result.filename}`, '', m, {
+                document: false,
+                APIC: result.thumbnail // Use thumbnail for cover art
             });
         } catch (e) {
-            console.log(e);
+            console.error(e); // Log error for debugging
             return client.reply(m.chat, Func.jsonFormat(e), m);
         }
     },
