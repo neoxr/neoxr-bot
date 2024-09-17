@@ -1,3 +1,4 @@
+
 "use strict";
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
@@ -10,7 +11,7 @@ const spinnies = new(require('spinnies'))(),
    env = require('./config.json'),
    { platform } = require('os')
 const cache = new(require('node-cache'))({
-   stdTTL: env.cooldownasd
+   stdTTL: env.cooldown
 })
 if (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) MongoDB.db = env.database
 const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./lib/system/localdb'))(env.database)
@@ -20,7 +21,7 @@ const client = new Baileys({
    sf: 'session',
    online: true,
    // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
-   version: [2, 2413, 51]//iok
+   version: [2, 2413, 51]
 })
 
 /* starting to connect */
@@ -147,9 +148,10 @@ client.on('group.add', async ctx => {
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
    if (!global.db || !global.db.groups) return
    try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      const photo = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      var pic = photo ? await Func.fetchBuffer(photo) : await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
+      var pic = await Func.fetchBuffer('./media/image/default.jpg')
    }
 
    /* localonly to remove new member when the number not from indonesia */
@@ -175,9 +177,10 @@ client.on('group.remove', async ctx => {
    if (!global.db || !global.db.groups) return
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
    try {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      const photo = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.member, 'image'))
+      var pic = photo ? await Func.fetchBuffer(photo) : await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
    } catch {
-      var pic = await Func.fetchBuffer(await sock.profilePictureUrl(ctx.jid, 'image'))
+      var pic = await Func.fetchBuffer('./media/image/default.jpg')
    }
    const txt = (groupSet && groupSet.text_left ? groupSet.text_left : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
    if (groupSet && groupSet.left) sock.sendMessageModify(ctx.jid, txt, null, {

@@ -11,56 +11,42 @@ const models = {
 };
 
 exports.run = {
-    usage: ['imagine'],
-    hidden: Object.keys(models),
-    use: 'query <premium>',
+    usage: ['dreamshaperXL', 'dynavisionXL', 'juggernautXL', 'realismEngineSDXL', 'sd_xl_base', 'sd_xl_inpainting', 'turbovisionXL'],
     category: 'generativeai',
-    async: async (m, { client, text, args, isPrefix, command, Func }) => {
+    async: async (m, { client, text, command }) => {
         try {
             if (!text) {
-                return client.reply(m.chat, Func.example(isPrefix, command, 'cat,fish'), m);
+                return client.reply(m.chat, `Please provide a prompt. Example: /${command} "your prompt here"`, m);
             }
 
-            if (command === 'imagine') {
-                const sections = [{
-                    rows: Object.keys(models).map(key => ({
-                        title: key,
-                        id: `${isPrefix}${key} ${text}`
-                    }))
-                }];
-
-                const buttonParamsJson = JSON.stringify({
-                    title: 'Select a Model',
-                    sections: sections
-                });
-
-                const buttons = [{ name: 'single_select', buttonParamsJson }];
-                return await client.sendIAMessage(m.chat, buttons, m, {
-                    header: 'Select a Model for Image Generation',
-                    content: 'Choose one of the models below to generate an image.'
-                });
-            }
-
-            if (command === 'dreamshaperXL') {
-                await handleDreamshaperXL(text, client, m);
-            } else if (command === 'dynavisionXL') {
-                await handleDynavisionXL(text, client, m);
-            } else if (command === 'juggernautXL') {
-                await handleJuggernautXL(text, client, m);
-            } else if (command === 'realismEngineSDXL') {
-                await handleRealismEngineSDXL(text, client, m);
-            } else if (command === 'sd_xl_base') {
-                await handleSdXlBase(text, client, m);
-            } else if (command === 'sd_xl_inpainting') {
-                await handleSdXlInpainting(text, client, m);
-            } else if (command === 'turbovisionXL') {
-                await handleTurbovisionXL(text, client, m);
-            } else {
-                return client.reply(m.chat, 'Command not recognized. Please select a valid model.', m);
+            switch (command) {
+                case 'dreamshaperXL':
+                    await handleModelGeneration('dreamshaperXL', text, client, m);
+                    break;
+                case 'dynavisionXL':
+                    await handleModelGeneration('dynavisionXL', text, client, m);
+                    break;
+                case 'juggernautXL':
+                    await handleModelGeneration('juggernautXL', text, client, m);
+                    break;
+                case 'realismEngineSDXL':
+                    await handleModelGeneration('realismEngineSDXL', text, client, m);
+                    break;
+                case 'sd_xl_base':
+                    await handleModelGeneration('sd_xl_base', text, client, m);
+                    break;
+                case 'sd_xl_inpainting':
+                    await handleModelGeneration('sd_xl_inpainting', text, client, m);
+                    break;
+                case 'turbovisionXL':
+                    await handleModelGeneration('turbovisionXL', text, client, m);
+                    break;
+                default:
+                    client.reply(m.chat, 'Unknown command.', m);
             }
         } catch (e) {
             console.error('Error:', e);
-            return client.reply(m.chat, global.status.error, m);
+            return client.reply(m.chat, 'An error occurred.', m);
         }
     },
     error: false,
@@ -68,6 +54,36 @@ exports.run = {
     premium: true,
     verified: true,
     location: __filename
+};
+
+const handleModelGeneration = async (modelKey, promptText, client, message) => {
+    const model = models[modelKey];
+    const curlPostCommand = `curl --request POST \
+        --url https://api.prodia.com/v1/sdxl/generate \
+        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
+        --header 'accept: application/json' \
+        --header 'content-type: application/json' \
+        --data '{
+            "model": "${model}",
+            "prompt": "${promptText}",
+            "negative_prompt": "badly drawn",
+            "style_preset": "cinematic",
+            "steps": 20,
+            "cfg_scale": 7,
+            "seed": -1,
+            "sampler": "DPM++ 2M Karras",
+            "width": 1024,
+            "height": 1024
+        }'`;
+
+    exec(curlPostCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return client.reply(message.chat, `Failed to initiate image generation for ${modelKey}. Please try again.`, message);
+        }
+
+        handleImageResponse(stdout, client, message, promptText);
+    });
 };
 
 const handleImageResponse = (stdout, client, message, promptText) => {
@@ -119,207 +135,4 @@ const handleImageResponse = (stdout, client, message, promptText) => {
     };
 
     pollStatus();
-};
-
-const handleDreamshaperXL = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "dreamshaperXL10_alpha2.safetensors [c8afe2ef]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for DreamshaperXL. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleDynavisionXL = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "dynavisionXL_0411.safetensors [c39cc051]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for DynavisionXL. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleJuggernautXL = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "juggernautXL_v45.safetensors [e75f5471]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for JuggernautXL. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleRealismEngineSDXL = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "realismEngineSDXL_v10.safetensors [af771c3f]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for RealismEngineSDXL. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleSdXlBase = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "sd_xl_base_1.0.safetensors [be9edd61]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for SdXlBase. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleSdXlInpainting = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "sd_xl_base_1.0_inpainting_0.1.safetensors [5679a81a]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for SdXlInpainting. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
-};
-
-const handleTurbovisionXL = async (promptText, client, message) => {
-    const curlPostCommand = `curl --request POST \
-        --url https://api.prodia.com/v1/sdxl/generate \
-        --header 'X-Prodia-Key: 501eba46-a956-4649-96aa-2d9cc0f048bf' \
-        --header 'accept: application/json' \
-        --header 'content-type: application/json' \
-        --data '{
-            "model": "turbovisionXL_v431.safetensors [78890989]",
-            "prompt": "${promptText}",
-            "negative_prompt": "badly drawn",
-            "style_preset": "cinematic",
-            "steps": 20,
-            "cfg_scale": 7,
-            "seed": -1,
-            "sampler": "DPM++ 2M Karras",
-            "width": 1024,
-            "height": 1024
-        }'`;
-
-    exec(curlPostCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return client.reply(message.chat, 'Failed to initiate image generation for TurbovisionXL. Please try again.', message);
-        }
-
-        handleImageResponse(stdout, client, message, promptText);
-    });
 };

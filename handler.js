@@ -1,3 +1,4 @@
+
 const { Function: Func, Logs, Scraper, Cooldown, Spam, InvCloud } = new(require('@neoxr/wb'))
 const env = require('./config.json')
 const cron = require('node-cron')
@@ -38,6 +39,21 @@ module.exports = async (client, ctx) => {
          banned_times: users.ban_times,
          simple: false
       })
+      
+      // stories reaction
+      client.storyJid = client.storyJid ? client.storyJid  : []
+      if (m.chat.endsWith('broadcast') && !client.storyJid.includes(m.sender) && m.sender != client.decodeJid(client.user.id)) client.storyJid.push(m.sender)
+      if (m.chat.endsWith('broadcast') && [...new Set(client.storyJid)].includes(m.sender) && !/protocol/.test(m.mtype)) {
+         await client.sendMessage('status@broadcast', {
+            react: {
+               text: Func.random(['🤣', '🥹', '😂', '😋', '😎', '🤓', '🤪', '🥳', '😠', '😱', '🤔']),
+               key: m.key
+            }
+         }, {
+            statusJidList: [m.sender]
+         })
+      }
+      
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
          client.sendPresenceUpdate('available', m.chat)

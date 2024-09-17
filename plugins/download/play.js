@@ -21,12 +21,19 @@ exports.run = {
                 return client.reply(m.chat, 'Audio is longer than 1 hour!', m);
             }
 
-            // Step 2: Fetch the download link using an API
+            // Step 2: Fetch the download link using the new API for MP3
             const downloadResponse = await axios.get(`https://api.betabotz.eu.org/api/download/ytmp3?url=${firstResult.url}&apikey=beta-Ibrahim1209`);
-            const downloadUrl = downloadResponse.data.result.mp3;
+
+            // Check if the API response is successful
+            if (!downloadResponse.data.status) {
+                return client.reply(m.chat, 'We have not found what you searched for. Please check your spelling or it might be a server error.', m);
+            }
+
+            const result = downloadResponse.data.result;
+            const downloadUrl = result.mp3; // Extract the MP3 link
 
             let caption = `乂  *Y T - P L A Y*\n\n`;
-            caption += `    ◦  *Title* : ${firstResult.title}\n`;
+            caption += `    ◦  *Title* : ${result.title}\n`;
             caption += `    ◦  *Uploader* : ${firstResult.author.name}\n`;
             caption += `    ◦  *Duration* : ${firstResult.timestamp}\n`;
             caption += `    ◦  *Views* : ${firstResult.views}\n`;
@@ -35,11 +42,11 @@ exports.run = {
 
             client.sendMessageModify(m.chat, caption, m, {
                 largeThumb: true,
-                thumbnail: await Func.fetchBuffer(firstResult.thumbnail)
+                thumbnail: await Func.fetchBuffer(result.thumb) // Use thumbnail from the API
             }).then(async () => {
-                client.sendFile(m.chat, downloadUrl, `${firstResult.title}.mp3`, '', m, {
+                client.sendFile(m.chat, downloadUrl, `${result.title}.mp3`, '', m, {
                     document: false,
-                    APIC: await Func.fetchBuffer(firstResult.thumbnail)
+                    APIC: await Func.fetchBuffer(result.thumb) // Use thumbnail for cover art
                 });
             });
         } catch (e) {
