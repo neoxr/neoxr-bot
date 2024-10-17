@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['gemini', 'ai'],
+   usage: ['gemini'],
    use: 'query',
    category: 'utilities',
    async: async (m, {

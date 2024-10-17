@@ -17,7 +17,7 @@
 **Special Features & Benefit :**
 - Auto Download
 - Porn Detector (Image Only)
-- 24 Mini Games
+- 29 Mini Games
 - Leveling & Roles
 - Email Verification
 - Send Email
@@ -27,7 +27,7 @@
 - Mistery Box
 - High Optimation
 - Free Updates
-- Bonus ApiKey 30K Request (for 3 month)
+- Bonus ApiKey 100K Request (for 1 year)
 
 **Additional Features :**
 
@@ -53,7 +53,7 @@
 
 ### Requirements
 
-- [x] NodeJS >= 14 (Recommended v18)
+- [x] NodeJS >= 18 (Recommended v18)
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
