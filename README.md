@@ -24,10 +24,13 @@
 - Cloud Storage
 - Menfess w/ Session
 - Store Plugin (Product)
+- Jadibot (Auto Connect)
 - Mistery Box
 - High Optimation
 - Free Updates
 - Bonus ApiKey 100K Request (for 1 year)
+
+> Note : Script Premium sudah terdapat semua additional features, kecuali payment gateway.
 
 **Additional Features :**
 
@@ -49,6 +52,10 @@
 
 > 24 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
+🏷️ Jadi Bot (**+Rp. 50.000 / +$6.50**)
+
+> Fitur jadibot ini sudah dilengkapi dengan auto connect/reconnect apabila bot utama restart bot yang menjadi klien akan terkoneksi kembali secara otomatis (mirip bot hosting).
+
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
 
 ### Requirements
@@ -68,7 +75,7 @@
 
 - [x] PostgreSQL [Supabase](https://supabase.com/pricing) ~ [Setup Tutorial](https://youtu.be/kdyF7cP9E7k?si=YjlxI5OMHBdkSxkw) (Recommended)
 - [x] PostgreSQL [Aiven](https://aiven.io) ~ Remove ```?sslmode=required```
-- [x] MongoDB [MongoDB](https://www.mongodb.com) ~ [Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmyA6qeBYKbO4R45)
+- [x] MongoDB [MongoDB](https://www.mongodb.com) ~ [Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmyA6qeBYKbO4R45) (Recommended)
 
 ### Configuration
 
