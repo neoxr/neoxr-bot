@@ -39,10 +39,9 @@ exports.run = {
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
-            thumbnail: pic,
+            thumbnail: pic ? await Func.fetchBuffer(pic) : await Func.fetchBuffer('./media/image/default.jpg')
          })
       } catch (e) {
-         console.log(e)
          client.reply(m.chat, Func.jsonFormat(e), m)
       }
    },
