@@ -1,5 +1,5 @@
 if (process.argv.includes('--server')) require('./server')
-require('dotenv').config(), require('rootpath')()
+require('dotenv').config(), require('rootpath')(), console.clear()
 const { spawn: spawn } = require('child_process'), { Function: Func } = new(require('@neoxr/wb')), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts'), chalk = require('chalk')
 
 const unhandledRejections = new Map()
