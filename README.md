@@ -74,7 +74,7 @@ const client = new Baileys({
 
 🏷️ Game Plugins (**+Rp. 70.000 / +$9.80**)
 
-> 24 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
+> 29 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 🏷️ Jadi Bot (**+Rp. 50.000 / +$6.50**)
 
@@ -228,21 +228,19 @@ Connecting account without qr scan but using pairing code.
 
 ### Installation & Run
 
-Make sure the configuration and server meet the requirements so that there are no problems during installation or when this bot is running, type this on your console :
+Make sure the configuration and server meet the requirements so that there are no problems during installation or when this bot is running, type this on your console (linux) :
 
 ```
-$ npm -i g yarn
-$ yarn install --ignore-engines
-$ node .
+$ bash install.sh
 ```
 
-or want to use pm2
+to run in it, type this :
 
 ```
-$ npm -i g pm2 yarn
-$ yarn install --ignore-engines
 $ pm2 start index.js && pm2 save && pm2 logs
 ```
+
+> I don't know how to use Windows bacause I'm Linux user, so I didn't create files for installation on Windows :v
 
 ### Command Plugin
 
