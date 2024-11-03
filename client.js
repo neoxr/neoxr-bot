@@ -1,12 +1,11 @@
 "use strict";
 // process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
-const { Baileys, MongoDB, PostgreSQL, Scandir, Function: Func } = new(require('@neoxr/wb'))
+const { Baileys, MongoDB, PostgreSQL, Function: Func, Config: env } = new(require('@neoxr/wb'))
 const spinnies = new(require('spinnies'))(),
    fs = require('fs'),
    path = require('path'),
    colors = require('@colors/colors'),
-   env = require('./config.json'),
    { platform } = require('os')
 const cache = new(require('node-cache'))({
    stdTTL: env.cooldown

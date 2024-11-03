@@ -2,15 +2,38 @@
 
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
 
-### Important
+### Important (Baileys)
 
-> To use [@neoxr/wb >= v1.17.20](https://www.npmjs.com/package/@neoxr/wb) you must add the following components [Open Commit](https://github.com/neoxr/neoxr-bot/commit/26790679dea49494c25106edbaffc5ae9cb716ec)
+If you use baileys from whiskeysockets ```npm:@whiskeysockets/baileys@6.6.0``` or ```git+https://github.com/neoxr/whiskeys-baileys``` add browser option and use version ```[2, 3000, 1017531287]```, for example :
+
+```Javascript
+const client = new Baileys({
+   type: '--neoxr-v1',
+   plugsdir: 'plugins',
+   sf: 'session',
+   online: true,
+   version: [2, 3000, 1017531287]
+}, {
+   browser: ['Ubuntu', 'Firefox', '20.0.00']
+})
+```
+
+and if using previous baileys i.e. ```@neoxr/baileys``` no need to add browser options just use version ```[2, 2413, 51]```, for example : 
+
+```Javascript
+const client = new Baileys({
+   type: '--neoxr-v1',
+   plugsdir: 'plugins',
+   sf: 'session',
+   online: true,
+   version: [2, 2413, 51]
+})
 
 ### Script Delay 🤣
 
-> Buat yang lapor ke kreator scriptnya delay itu bukan delay melainkan sistem anti spam (cooldown) supaya nomor tahan banned, jika di rasa sistem ini tidak berguna dan nomormu kebal dari banned matikan anti spam : **.antispam off*
+> Untuk yang melapor masalah terkait script delay, itu memang sengaja dari sistem cooldown (anti spam) untuk meminimalisir banned dari pihak whatssapp dan jika fitur ini membuat tidak nyaman saat menggunakan bot silahkan matikan dengan command : **.antispam off**
 
-### Premium Script v4.1
+### Premium Script v4.1-Optima
 
 🏷️ Price : **Rp. 150.000 / $20.80**
 

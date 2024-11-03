@@ -1,9 +1,5 @@
-const { Function: Func, Logs, Scraper, Cooldown, Spam, InvCloud } = new(require('@neoxr/wb'))
-const env = require('./config.json')
+const { Function: Func, Scraper, Cooldown, Spam, InvCloud, Config: env } = new(require('@neoxr/wb'))
 const cron = require('node-cron')
-const cache = new(require('node-cache'))({
-   stdTTL: env.cooldown
-})
 const cooldown = new Cooldown(env.cooldown)
 const spam = new Spam({
    RESET_TIMER: env.cooldown,
