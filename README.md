@@ -28,6 +28,7 @@ const client = new Baileys({
    online: true,
    version: [2, 2413, 51]
 })
+```
 
 ### Script Delay 🤣
 
