@@ -1,4 +1,4 @@
-const { Function: Func, Scraper, Cooldown, Spam, InvCloud, Config: env } = new(require('@neoxr/wb'))
+const { Function: Func, Scraper, Cooldown, Spam, InvCloud, Config: env } = new (require('@neoxr/wb'))
 const cron = require('node-cron')
 const cooldown = new Cooldown(env.cooldown)
 const spam = new Spam({
@@ -10,7 +10,7 @@ const spam = new Spam({
 })
 
 module.exports = async (client, ctx) => {
-   const { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core } = ctx
+   var { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core } = ctx
    // const context = m.message[m.mtype] || m.message.viewOnceMessageV2.message[m.mtype]
    // process.env['E_MSG'] = context.contextInfo ? Number(context.contextInfo.expiration) : 0
    try {
@@ -26,7 +26,7 @@ module.exports = async (client, ctx) => {
       const participants = m.isGroup ? groupMetadata ? groupMetadata.participants : [] : [] || []
       const adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
       const isAdmin = m.isGroup ? adminList.includes(m.sender) : false
-      const isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:` [0]) + '@s.whatsapp.net') : false
+      const isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
       const blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
@@ -34,9 +34,12 @@ module.exports = async (client, ctx) => {
          banned_times: users.ban_times,
          simple: false
       })
-      
+
+      // exception disabled plugin
+      var plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
+
       // stories reaction
-      client.storyJid = client.storyJid ? client.storyJid  : []
+      client.storyJid = client.storyJid ? client.storyJid : []
       if (m.chat.endsWith('broadcast') && !client.storyJid.includes(m.sender) && m.sender != client.decodeJid(client.user.id)) client.storyJid.push(m.sender)
       if (m.chat.endsWith('broadcast') && [...new Set(client.storyJid)].includes(m.sender) && !/protocol/.test(m.mtype)) {
          await client.sendMessage('status@broadcast', {
@@ -48,7 +51,7 @@ module.exports = async (client, ctx) => {
             statusJidList: [m.sender]
          })
       }
-      
+
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
          client.sendPresenceUpdate('available', m.chat)
@@ -80,7 +83,7 @@ module.exports = async (client, ctx) => {
             users.expired = 0
             users.limit = env.limit
          })
-      }     
+      }
       if (m.isGroup) groupSet.activity = new Date() * 1
       if (users) {
          users.name = m.pushName
