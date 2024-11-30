@@ -139,7 +139,7 @@ module.exports = async (client, ctx) => {
             const turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
             const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
             if (!turn && !turn_hidden) continue
-            if (m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
+            if (m.fromMe || m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
             if (setting.self && !isOwner && !m.fromMe) continue
             if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < env.timeout) continue
             if (!m.isGroup && !['owner', 'menfess', 'scan', 'verify', 'payment', 'premium'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) {

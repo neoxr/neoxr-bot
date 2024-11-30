@@ -25,10 +25,10 @@
    },
    "homepage": "https://github.com/neoxr/neoxr-bot#readme",
    "dependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@6.11.6",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^3.3.6",
+      "@neoxr/wb": "^3.3.9",
       "@neoxr/youtube-scraper": "^3.1.5",
       "audio-decode": "^2.2.0",
       "bytes": "^3.1.2",

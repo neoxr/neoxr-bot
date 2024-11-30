@@ -1,17 +1,17 @@
 "use strict";
 // process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
-const { Baileys, MongoDB, PostgreSQL, Function: Func, Config: env } = new(require('@neoxr/wb'))
-const spinnies = new(require('spinnies'))(),
+const { Baileys, MongoDB, PostgreSQL, Function: Func, Config: env } = new (require('@neoxr/wb'))
+const spinnies = new (require('spinnies'))(),
    fs = require('fs'),
    path = require('path'),
    colors = require('@colors/colors'),
    { platform } = require('os')
-const cache = new(require('node-cache'))({
+const cache = new (require('node-cache'))({
    stdTTL: env.cooldown
 })
 if (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) MongoDB.db = env.database
-const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new(require('./lib/system/localdb'))(env.database)
+const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL)) ? MongoDB : (process.env.DATABASE_URL && /postgres/.test(process.env.DATABASE_URL)) ? PostgreSQL : new (require('./lib/system/localdb'))(env.database)
 const client = new Baileys({
    type: '--neoxr-v1',
    plugsdir: 'plugins',
@@ -22,10 +22,10 @@ const client = new Baileys({
 })
 
 /* starting to connect */
-client.on('connect', async res => {
+client.once('connect', async res => {
    /* load database */
-   global.db = {users:[], chats:[], groups:[], statistic:{}, sticker:{}, setting:{}, ...(await machine.fetch() ||{})}
-   
+   global.db = { users: [], chats: [], groups: [], statistic: {}, sticker: {}, setting: {}, ...(await machine.fetch() || {}) }
+
    /* save database */
    await machine.save(global.db)
 
@@ -34,13 +34,13 @@ client.on('connect', async res => {
 })
 
 /* print error */
-client.on('error', async error => {
+client.once('error', async error => {
    console.log(colors.red(error.message))
    if (error && typeof error === 'object' && error.message) Func.logFile(error.message)
 })
 
 /* bot is connected */
-client.on('ready', async () => {
+client.once('ready', async () => {
    /* auto restart if ram usage is over */
    const ramCheck = setInterval(() => {
       var ramUsage = process.memoryUsage().rss
@@ -55,7 +55,7 @@ client.on('ready', async () => {
 
    /* additional config */
    require('./lib/system/config')
-   
+
    /* clear temp folder every 10 minutes */
    setInterval(async () => {
       try {
@@ -63,7 +63,7 @@ client.on('ready', async () => {
          if (tmpFiles.length > 0) {
             tmpFiles.filter(v => !v.endsWith('.file')).map(v => fs.unlinkSync('./temp/' + v))
          }
-      } catch {}
+      } catch { }
    }, 60 * 1000 * 10)
 
    /* save database send http-request every 30 seconds */
@@ -82,25 +82,25 @@ client.on('ready', async () => {
 })
 
 /* print all message object */
-client.on('message', ctx => {
+client.register('message', ctx => {
    require('./handler')(client.sock, ctx)
    require('./lib/system/baileys')(client.sock)
    require('./lib/system/functions')
    require('./lib/system/scraper')
-})
+}, 2, true)
 
 /* print deleted message object */
-client.on('message.delete', ctx => {
-   const sock = client.sock  
+client.register('message.delete', ctx => {
+   const sock = client.sock
    if (!ctx || ctx.origin.fromMe || ctx.origin.isBot || !ctx.origin.sender) return
    if (cache.has(ctx.origin.sender) && cache.get(ctx.origin.sender) === 1) return
    cache.set(ctx.origin.sender, 1)
    if (Object.keys(ctx.delete.message) < 1) return
    if (ctx.origin.isGroup && global.db.groups.some(v => v.jid == ctx.origin.chat) && global.db.groups.find(v => v.jid == ctx.origin.chat).antidelete) return sock.copyNForward(ctx.origin.chat, ctx.delete)
-})
+}, 2, true)
 
 /* AFK detector */
-client.on('presence.update', update => {
+client.register('presence.update', update => {
    if (!update) return
    const sock = client.sock
    const { id, presences } = update
@@ -114,10 +114,10 @@ client.on('presence.update', update => {
             global.db.users.find(v => v.jid == jid).afkObj = {}
          }
       }
-   } else {}
-})
+   } else { }
+}, 2, true)
 
-client.on('group.add', async ctx => {
+client.register('group.add', async ctx => {
    const sock = client.sock
    const text = `Thanks +tag for joining into +grup group.`
    const groupSet = global.db.groups.find(v => v.jid == ctx.jid)
@@ -146,9 +146,9 @@ client.on('group.add', async ctx => {
       thumbnail: pic,
       url: global.db.setting.link
    })
-})
+}, 2, true)
 
-client.on('group.remove', async ctx => {
+client.register('group.remove', async ctx => {
    const sock = client.sock
    const text = `Good bye +tag :)`
    if (!global.db || !global.db.groups) return
@@ -167,12 +167,12 @@ client.on('group.remove', async ctx => {
       thumbnail: pic,
       url: global.db.setting.link
    })
-})
+}, 2, true)
 
-client.on('caller', ctx => {
-	if (typeof ctx === 'boolean') return
-	client.sock.updateBlockStatus(ctx.jid, 'block')
-})
+client.register('caller', ctx => {
+   if (typeof ctx === 'boolean') return
+   client.sock.updateBlockStatus(ctx.jid, 'block')
+}, 2, true)
 
 // client.on('group.promote', ctx => console.log(ctx))
 // client.on('group.demote', ctx => console.log(ctx))

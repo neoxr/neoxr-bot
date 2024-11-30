@@ -13,6 +13,11 @@ process.on('rejectionHandled', (promise) => {
 process.on('Something went wrong', function(err) {
    console.log('Caught exception: ', err)
 })
+process.on('warning', (warning) => {
+	if (warning.name === 'MaxListenersExceededWarning') {
+		console.warn('Potential memory leak detected:', warning.message)
+	}
+})
 
 function start() {
 	let args = [path.join(__dirname, 'client.js'), ...process.argv.slice(2)]
