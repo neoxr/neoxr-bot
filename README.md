@@ -90,7 +90,7 @@ const client = new Baileys({
 
 ### Server
 
-- [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/)  (Recommended)
+- [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/) (Recommended)
 - [x] Hosting Panel [Voxy Host](https://voxyhost.com/)
 - [x] VPS [OVH Hosting](https://www.ovhcloud.com/asia/vps/)
 - [x] RDP Windows [RDP Win](https://www.rdpwin.com/rdpbot.php)
@@ -98,6 +98,7 @@ const client = new Baileys({
 ### Cloud Database
 
 - [x] PostgreSQL [Supabase](https://supabase.com/pricing) ~ [Setup Tutorial](https://youtu.be/kdyF7cP9E7k?si=YjlxI5OMHBdkSxkw) (Recommended)
+- [x] PostgreSQL [Cockroach](https://cockroachlabs.cloud/) (Recommended)
 - [x] PostgreSQL [Aiven](https://aiven.io) ~ Remove ```?sslmode=required```
 - [x] MongoDB [MongoDB](https://www.mongodb.com) ~ [Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmyA6qeBYKbO4R45) (Recommended)
 
@@ -237,7 +238,7 @@ $ bash install.sh
 to run in it, type this :
 
 ```
-$ pm2 start index.js && pm2 save && pm2 logs
+$ pm2 start pm2.config.js
 ```
 
 > I don't know how to use Windows bacause I'm Linux user, so I didn't create files for installation on Windows :v

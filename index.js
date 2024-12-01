@@ -3,15 +3,30 @@ require('dotenv').config(), require('rootpath')(), console.clear()
 const { spawn: spawn } = require('child_process'), { Function: Func } = new(require('@neoxr/wb')), path = require('path'), colors = require('@colors/colors/safe'), CFonts = require('cfonts'), chalk = require('chalk')
 
 const unhandledRejections = new Map()
+process.on('uncaughtException', (err) => {
+	if (err.code === 'ENOMEM') {
+		console.error('Out of memory error detected. Cleaning up resources...');
+		// Lakukan tindakan pemulihan seperti membersihkan cache atau log
+	} else {
+		console.error('Uncaught Exception:', err)
+	}
+})
 process.on('unhandledRejection', (reason, promise) => {
-   unhandledRejections.set(promise, reason)
-   console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+	unhandledRejections.set(promise, reason)
+	if (reason.code === 'ENOMEM') {
+		console.error('Out of memory error detected. Attempting recovery...');
+		Object.keys(require.cache).forEach((key) => {
+			delete require.cache[key]
+		})
+	} else {
+		console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+	}
 })
 process.on('rejectionHandled', (promise) => {
-   unhandledRejections.delete(promise)
+	unhandledRejections.delete(promise)
 })
-process.on('Something went wrong', function(err) {
-   console.log('Caught exception: ', err)
+process.on('Something went wrong', function (err) {
+	console.log('Caught exception: ', err)
 })
 process.on('warning', (warning) => {
 	if (warning.name === 'MaxListenersExceededWarning') {

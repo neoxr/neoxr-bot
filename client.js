@@ -87,7 +87,7 @@ client.register('message', ctx => {
    require('./lib/system/baileys')(client.sock)
    require('./lib/system/functions')
    require('./lib/system/scraper')
-}, 2, true)
+})
 
 /* print deleted message object */
 client.register('message.delete', ctx => {
@@ -97,7 +97,7 @@ client.register('message.delete', ctx => {
    cache.set(ctx.origin.sender, 1)
    if (Object.keys(ctx.delete.message) < 1) return
    if (ctx.origin.isGroup && global.db.groups.some(v => v.jid == ctx.origin.chat) && global.db.groups.find(v => v.jid == ctx.origin.chat).antidelete) return sock.copyNForward(ctx.origin.chat, ctx.delete)
-}, 2, true)
+})
 
 /* AFK detector */
 client.register('presence.update', update => {
@@ -115,7 +115,7 @@ client.register('presence.update', update => {
          }
       }
    } else { }
-}, 2, true)
+})
 
 client.register('group.add', async ctx => {
    const sock = client.sock
@@ -146,7 +146,7 @@ client.register('group.add', async ctx => {
       thumbnail: pic,
       url: global.db.setting.link
    })
-}, 2, true)
+})
 
 client.register('group.remove', async ctx => {
    const sock = client.sock
@@ -167,12 +167,12 @@ client.register('group.remove', async ctx => {
       thumbnail: pic,
       url: global.db.setting.link
    })
-}, 2, true)
+})
 
 client.register('caller', ctx => {
    if (typeof ctx === 'boolean') return
    client.sock.updateBlockStatus(ctx.jid, 'block')
-}, 2, true)
+})
 
 // client.on('group.promote', ctx => console.log(ctx))
 // client.on('group.demote', ctx => console.log(ctx))
