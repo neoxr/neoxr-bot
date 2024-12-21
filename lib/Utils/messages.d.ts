@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import { Logger } from 'pino';
-import { proto } from '../../../6.6.0/WAProto';
+import { proto } from '../../WAProto';
 import { AnyMediaMessageContent, AnyMessageContent, MediaGenerationOptions, MessageContentGenerationOptions, MessageGenerationOptions, MessageGenerationOptionsFromContent, MessageUserReceipt, WAMessage, WAMessageContent, WAProto } from '../Types';
 import { MediaDownloadOptions } from './messages-media';
 /**

@@ -1,5 +1,5 @@
 import type { Boom } from '@hapi/boom';
-import { proto } from '../../../6.6.0/WAProto';
+import { proto } from '../../WAProto';
 import { AuthenticationCreds } from './Auth';
 import { WACallEvent } from './Call';
 import { Chat, ChatUpdate, PresenceData } from './Chat';

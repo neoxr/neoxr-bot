@@ -1,4 +1,4 @@
-import type { proto } from '../../../6.6.0/WAProto';
+import type { proto } from '../../WAProto';
 import type { AccountSettings } from './Auth';
 import type { BufferedEventData } from './Events';
 import type { ChatLabelAssociationActionBody } from './LabelAssociation';

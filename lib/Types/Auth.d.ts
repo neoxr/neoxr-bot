@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import type { proto } from '../../../6.6.0/WAProto';
+import type { proto } from '../../WAProto';
 import { RegistrationOptions } from '../Socket/registration';
 import type { Contact } from './Contact';
 import type { MinimalMessage } from './Message';

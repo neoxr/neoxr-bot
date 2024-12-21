@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from 'pino';
-import { proto } from '../../../6.6.0/WAProto';
+import { proto } from '../../WAProto';
 import { BaileysEventEmitter, BaileysEventMap, WACallUpdateType, WAVersion } from '../Types';
 import { BinaryNode } from '../WABinary';
 export declare const Browsers: {
