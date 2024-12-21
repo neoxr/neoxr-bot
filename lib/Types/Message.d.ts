@@ -9,7 +9,6 @@ import { proto } from '../../WAProto';
 import { MEDIA_HKDF_KEY_MAPPING } from '../Defaults';
 import type { GroupMetadata } from './GroupMetadata';
 import { CacheStore } from './Socket';
-import { BinaryNode } from '../WABinary';
 export { proto as WAProto };
 export type WAMessage = proto.IWebMessageInfo;
 export type WAMessageContent = proto.IMessage;
@@ -94,8 +93,12 @@ export type PollMessageOptions = {
     values: string[];
     /** 32 byte message secret to encrypt poll selections */
     messageSecret?: Uint8Array;
-    mentions?: any;
-    remoteJid?: string;
+};
+type SharePhoneNumber = {
+    sharePhoneNumber: boolean;
+};
+type RequestPhoneNumber = {
+    requestPhoneNumber: boolean;
 };
 export type MediaType = keyof typeof MEDIA_HKDF_KEY_MAPPING;
 export type AnyMediaMessageContent = (({
@@ -107,8 +110,6 @@ export type AnyMediaMessageContent = (({
     caption?: string;
     gifPlayback?: boolean;
     jpegThumbnail?: string;
-    /** if set to true, will send as a `video note` */
-    ptv?: boolean;
 } & Mentionable & Contextable & Buttonable & Templatable & WithDimensions) | {
     audio: WAMediaUpload;
     /** if set to true, will send as a `voice note` */
@@ -126,13 +127,6 @@ export type AnyMediaMessageContent = (({
 } & Contextable & Buttonable & Templatable)) & {
     mimetype?: string;
 } & Editable;
-export type GroupInviteInfo = {
-    inviteCode: string;
-    inviteExpiration: number;
-    text: string;
-    jid: string;
-    subject: string;
-};
 export type ButtonReplyInfo = {
     displayText: string;
     id: string;
@@ -161,20 +155,11 @@ export type AnyRegularMessageContent = (({
 } | {
     listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>;
 } | {
-    groupInvite: GroupInviteInfo;
-} | {
-    pin: WAMessageKey;
-    type: proto.PinInChat.Type;
-    /**
-     * 24 hours, 7 days, 30 days
-     */
-    time?: 86400 | 604800 | 2592000;
-} | {
     product: WASendableProduct;
     businessOwnerJid?: string;
     body?: string;
     footer?: string;
-}) & ViewOnce;
+} | SharePhoneNumber | RequestPhoneNumber) & ViewOnce;
 export type AnyMessageContent = AnyRegularMessageContent | {
     forward: WAMessage;
     force?: boolean;
@@ -201,8 +186,6 @@ export type MessageRelayOptions = MinimalRelayOptions & {
     additionalAttributes?: {
         [_: string]: string;
     };
-    /** add additional nodes to the binary node */
-    additionalNodes?: BinaryNode[];
     /** should we use the devices cache, or fetch afresh from the server; default assumed to be "true" */
     useUserDevicesCache?: boolean;
     /** jid list of participants for status@broadcast */
@@ -217,30 +200,23 @@ export type MiscMessageGenerationOptions = MinimalRelayOptions & {
     ephemeralExpiration?: number | string;
     /** timeout for media upload to WA server */
     mediaUploadTimeoutMs?: number;
-    /** add additional nodes to the binary nodes **/
-    additionalNodes?: BinaryNode[];
     /** jid list of participants for status@broadcast */
     statusJidList?: string[];
     /** backgroundcolor for status */
     backgroundColor?: string;
     /** font type for status */
     font?: number;
-    /** if it is broadcast */
-    broadcast?: boolean;
 };
 export type MessageGenerationOptionsFromContent = MiscMessageGenerationOptions & {
     userJid: string;
 };
-export type WAMediaUploadFunctionOpts = {
+export type WAMediaUploadFunction = (readStream: Readable, opts: {
     fileEncSha256B64: string;
     mediaType: MediaType;
-    newsletter?: boolean;
     timeoutMs?: number;
-};
-export type WAMediaUploadFunction = (readStream: Readable | Buffer, opts: WAMediaUploadFunctionOpts) => Promise<{
+}) => Promise<{
     mediaUrl: string;
     directPath: string;
-    handle?: string;
 }>;
 export type MediaGenerationOptions = {
     logger?: Logger;
@@ -252,12 +228,9 @@ export type MediaGenerationOptions = {
     options?: AxiosRequestConfig;
     backgroundColor?: string;
     font?: number;
-    /** The message is for newsletter? */
-    newsletter?: boolean;
 };
 export type MessageContentGenerationOptions = MediaGenerationOptions & {
     getUrlInfo?: (text: string) => Promise<WAUrlInfo | undefined>;
-    getProfilePicUrl?: (jid: string, type: 'image' | 'preview') => Promise<string | undefined>;
 };
 export type MessageGenerationOptions = MessageContentGenerationOptions & MessageGenerationOptionsFromContent;
 /**

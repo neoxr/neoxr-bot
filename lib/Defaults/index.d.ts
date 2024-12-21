@@ -138,7 +138,7 @@ export declare const PHONENUMBER_MCC: {
     "977": number;
     "31": number;
     "687": number;
-    "64": number;
+    "64": number; /** from: https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url */
     "505": number;
     "227": number;
     "234": number;
@@ -234,7 +234,7 @@ export declare const PHONE_CONNECTION_CB = "CB:Pong";
 export declare const WA_DEFAULT_EPHEMERAL: number;
 export declare const MOBILE_TOKEN: Buffer;
 export declare const MOBILE_REGISTRATION_ENDPOINT = "https://v.whatsapp.net/v2";
-export declare const MOBILE_USERAGENT = "WhatsApp/2.23.13.82 iOS/15.3.1 Device/Apple-iPhone_7";
+export declare const MOBILE_USERAGENT: string;
 export declare const REGISTRATION_PUBLIC_KEY: Buffer;
 export declare const NOISE_MODE = "Noise_XX_25519_AESGCM_SHA256\0\0\0\0";
 export declare const DICT_VERSION = 2;
@@ -271,8 +271,9 @@ export declare const MEDIA_HKDF_KEY_MAPPING: {
     'md-app-state': string;
     'product-catalog-image': string;
     'payment-bg-image': string;
+    ptv: string;
 };
-export declare const MEDIA_KEYS: ("ppic" | "product" | "image" | "video" | "sticker" | "audio" | "gif" | "ptt" | "thumbnail-document" | "thumbnail-image" | "thumbnail-link" | "thumbnail-video" | "md-app-state" | "md-msg-hist" | "document" | "product-catalog-image" | "payment-bg-image")[];
+export declare const MEDIA_KEYS: ("ppic" | "product" | "image" | "video" | "sticker" | "audio" | "gif" | "ptt" | "thumbnail-document" | "thumbnail-image" | "thumbnail-link" | "thumbnail-video" | "md-app-state" | "md-msg-hist" | "document" | "product-catalog-image" | "payment-bg-image" | "ptv")[];
 export declare const MIN_PREKEY_COUNT = 5;
 export declare const INITIAL_PREKEY_COUNT = 30;
 export declare const DEFAULT_CACHE_TTLS: {

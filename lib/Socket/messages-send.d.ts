@@ -6,9 +6,10 @@ import { BinaryNode } from '../WABinary';
 export declare const makeMessagesSocket: (config: SocketConfig) => {
     getPrivacyTokens: (jids: string[]) => Promise<BinaryNode>;
     assertSessions: (jids: string[], force: boolean) => Promise<boolean>;
-    relayMessage: (jid: string, message: proto.IMessage, { messageId: msgId, participant, additionalAttributes, useUserDevicesCache, cachedGroupMetadata, statusJidList, additionalNodes }: MessageRelayOptions) => Promise<string>;
+    relayMessage: (jid: string, message: proto.IMessage, { messageId: msgId, participant, additionalAttributes, useUserDevicesCache, cachedGroupMetadata, statusJidList }: MessageRelayOptions) => Promise<string>;
     sendReceipt: (jid: string, participant: string | undefined, messageIds: string[], type: MessageReceiptType) => Promise<void>;
     sendReceipts: (keys: WAMessageKey[], type: MessageReceiptType) => Promise<void>;
+    getButtonArgs: (message: proto.IMessage) => BinaryNode['attrs'];
     readMessages: (keys: WAMessageKey[]) => Promise<void>;
     refreshMediaConn: (forceGet?: boolean) => Promise<MediaConnInfo>;
     waUploadToServer: import("../Types").WAMediaUploadFunction;
@@ -26,7 +27,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     }[]>;
     groupRequestParticipantsUpdate: (jid: string, participants: string[], action: "reject" | "approve") => Promise<{
         status: string;
-        jid: string;
+        jid: string; /** Bulk read messages. Keys can be from different chats & participants */
     }[]>;
     groupParticipantsUpdate: (jid: string, participants: string[], action: import("../Types").ParticipantAction) => Promise<{
         status: string;
@@ -41,6 +42,8 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     groupGetInviteInfo: (code: string) => Promise<import("../Types").GroupMetadata>;
     groupToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
     groupSettingUpdate: (jid: string, setting: "announcement" | "locked" | "not_announcement" | "unlocked") => Promise<void>;
+    groupMemberAddMode: (jid: string, mode: "all_member_add" | "admin_add") => Promise<void>;
+    groupJoinApprovalMode: (jid: string, mode: "on" | "off") => Promise<void>;
     groupFetchAllParticipating: () => Promise<{
         [_: string]: import("../Types").GroupMetadata;
     }>;
@@ -81,6 +84,10 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     removeChatLabel: (jid: string, labelId: string) => Promise<void>;
     addMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
     removeMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
+    star: (jid: string, messages: {
+        id: string;
+        fromMe?: boolean | undefined;
+    }[], star: boolean) => Promise<void>;
     type: "md";
     ws: any;
     ev: import("../Types").BaileysEventEmitter & {

@@ -44,6 +44,10 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     removeChatLabel: (jid: string, labelId: string) => Promise<void>;
     addMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
     removeMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
+    star: (jid: string, messages: {
+        id: string;
+        fromMe?: boolean;
+    }[], star: boolean) => Promise<void>;
     type: "md";
     ws: any;
     ev: import("../Types").BaileysEventEmitter & {
