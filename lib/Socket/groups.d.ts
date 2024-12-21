@@ -32,6 +32,8 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     groupGetInviteInfo: (code: string) => Promise<GroupMetadata>;
     groupToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
     groupSettingUpdate: (jid: string, setting: 'announcement' | 'not_announcement' | 'locked' | 'unlocked') => Promise<void>;
+    groupMemberAddMode: (jid: string, mode: 'admin_add' | 'all_member_add') => Promise<void>;
+    groupJoinApprovalMode: (jid: string, mode: 'on' | 'off') => Promise<void>;
     groupFetchAllParticipating: () => Promise<{
         [_: string]: GroupMetadata;
     }>;
@@ -75,6 +77,10 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     removeChatLabel: (jid: string, labelId: string) => Promise<void>;
     addMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
     removeMessageLabel: (jid: string, messageId: string, labelId: string) => Promise<void>;
+    star: (jid: string, messages: {
+        id: string;
+        fromMe?: boolean | undefined;
+    }[], star: boolean) => Promise<void>;
     type: "md";
     ws: any;
     ev: import("../Types").BaileysEventEmitter & {

@@ -231,16 +231,13 @@ export type MiscMessageGenerationOptions = MinimalRelayOptions & {
 export type MessageGenerationOptionsFromContent = MiscMessageGenerationOptions & {
     userJid: string;
 };
-export type WAMediaUploadFunctionOpts = {
+export type WAMediaUploadFunction = (readStream: Readable, opts: {
     fileEncSha256B64: string;
     mediaType: MediaType;
-    newsletter?: boolean;
     timeoutMs?: number;
-};
-export type WAMediaUploadFunction = (readStream: Readable | Buffer, opts: WAMediaUploadFunctionOpts) => Promise<{
+}) => Promise<{
     mediaUrl: string;
     directPath: string;
-    handle?: string;
 }>;
 export type MediaGenerationOptions = {
     logger?: Logger;
@@ -252,8 +249,6 @@ export type MediaGenerationOptions = {
     options?: AxiosRequestConfig;
     backgroundColor?: string;
     font?: number;
-    /** The message is for newsletter? */
-    newsletter?: boolean;
 };
 export type MessageContentGenerationOptions = MediaGenerationOptions & {
     getUrlInfo?: (text: string) => Promise<WAUrlInfo | undefined>;
