@@ -1,39 +1,57 @@
 /// <reference types="node" />
-import { proto } from '../../WAProto';
-import { GroupMetadata, ParticipantAction, SocketConfig } from '../Types';
-import { BinaryNode } from '../WABinary';
-export declare const makeGroupsSocket: (config: SocketConfig) => {
-    groupMetadata: (jid: string) => Promise<GroupMetadata>;
-    groupCreate: (subject: string, participants: string[]) => Promise<GroupMetadata>;
+import { NewsletterFetchedUpdate, NewsletterMetadata, NewsletterReactionMode, NewsletterViewRole, QueryIds, SocketConfig, WAMediaUpload } from "../Types";
+import { BinaryNode } from "../WABinary";
+export declare const makeNewsLetterSocket: (config: SocketConfig) => {
+    extractNewsletterMetadata: (node: BinaryNode, isCreate?: boolean) => NewsletterMetadata;
+    subscribeNewsletterUpdates: (jid: string) => Promise<{
+        duration: string;
+    }>;
+    newsletterReactionMode: (jid: string, mode: NewsletterReactionMode) => Promise<void>;
+    newsletterUpdateDescription: (jid: string, description?: string) => Promise<void>;
+    newsletterUpdateName: (jid: string, name: string) => Promise<void>;
+    newsletterUpdatePicture: (jid: string, content: WAMediaUpload) => Promise<void>;
+    newsletterRemovePicture: (jid: string) => Promise<void>;
+    newsletterAction: (jid: string, type: "follow" | "unfollow" | "mute" | "unmute") => Promise<void>;
+    newsletterCreate: (name: string, description: string) => Promise<NewsletterMetadata>;
+    newsletterMetadata: (type: "invite" | "jid", key: string, role?: NewsletterViewRole) => Promise<NewsletterMetadata>;
+    newsletterAdminCount: (jid: string) => Promise<number>;
+    /**user is Lid, not Jid */
+    newsletterChangeOwner: (jid: string, user: string) => Promise<void>;
+    /**user is Lid, not Jid */
+    newsletterDemote: (jid: string, user: string) => Promise<void>;
+    newsletterDelete: (jid: string) => Promise<void>;
+    /**if code wasn't passed, the reaction will be removed (if is reacted) */
+    newsletterReactMessage: (jid: string, serverId: string, code?: string) => Promise<void>;
+    newsletterFetchMessages: (type: "invite" | "jid", key: string, count: number, after?: number) => Promise<NewsletterFetchedUpdate[]>;
+    newsletterFetchUpdates: (jid: string, count: number, after?: number, since?: number) => Promise<NewsletterFetchedUpdate[]>;
+    newsletterWMexQuery: (jid: string | undefined, queryId: QueryIds, content?: object) => Promise<BinaryNode>;
+    newsletterQuery: (jid: string, type: "get" | "set", content: BinaryNode[]) => Promise<BinaryNode>;
+    groupMetadata: (jid: string) => Promise<import("../Types").GroupMetadata>;
+    groupCreate: (subject: string, participants: string[]) => Promise<import("../Types").GroupMetadata>;
     groupLeave: (id: string) => Promise<void>;
     groupUpdateSubject: (jid: string, subject: string) => Promise<void>;
     groupRequestParticipantsList: (jid: string) => Promise<{
         [key: string]: string;
     }[]>;
-    groupRequestParticipantsUpdate: (jid: string, participants: string[], action: 'approve' | 'reject') => Promise<{
+    groupRequestParticipantsUpdate: (jid: string, participants: string[], action: "reject" | "approve") => Promise<{
         status: string;
         jid: string;
     }[]>;
-    groupParticipantsUpdate: (jid: string, participants: string[], action: ParticipantAction) => Promise<{
+    groupParticipantsUpdate: (jid: string, participants: string[], action: import("../Types").ParticipantAction) => Promise<{
         status: string;
         jid: string;
         content: BinaryNode;
     }[]>;
-    groupUpdateDescription: (jid: string, description?: string) => Promise<void>;
+    groupUpdateDescription: (jid: string, description?: string | undefined) => Promise<void>;
     groupInviteCode: (jid: string) => Promise<string | undefined>;
     groupRevokeInvite: (jid: string) => Promise<string | undefined>;
     groupAcceptInvite: (code: string) => Promise<string | undefined>;
-    /**
-     * accept a GroupInviteMessage
-     * @param key the key of the invite message, or optionally only provide the jid of the person who sent the invite
-     * @param inviteMessage the message to accept
-     */
-    groupAcceptInviteV4: (key: string | proto.IMessageKey, inviteMessage: proto.Message.IGroupInviteMessage) => Promise<string>;
-    groupGetInviteInfo: (code: string) => Promise<GroupMetadata>;
+    groupAcceptInviteV4: (key: string | import("../Types").WAProto.IMessageKey, inviteMessage: import("../Types").WAProto.Message.IGroupInviteMessage) => Promise<string>;
+    groupGetInviteInfo: (code: string) => Promise<import("../Types").GroupMetadata>;
     groupToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
-    groupSettingUpdate: (jid: string, setting: 'announcement' | 'not_announcement' | 'locked' | 'unlocked') => Promise<void>;
+    groupSettingUpdate: (jid: string, setting: "announcement" | "locked" | "not_announcement" | "unlocked") => Promise<void>;
     groupFetchAllParticipating: () => Promise<{
-        [_: string]: GroupMetadata;
+        [_: string]: import("../Types").GroupMetadata;
     }>;
     processingMutex: {
         mutex<T>(code: () => T | Promise<T>): Promise<T>;
@@ -41,7 +59,7 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     fetchPrivacySettings: (force?: boolean) => Promise<{
         [_: string]: string;
     }>;
-    upsertMessage: (msg: proto.IWebMessageInfo, type: import("../Types").MessageUpsertType) => Promise<void>;
+    upsertMessage: (msg: import("../Types").WAProto.IWebMessageInfo, type: import("../Types").MessageUpsertType) => Promise<void>;
     appPatch: (patchCreate: import("../Types").WAPatchCreate) => Promise<void>;
     sendPresenceUpdate: (type: import("../Types").WAPresence, toJid?: string | undefined) => Promise<void>;
     presenceSubscribe: (toJid: string, tcToken?: Buffer | undefined) => Promise<void>;
@@ -55,7 +73,7 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
         status: string | undefined;
         setAt: Date;
     } | undefined>;
-    updateProfilePicture: (jid: string, content: import("../Types").WAMediaUpload) => Promise<void>;
+    updateProfilePicture: (jid: string, content: WAMediaUpload) => Promise<void>;
     removeProfilePicture: (jid: string) => Promise<void>;
     updateProfileStatus: (status: string) => Promise<void>;
     updateProfileName: (name: string) => Promise<void>;
@@ -104,4 +122,4 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
 };
-export declare const extractGroupMetadata: (result: BinaryNode) => GroupMetadata;
+export declare const extractNewsletterMetadata: (node: BinaryNode, isCreate?: boolean) => NewsletterMetadata;

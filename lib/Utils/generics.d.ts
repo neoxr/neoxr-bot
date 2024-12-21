@@ -8,7 +8,6 @@ export declare const Browsers: {
     ubuntu: (browser: any) => [string, string, string];
     macOS: (browser: any) => [string, string, string];
     baileys: (browser: any) => [string, string, string];
-    windows: (browser: any) => [string, string, string];
     /** The appropriate browser based on your OS & release */
     appropriate: (browser: any) => [string, string, string];
 };

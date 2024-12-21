@@ -4,6 +4,7 @@ export * from './Chat';
 export * from './Contact';
 export * from './State';
 export * from './Message';
+export * from './Newsletter';
 export * from './Socket';
 export * from './Events';
 export * from './Product';
@@ -22,9 +23,7 @@ export declare enum DisconnectReason {
     loggedOut = 401,
     badSession = 500,
     restartRequired = 515,
-    multideviceMismatch = 411,
-    forbidden = 403,
-    unavailableService = 503
+    multideviceMismatch = 411
 }
 export type WAInitResponse = {
     ref: string;

@@ -25,10 +25,6 @@ export type BaileysEventMap = {
     'chats.upsert': Chat[];
     /** update the given chats */
     'chats.update': ChatUpdate[];
-    'chats.phoneNumberShare': {
-        lid: string;
-        jid: string;
-    };
     /** delete chats with given ID */
     'chats.delete': string[];
     /** presence of contact in a chat updated */
@@ -74,7 +70,6 @@ export type BaileysEventMap = {
     /** apply an action to participants in a group */
     'group-participants.update': {
         id: string;
-        author: string;
         participants: string[];
         action: ParticipantAction;
     };
