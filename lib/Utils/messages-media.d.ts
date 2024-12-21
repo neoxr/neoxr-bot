@@ -6,7 +6,7 @@ import { AxiosRequestConfig } from 'axios';
 import type { Logger } from 'pino';
 import { Readable, Transform } from 'stream';
 import { URL } from 'url';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { DownloadableMessage, MediaConnInfo, MediaDecryptionKeyInfo, MediaType, SocketConfig, WAMediaUpload, WAMediaUploadFunction, WAMessageContent } from '../Types';
 import { BinaryNode } from '../WABinary';
 export declare const hkdfInfoKey: (type: MediaType) => string;

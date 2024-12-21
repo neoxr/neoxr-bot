@@ -1,4 +1,4 @@
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 type DecryptGroupSignalOpts = {
     group: string;
     authorJid: string;

@@ -4,7 +4,7 @@ import { AxiosRequestConfig } from 'axios';
 import type { Agent } from 'https';
 import type { Logger } from 'pino';
 import type { URL } from 'url';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { AuthenticationState, SignalAuthState, TransactionCapabilityOptions } from './Auth';
 import { MediaConnInfo } from './Message';
 import { SignalRepository } from './Signal';

@@ -5,7 +5,7 @@ import { AxiosRequestConfig } from 'axios';
 import type { Logger } from 'pino';
 import type { Readable } from 'stream';
 import type { URL } from 'url';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { MEDIA_HKDF_KEY_MAPPING } from '../Defaults';
 import type { GroupMetadata } from './GroupMetadata';
 import { CacheStore } from './Socket';

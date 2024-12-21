@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import type { Logger } from 'pino';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { AuthenticationCreds, BaileysEventEmitter, SignalKeyStoreWithTransaction, SocketConfig } from '../Types';
 type ProcessMessageContext = {
     shouldProcessHistoryMsg: boolean;

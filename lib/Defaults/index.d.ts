@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import type { MediaType, SocketConfig } from '../Types';
 export declare const UNAUTHORIZED_CODES: number[];
 export declare const PHONENUMBER_MCC: {

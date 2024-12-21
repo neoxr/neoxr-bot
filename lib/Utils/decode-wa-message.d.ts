@@ -1,5 +1,5 @@
 import { Logger } from 'pino';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { SignalRepository } from '../Types';
 import { BinaryNode } from '../WABinary';
 /**

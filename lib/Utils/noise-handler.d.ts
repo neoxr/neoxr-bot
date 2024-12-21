@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { Logger } from 'pino';
-import { proto } from '../../WAProto';
+import { proto } from '../../../6.6.0/WAProto';
 import { KeyPair } from '../Types';
 import { BinaryNode } from '../WABinary';
 export declare const makeNoiseHandler: ({ keyPair: { private: privateKey, public: publicKey }, NOISE_HEADER, mobile, logger, }: {
