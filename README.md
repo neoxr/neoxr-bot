@@ -6,6 +6,34 @@
 
 > Untuk yang melapor masalah terkait script delay, itu memang sengaja dari sistem cooldown (anti spam) untuk meminimalisir banned dari pihak whatssapp dan jika fitur ini membuat tidak nyaman saat menggunakan bot silahkan matikan dengan command : **.antispam off**
 
+### Important (Baileys)
+
+If you use baileys from whiskeysockets ```npm:@whiskeysockets/baileys@6.6.0``` or ```npm:@neoxr/baileys``` add browser option and use version ```[2, 3000, 1017531287]```, for example :
+
+```Javascript
+const client = new Baileys({
+   type: '--neoxr-v1',
+   plugsdir: 'plugins',
+   sf: 'session',
+   online: true,
+   version: [2, 3000, 1017531287]
+}, {
+   browser: ['Ubuntu', 'Firefox', '20.0.00']
+})
+```
+
+and if using previous baileys i.e. ```github:neoxr/neoxr-bot#baileys``` no need to add browser options just use version ```[2, 2413, 51]```, for example : 
+
+```Javascript
+const client = new Baileys({
+   type: '--neoxr-v1',
+   plugsdir: 'plugins',
+   sf: 'session',
+   online: true,
+   version: [2, 2413, 51]
+})
+```
+
 ### Premium Script v4.1-Optima
 
 🏷️ Price : **Rp. 150.000 / $20.80**
