@@ -1,5 +1,6 @@
 exports.run = {
    usage: ['fromai'],
+   category: 'example',
    async: async (m, {
       client,
       Func
