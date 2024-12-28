@@ -11,8 +11,6 @@ const spam = new Spam({
 
 module.exports = async (client, ctx) => {
    var { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core } = ctx
-   // const context = m.message[m.mtype] || m.message.viewOnceMessageV2.message[m.mtype]
-   // process.env['E_MSG'] = context.contextInfo ? Number(context.contextInfo.expiration) : 0
    try {
       // "InvCloud" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
       require('./lib/system/schema')(m, env), InvCloud(store)
@@ -139,7 +137,7 @@ module.exports = async (client, ctx) => {
             const turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
             const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
             if (!turn && !turn_hidden) continue
-            if (m.fromMe || m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
+            if (m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
             if (setting.self && !isOwner && !m.fromMe) continue
             if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < env.timeout) continue
             if (!m.isGroup && !['owner', 'menfess', 'scan', 'verify', 'payment', 'premium'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) {
@@ -204,7 +202,7 @@ module.exports = async (client, ctx) => {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
          for (let name in is_events) {
             let event = is_events[name].run
-            if (m.fromMe || m.chat.endsWith('broadcast') || /pollUpdate/.test(m.mtype)) continue
+            if ((m.fromMe && m.isBot) || m.chat.endsWith('broadcast') || /pollUpdate/.test(m.mtype)) continue
             if (!m.isGroup && env.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
             if (setting.self && !['menfess_ev', 'anti_link', 'anti_tagall', 'anti_virtex', 'filter'].includes(event.pluginName) && !isOwner && !m.fromMe) continue
             if (!['anti_link', 'anti_tagall', 'anti_virtex', 'filter'].includes(name) && users && (users.banned || new Date - users.ban_temporary < env.timeout)) continue

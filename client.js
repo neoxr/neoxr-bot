@@ -17,6 +17,7 @@ const client = new Baileys({
    plugsdir: 'plugins',
    sf: 'session',
    online: true,
+   bypass_disappearing: true,
    // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web
    version: [2, 3000, 1017531287]
 }, {

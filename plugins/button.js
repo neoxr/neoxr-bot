@@ -7,7 +7,8 @@ exports.run = {
       Func
    }) => {
       try {
-         const buttons = [{
+         // Button 1 (NativeFlow / Template Message)
+         const buttons1 = [{
             name: 'quick_reply',
             buttonParamsJson: JSON.stringify({
                display_text: 'Runtime',
@@ -30,12 +31,35 @@ exports.run = {
                }]
             })
          }]
-         client.sendIAMessage(m.chat, buttons, m, {
+         client.sendIAMessage(m.chat, buttons1, m, {
             header: '',
             content: 'Hi!',
             footer: global.footer,
             media: global.db.setting.cover
          })
+
+         await Func.delay(1200)
+
+         // Button 2 (NativeFlow / Template Message)
+         const buttons2 = [{
+            buttonId: '.menu',
+            buttonText: {
+               displayText: 'Menu'
+            }
+         }, {
+            buttonId: ".run",
+            buttonText: {
+               displayText: 'Runtime'
+            }
+         }]
+         client.sendMessage(m.chat, {
+            image: await Func.fetchBuffer(global.db.setting.cover),
+            caption: 'Hi!',
+            footer: global.footer,
+            buttons: buttons2,
+            viewOnce: true,
+            headerType: 4
+         }, { quoted: m })
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
       }
