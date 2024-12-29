@@ -1,6 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import { Logger } from 'pino';
+import { type Transform } from 'stream';
 import { proto } from '../../WAProto';
 import { AnyMediaMessageContent, AnyMessageContent, MediaGenerationOptions, MessageContentGenerationOptions, MessageGenerationOptions, MessageGenerationOptionsFromContent, MessageUserReceipt, WAMessage, WAMessageContent, WAProto } from '../Types';
 import { MediaDownloadOptions } from './messages-media';
@@ -70,7 +71,7 @@ type DownloadMediaMessageContext = {
 /**
  * Downloads the given message. Throws an error if it's not a media message
  */
-export declare const downloadMediaMessage: (message: WAMessage, type: 'buffer' | 'stream', options: MediaDownloadOptions, ctx?: DownloadMediaMessageContext) => Promise<Buffer | import("stream").Transform>;
+export declare const downloadMediaMessage: <Type extends "stream" | "buffer">(message: WAMessage, type: Type, options: MediaDownloadOptions, ctx?: DownloadMediaMessageContext) => Promise<Type extends "buffer" ? Buffer : Transform>;
 /** Checks whether the given message is a media message; if it is returns the inner content */
 export declare const assertMediaContent: (content: proto.IMessage | null | undefined) => proto.Message.IVideoMessage | proto.Message.IImageMessage | proto.Message.IAudioMessage | proto.Message.IDocumentMessage | proto.Message.IStickerMessage;
 export {};

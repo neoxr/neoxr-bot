@@ -63,6 +63,15 @@ type EncryptedStreamOptions = {
     logger?: Logger;
     opts?: AxiosRequestConfig;
 };
+export declare const prepareStream: (media: WAMediaUpload, mediaType: MediaType, { logger, saveOriginalFileIfRequired, opts }?: EncryptedStreamOptions) => Promise<{
+    mediaKey: undefined;
+    encWriteStream: Buffer;
+    fileLength: number;
+    fileSha256: Buffer;
+    fileEncSha256: undefined;
+    bodyPath: string | undefined;
+    didSaveToTmpPath: boolean;
+}>;
 export declare const encryptedStream: (media: WAMediaUpload, mediaType: MediaType, { logger, saveOriginalFileIfRequired, opts }?: EncryptedStreamOptions) => Promise<{
     mediaKey: Buffer;
     encWriteStream: Readable;

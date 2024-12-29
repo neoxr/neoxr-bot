@@ -38,5 +38,6 @@ export declare const makeSocket: (config: SocketConfig) => {
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     /** Waits for the connection to WA to reach a state */
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
+    sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };
 export type Socket = ReturnType<typeof makeSocket>;

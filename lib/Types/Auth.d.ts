@@ -64,6 +64,8 @@ export type AuthenticationCreds = SignalCreds & {
     backupToken: Buffer;
     registration: RegistrationOptions;
     pairingCode: string | undefined;
+    lastPropHash: string | undefined;
+    routingInfo: Buffer | undefined;
 };
 export type SignalDataTypeMap = {
     'pre-key': KeyPair;

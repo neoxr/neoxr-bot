@@ -1,61 +1,32 @@
 /// <reference types="node" />
-import { Boom } from '@hapi/boom';
-import { proto } from '../../WAProto';
-import { MessageReceiptType, MessageRelayOptions, SocketConfig } from '../Types';
+import { NewsletterFetchedUpdate, NewsletterMetadata, NewsletterReactionMode, NewsletterViewRole, SocketConfig, WAMediaUpload } from '../Types';
 import { BinaryNode } from '../WABinary';
-export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
-    sendMessageAck: ({ tag, attrs, content }: BinaryNode) => Promise<void>;
-    sendRetryRequest: (node: BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
-    offerCall: (toJid: string, isVideo?: boolean) => Promise<{
-        id: string;
-        to: string;
-    }>;
-    rejectCall: (callId: string, callFrom: string) => Promise<void>;
-    getPrivacyTokens: (jids: string[]) => Promise<BinaryNode>;
-    assertSessions: (jids: string[], force: boolean) => Promise<boolean>;
-    relayMessage: (jid: string, message: proto.IMessage, { messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, cachedGroupMetadata, statusJidList }: MessageRelayOptions) => Promise<string>;
-    sendReceipt: (jid: string, participant: string | undefined, messageIds: string[], type: MessageReceiptType) => Promise<void>;
-    sendReceipts: (keys: proto.IMessageKey[], type: MessageReceiptType) => Promise<void>;
-    getButtonArgs: (message: proto.IMessage) => {
-        [key: string]: string;
-    };
-    readMessages: (keys: proto.IMessageKey[]) => Promise<void>;
-    refreshMediaConn: (forceGet?: boolean) => Promise<import("../Types").MediaConnInfo>;
-    getUSyncDevices: (jids: string[], useCache: boolean, ignoreZeroDevices: boolean) => Promise<import("../WABinary").JidWithDevice[]>;
-    createParticipantNodes: (jids: string[], message: proto.IMessage, extraAttrs?: {
-        [key: string]: string;
-    } | undefined) => Promise<{
-        nodes: BinaryNode[];
-        shouldIncludeDeviceIdentity: boolean;
-    }>;
-    waUploadToServer: import("../Types").WAMediaUploadFunction;
-    fetchPrivacySettings: (force?: boolean) => Promise<{
-        [_: string]: string;
-    }>;
-    updateMediaMessage: (message: proto.IWebMessageInfo) => Promise<proto.IWebMessageInfo>;
-    sendMessage: (jid: string, content: import("../Types").AnyMessageContent, options?: import("../Types").MiscMessageGenerationOptions) => Promise<proto.WebMessageInfo | undefined>;
+export declare const makeNewsletterSocket: (config: SocketConfig) => {
     subscribeNewsletterUpdates: (jid: string) => Promise<{
         duration: string;
     }>;
-    newsletterReactionMode: (jid: string, mode: import("../Types").NewsletterReactionMode) => Promise<void>;
-    newsletterUpdateDescription: (jid: string, description?: string | undefined) => Promise<void>;
+    newsletterReactionMode: (jid: string, mode: NewsletterReactionMode) => Promise<void>;
+    newsletterUpdateDescription: (jid: string, description?: string) => Promise<void>;
     newsletterUpdateName: (jid: string, name: string) => Promise<void>;
-    newsletterUpdatePicture: (jid: string, content: import("../Types").WAMediaUpload) => Promise<void>;
+    newsletterUpdatePicture: (jid: string, content: WAMediaUpload) => Promise<void>;
     newsletterRemovePicture: (jid: string) => Promise<void>;
     newsletterUnfollow: (jid: string) => Promise<void>;
     newsletterFollow: (jid: string) => Promise<void>;
     newsletterUnmute: (jid: string) => Promise<void>;
     newsletterMute: (jid: string) => Promise<void>;
-    newsletterAction: (jid: string, type: "mute" | "follow" | "unfollow" | "unmute") => Promise<void>;
-    newsletterCreate: (name: string, description: string, reaction_codes: string) => Promise<import("../Types").NewsletterMetadata>;
-    newsletterMetadata: (type: "invite" | "jid", key: string, role?: import("../Types").NewsletterViewRole | undefined) => Promise<import("../Types").NewsletterMetadata>;
+    newsletterAction: (jid: string, type: 'follow' | 'unfollow' | 'mute' | 'unmute') => Promise<void>;
+    newsletterCreate: (name: string, description: string, reaction_codes: string) => Promise<NewsletterMetadata>;
+    newsletterMetadata: (type: 'invite' | 'jid', key: string, role?: NewsletterViewRole) => Promise<NewsletterMetadata>;
     newsletterAdminCount: (jid: string) => Promise<number>;
+    /**user is Lid, not Jid */
     newsletterChangeOwner: (jid: string, user: string) => Promise<void>;
+    /**user is Lid, not Jid */
     newsletterDemote: (jid: string, user: string) => Promise<void>;
     newsletterDelete: (jid: string) => Promise<void>;
-    newsletterReactMessage: (jid: string, serverId: string, code?: string | undefined) => Promise<void>;
-    newsletterFetchMessages: (type: "invite" | "jid", key: string, count: number, after?: number | undefined) => Promise<import("../Types").NewsletterFetchedUpdate[]>;
-    newsletterFetchUpdates: (jid: string, count: number, after?: number | undefined, since?: number | undefined) => Promise<import("../Types").NewsletterFetchedUpdate[]>;
+    /**if code wasn't passed, the reaction will be removed (if is reacted) */
+    newsletterReactMessage: (jid: string, serverId: string, code?: string) => Promise<void>;
+    newsletterFetchMessages: (type: 'invite' | 'jid', key: string, count: number, after?: number) => Promise<NewsletterFetchedUpdate[]>;
+    newsletterFetchUpdates: (jid: string, count: number, after?: number, since?: number) => Promise<NewsletterFetchedUpdate[]>;
     groupMetadata: (jid: string) => Promise<import("../Types").GroupMetadata>;
     groupCreate: (subject: string, participants: string[]) => Promise<import("../Types").GroupMetadata>;
     groupLeave: (id: string) => Promise<void>;
@@ -76,7 +47,7 @@ export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
     groupInviteCode: (jid: string) => Promise<string | undefined>;
     groupRevokeInvite: (jid: string) => Promise<string | undefined>;
     groupAcceptInvite: (code: string) => Promise<string | undefined>;
-    groupAcceptInviteV4: (key: string | proto.IMessageKey, inviteMessage: proto.Message.IGroupInviteMessage) => Promise<string>;
+    groupAcceptInviteV4: (key: string | import("../Types").WAProto.IMessageKey, inviteMessage: import("../Types").WAProto.Message.IGroupInviteMessage) => Promise<string>;
     groupGetInviteInfo: (code: string) => Promise<import("../Types").GroupMetadata>;
     groupToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
     groupSettingUpdate: (jid: string, setting: "announcement" | "locked" | "not_announcement" | "unlocked") => Promise<void>;
@@ -88,7 +59,10 @@ export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
     processingMutex: {
         mutex<T>(code: () => T | Promise<T>): Promise<T>;
     };
-    upsertMessage: (msg: proto.IWebMessageInfo, type: import("../Types").MessageUpsertType) => Promise<void>;
+    fetchPrivacySettings: (force?: boolean) => Promise<{
+        [_: string]: string;
+    }>;
+    upsertMessage: (msg: import("../Types").WAProto.IWebMessageInfo, type: import("../Types").MessageUpsertType) => Promise<void>;
     appPatch: (patchCreate: import("../Types").WAPatchCreate) => Promise<void>;
     sendPresenceUpdate: (type: import("../Types").WAPresence, toJid?: string | undefined) => Promise<void>;
     presenceSubscribe: (toJid: string, tcToken?: Buffer | undefined) => Promise<void>;
@@ -102,7 +76,7 @@ export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
         status: string | undefined;
         setAt: Date;
     } | undefined>;
-    updateProfilePicture: (jid: string, content: import("../Types").WAMediaUpload) => Promise<void>;
+    updateProfilePicture: (jid: string, content: WAMediaUpload) => Promise<void>;
     removeProfilePicture: (jid: string) => Promise<void>;
     updateProfileStatus: (status: string) => Promise<void>;
     updateProfileName: (name: string) => Promise<void>;
@@ -149,10 +123,11 @@ export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
     sendNode: (frame: BinaryNode) => Promise<void>;
     logout: (msg?: string | undefined) => Promise<void>;
     end: (error: Error | undefined) => void;
-    onUnexpectedError: (err: Error | Boom<any>, msg: string) => void;
+    onUnexpectedError: (err: Error | import("@hapi/boom").Boom<any>, msg: string) => void;
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
     sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };
+export declare const extractNewsletterMetadata: (node: BinaryNode, isCreate?: boolean) => NewsletterMetadata;

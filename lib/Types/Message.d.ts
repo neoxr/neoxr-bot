@@ -5,11 +5,11 @@ import { AxiosRequestConfig } from 'axios';
 import type { Logger } from 'pino';
 import type { Readable } from 'stream';
 import type { URL } from 'url';
+import { BinaryNode } from '../WABinary';
 import { proto } from '../../WAProto';
 import { MEDIA_HKDF_KEY_MAPPING } from '../Defaults';
 import type { GroupMetadata } from './GroupMetadata';
 import { CacheStore } from './Socket';
-import { BinaryNode } from '../WABinary';
 export { proto as WAProto };
 export type WAMessage = proto.IWebMessageInfo;
 export type WAMessageContent = proto.IMessage;
@@ -97,6 +97,12 @@ export type PollMessageOptions = {
     mentions?: any;
     remoteJid?: string;
 };
+type SharePhoneNumber = {
+    sharePhoneNumber: boolean;
+};
+type RequestPhoneNumber = {
+    requestPhoneNumber: boolean;
+};
 export type MediaType = keyof typeof MEDIA_HKDF_KEY_MAPPING;
 export type AnyMediaMessageContent = (({
     image: WAMediaUpload;
@@ -126,13 +132,6 @@ export type AnyMediaMessageContent = (({
 } & Contextable & Buttonable & Templatable)) & {
     mimetype?: string;
 } & Editable;
-export type GroupInviteInfo = {
-    inviteCode: string;
-    inviteExpiration: number;
-    text: string;
-    jid: string;
-    subject: string;
-};
 export type ButtonReplyInfo = {
     displayText: string;
     id: string;
@@ -161,20 +160,11 @@ export type AnyRegularMessageContent = (({
 } | {
     listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>;
 } | {
-    groupInvite: GroupInviteInfo;
-} | {
-    pin: WAMessageKey;
-    type: proto.PinInChat.Type;
-    /**
-     * 24 hours, 7 days, 30 days
-     */
-    time?: 86400 | 604800 | 2592000;
-} | {
     product: WASendableProduct;
     businessOwnerJid?: string;
     body?: string;
     footer?: string;
-}) & ViewOnce;
+} | SharePhoneNumber | RequestPhoneNumber) & ViewOnce;
 export type AnyMessageContent = AnyRegularMessageContent | {
     forward: WAMessage;
     force?: boolean;
@@ -201,7 +191,6 @@ export type MessageRelayOptions = MinimalRelayOptions & {
     additionalAttributes?: {
         [_: string]: string;
     };
-    /** add additional nodes to the binary node */
     additionalNodes?: BinaryNode[];
     /** should we use the devices cache, or fetch afresh from the server; default assumed to be "true" */
     useUserDevicesCache?: boolean;
@@ -213,12 +202,11 @@ export type MiscMessageGenerationOptions = MinimalRelayOptions & {
     timestamp?: Date;
     /** the message you want to quote */
     quoted?: WAMessage;
+    additionalNodes?: BinaryNode[];
     /** disappearing messages settings */
     ephemeralExpiration?: number | string;
     /** timeout for media upload to WA server */
     mediaUploadTimeoutMs?: number;
-    /** add additional nodes to the binary nodes **/
-    additionalNodes?: BinaryNode[];
     /** jid list of participants for status@broadcast */
     statusJidList?: string[];
     /** backgroundcolor for status */
@@ -257,7 +245,6 @@ export type MediaGenerationOptions = {
 };
 export type MessageContentGenerationOptions = MediaGenerationOptions & {
     getUrlInfo?: (text: string) => Promise<WAUrlInfo | undefined>;
-    getProfilePicUrl?: (jid: string, type: 'image' | 'preview') => Promise<string | undefined>;
 };
 export type MessageGenerationOptions = MessageContentGenerationOptions & MessageGenerationOptionsFromContent;
 /**
