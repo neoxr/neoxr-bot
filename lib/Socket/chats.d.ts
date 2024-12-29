@@ -53,7 +53,7 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     ev: import("../Types").BaileysEventEmitter & {
         process(handler: (events: Partial<import("../Types").BaileysEventMap>) => void | Promise<void>): () => void;
         buffer(): void;
-        createBufferedFunction<A extends any[], T_1>(work: (...args: A) => Promise<T_1>): (...args: A) => Promise<T_1>;
+        createBufferedFunction<A extends any[], T_1>(work: (...args: A) => Promise<T_1>): (...args: A) => Promise<T_1>; /** helper function to fetch the given app state sync key */
         flush(force?: boolean | undefined): boolean;
         isBuffering(): boolean;
     };
