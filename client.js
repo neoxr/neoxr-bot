@@ -15,7 +15,8 @@ const machine = (process.env.DATABASE_URL && /mongo/.test(process.env.DATABASE_U
 const client = new Baileys({
    type: '--neoxr-v1',
    plugsdir: 'plugins',
-   sf: 'session',
+   // To see documentation : https://github.com/neoxr/session
+   session: 'session',
    online: true,
    bypass_disappearing: true,
    // To see the latest version : https://web.whatsapp.com/check-update?version=1&platform=web

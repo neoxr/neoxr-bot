@@ -2,6 +2,34 @@
 
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
 
+### External Session
+
+External sessions are a feature where you store sessions not locally except SQLite, there are 5 database providers that you can use and before using them read the [documentation](https://github.com/neoxr/session) first here : [https://github.com/neoxr/session](https://github.com/neoxr/session).
+
+For example, here I use MongoDB to save sessions to the database, 1st add this to ```package.json``` and install it :
+
+```JSON
+"session": "github:neoxr/session#mongo"
+```
+then call the function ```useMongoAuthState``` from the session module as below
+
+```Javascript
+const { useMongoAuthState } = require('session')
+
+const client = new Baileys({
+   type: '--neoxr-v1',
+   plugsdir: 'plugins',
+   session: useMongoAuthState(process.env.DATABASE_URL, 'session'), <--- like this
+   online: true,
+   bypass_disappearing: true,
+   version: [2, 3000, 1017531287]
+}, {
+   browser: ['Ubuntu', 'Firefox', '20.0.00']
+})
+```
+
+> Each database provider has different function names, so read the [documentation](https://github.com/neoxr/session) and understand them.
+
 ### Script Delay 🤣
 
 > Untuk yang melapor masalah terkait script delay, itu memang sengaja dari sistem cooldown (anti spam) untuk meminimalisir banned dari pihak whatssapp dan jika fitur ini membuat tidak nyaman saat menggunakan bot silahkan matikan dengan command : **.antispam off**
