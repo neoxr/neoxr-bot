@@ -137,6 +137,13 @@ export type ButtonReplyInfo = {
     id: string;
     index: number;
 };
+export type GroupInviteInfo = {
+    inviteCode: string;
+    inviteExpiration: number;
+    text: string;
+    jid: string;
+    subject: string;
+};
 export type WASendableProduct = Omit<proto.Message.ProductMessage.IProductSnapshot, 'productImage'> & {
     productImage: WAMediaUpload;
 };
@@ -155,10 +162,19 @@ export type AnyRegularMessageContent = (({
 } | {
     react: proto.Message.IReactionMessage;
 } | {
+    groupInvite: GroupInviteInfo;
+} | {
     buttonReply: ButtonReplyInfo;
     type: 'template' | 'plain';
 } | {
     listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>;
+} | {
+    pin: WAMessageKey;
+    type: proto.PinInChat.Type;
+    /**
+     * 24 hours, 7 days, 30 days
+     */
+    time?: 86400 | 604800 | 2592000;
 } | {
     product: WASendableProduct;
     businessOwnerJid?: string;
@@ -245,6 +261,7 @@ export type MediaGenerationOptions = {
 };
 export type MessageContentGenerationOptions = MediaGenerationOptions & {
     getUrlInfo?: (text: string) => Promise<WAUrlInfo | undefined>;
+    getProfilePicUrl?: (jid: string, type: 'image' | 'preview') => Promise<string | undefined>;
 };
 export type MessageGenerationOptions = MessageContentGenerationOptions & MessageGenerationOptionsFromContent;
 /**
