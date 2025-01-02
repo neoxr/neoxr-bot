@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6'],
+   usage: ['button1', 'button2', 'button3', 'button4', 'button5'],
    category: 'example',
    async: async (m, {
       client,
@@ -129,23 +129,6 @@ exports.run = {
                })
                break
 
-            case 'button6': // Old button + Native Flow (Useless)
-               client.replyButton(m.chat, [{
-                  text: 'Runtime',
-                  command: '.runtime'
-               }, {
-                  name: 'cta_url',
-                  param: {
-                     display_text: "Rest API",
-                     url: "https://api.neoxr.my.id",
-                     merchant_url: "https://api.neoxr.my.id"
-                  }
-               }], m, {
-                  text: 'Hi @0', // do not empty
-                  footer: global.footer, // do not empty
-                  media: global.db.setting.cover // video or image link
-               })
-               break
          }
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
