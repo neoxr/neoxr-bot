@@ -19,7 +19,7 @@ const { useMongoAuthState } = require('session')
 const client = new Baileys({
    type: '--neoxr-v1',
    plugsdir: 'plugins',
-   session: useMongoAuthState(process.env.DATABASE_URL, 'session'), <--- like this
+   session: useMongoAuthState(process.env.DATABASE_URL, 'session'), // like this
    online: true,
    bypass_disappearing: true,
    version: [2, 3000, 1017531287]
