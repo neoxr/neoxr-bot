@@ -2,8 +2,8 @@
 // process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 require('events').EventEmitter.defaultMaxListeners = 500
 const { Baileys, MongoDB, PostgreSQL, Function: Func, Config: env } = new (require('@neoxr/wb'))
-const spinnies = new (require('spinnies'))(),
-   fs = require('fs'),
+require('./lib/system/functions'), require('./lib/system/scraper')
+const fs = require('fs'),
    path = require('path'),
    colors = require('@colors/colors'),
    { platform } = require('os')
@@ -89,8 +89,6 @@ client.once('ready', async () => {
 client.register('message', ctx => {
    require('./handler')(client.sock, ctx)
    require('./lib/system/baileys')(client.sock)
-   require('./lib/system/functions')
-   require('./lib/system/scraper')
 })
 
 /* print deleted message object */
