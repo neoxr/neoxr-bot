@@ -308,7 +308,7 @@ exports.run = {
                   header: '',
                   content: print,
                   footer: global.footer,
-                  media: global.db.setting.cover
+                  media: setting.cover
                })
             }
          }

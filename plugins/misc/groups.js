@@ -1,5 +1,6 @@
 const moment = require('moment-timezone')
 moment.tz.setDefault('Asia/Jakarta').locale('id')
+const { models } = require('../../lib/system/models')
 exports.run = {
    usage: ['groups'],
    category: 'miscs',
@@ -22,20 +23,7 @@ exports.run = {
          } else {
             global.db.groups.push({
                jid: x.id,
-               activity: new Date * 1,
-               antidelete: true,
-               antilink: false,
-               antivirtex: false,
-               filter: false,
-               left: false,
-               localonly: false,
-               mute: false,
-               member: {},
-               text_left: '',
-               text_welcome: '',
-               welcome: true,
-               expired: 0,
-               stay: false
+               ...(models?.groups || {})
             })
          }
       })
