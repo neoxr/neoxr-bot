@@ -1,6 +1,6 @@
 {
 	"name": "@neoxr/baileys",
-	"version": "7.6.0",
+	"version": "7.6.1",
 	"description": "WhatsApp API",
 	"keywords": [
 		"whatsapp",
@@ -62,7 +62,7 @@
 		"conventional-changelog-cli": "^2.2.2",
 		"eslint": "^8.0.0",
 		"jest": "^27.0.6",
-		"jimp": "^0.16.1",
+		"jimp": "^0.22.12",
 		"link-preview-js": "^3.0.0",
 		"open": "^8.4.2",
 		"qrcode-terminal": "^0.12.0",
@@ -74,7 +74,7 @@
 		"typescript": "^4.6.4"
 	},
 	"peerDependencies": {
-		"jimp": "^0.16.1",
+		"jimp": "^0.22.12",
 		"link-preview-js": "^3.0.0",
 		"qrcode-terminal": "^0.12.0",
 		"sharp": "^0.30.5"
