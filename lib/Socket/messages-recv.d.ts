@@ -4,7 +4,7 @@ import { proto } from '../../WAProto';
 import { MessageReceiptType, MessageRelayOptions, SocketConfig } from '../Types';
 import { BinaryNode } from '../WABinary';
 export declare const makeMessagesRecvSocket: (config: SocketConfig) => {
-    sendMessageAck: ({ tag, attrs, content }: BinaryNode) => Promise<void>;
+    sendMessageAck: ({ tag, attrs, content }: BinaryNode, errorCode?: number) => Promise<void>;
     sendRetryRequest: (node: BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
     offerCall: (toJid: string, isVideo?: boolean) => Promise<{
         id: string;

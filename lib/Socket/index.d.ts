@@ -17,7 +17,7 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
         deleted: number;
     }>;
     productUpdate: (productId: string, update: import("../Types").ProductUpdate) => Promise<import("../Types").Product>;
-    sendMessageAck: ({ tag, attrs, content }: import("../index").BinaryNode) => Promise<void>;
+    sendMessageAck: ({ tag, attrs, content }: import("../index").BinaryNode, errorCode?: number | undefined) => Promise<void>;
     sendRetryRequest: (node: import("../index").BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
     offerCall: (toJid: string, isVideo?: boolean) => Promise<{
         id: string;

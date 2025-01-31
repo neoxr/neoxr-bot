@@ -18,7 +18,7 @@ export declare const makeRegistrationSocket: (config: SocketConfig) => {
         deleted: number;
     }>;
     productUpdate: (productId: string, update: import("../Types").ProductUpdate) => Promise<import("../Types").Product>;
-    sendMessageAck: ({ tag, attrs, content }: import("../WABinary").BinaryNode) => Promise<void>;
+    sendMessageAck: ({ tag, attrs, content }: import("../WABinary").BinaryNode, errorCode?: number | undefined) => Promise<void>;
     sendRetryRequest: (node: import("../WABinary").BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
     offerCall: (toJid: string, isVideo?: boolean) => Promise<{
         id: string;

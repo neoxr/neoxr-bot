@@ -16,7 +16,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
         deleted: number;
     }>;
     productUpdate: (productId: string, update: ProductUpdate) => Promise<import("../Types").Product>;
-    sendMessageAck: ({ tag, attrs, content }: BinaryNode) => Promise<void>;
+    sendMessageAck: ({ tag, attrs, content }: BinaryNode, errorCode?: number | undefined) => Promise<void>;
     sendRetryRequest: (node: BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
     offerCall: (toJid: string, isVideo?: boolean) => Promise<{
         id: string;
