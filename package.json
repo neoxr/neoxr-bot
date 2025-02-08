@@ -28,7 +28,7 @@
       "@adiwajshing/baileys": "npm:@neoxr/baileys@7.6.2",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^4.7.3",
+      "@neoxr/wb": "^4.7.4",
       "@neoxr/youtube-scraper": "^3.1.5",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
