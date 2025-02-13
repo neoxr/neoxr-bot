@@ -1,5 +1,7 @@
+const fs = require('fs')
+
 exports.run = {
-   usage: ['button1', 'button2', 'button3', 'button4', 'button5'],
+   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6'],
    category: 'example',
    async: async (m, {
       client,
@@ -64,7 +66,7 @@ exports.run = {
                }], m, {
                   text: 'Hi @0',
                   footer: global.footer,
-                  media: 'https://qu.ax/TancZ.mp4' // video or image link
+                  media: fs.readFileSync('./media/image/default.jpg') // video or image (url or buffer)
                })
                break
 
@@ -129,6 +131,26 @@ exports.run = {
                })
                break
 
+            case 'button6': // Button 6 (Message Modify)
+               client.replyButton(m.chat, [{
+                  text: 'Runtime',
+                  command: '.runtime'
+               }, {
+                  text: 'Statistic',
+                  command: '.stat'
+               }], m, {
+                  text: 'Hi @0',
+                  footer: global.footer,
+                  docs: {
+                     name: 'オートメーション',
+                     pages: 20,
+                     size: '1GB',
+                     extension: 'ppt'
+                  },
+                  body: 'WhatsApp Automation',
+                  thumbnail: global.db.setting.cover
+               })
+               break
          }
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)

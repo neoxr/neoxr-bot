@@ -150,9 +150,6 @@ module.exports = async (client, ctx) => {
             }
             if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < env.timeout)) continue
             if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
-            if (cmd.cache && cmd.location) {
-               Func.updateFile(cmd.location)
-            }
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
@@ -213,9 +210,6 @@ module.exports = async (client, ctx) => {
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg'),
                url: setting.link
             }).then(() => chats.lastchat = new Date() * 1)
-            if (event.cache && event.location) {
-               Func.updateFile(event.location)
-            }
             if (event.error) continue
             if (event.owner && !isOwner) continue
             if (event.group && !m.isGroup) continue
