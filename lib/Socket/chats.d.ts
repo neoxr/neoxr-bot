@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { Boom } from '@hapi/boom';
 import { proto } from '../../WAProto';
-import { ChatModification, MessageUpsertType, SocketConfig, WABusinessProfile, WAMediaUpload, WAPatchCreate, WAPresence, WAPrivacyCallValue, WAPrivacyGroupAddValue, WAPrivacyOnlineValue, WAPrivacyValue, WAReadReceiptsValue } from '../Types';
+import { ChatModification, MessageUpsertType, SocketConfig, WABusinessProfile, WAMediaUpload, WAPatchCreate, WAPresence, WAPrivacyCallValue, WAPrivacyGroupAddValue, WAPrivacyMessagesValue, WAPrivacyOnlineValue, WAPrivacyValue, WAReadReceiptsValue } from '../Types';
 import { LabelActionBody } from '../Types/Label';
 import { BinaryNode } from '../WABinary';
 import { USyncQuery } from '../WAUSync';
@@ -30,6 +30,7 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     updateProfileName: (name: string) => Promise<void>;
     updateBlockStatus: (jid: string, action: 'block' | 'unblock') => Promise<void>;
     updateCallPrivacy: (value: WAPrivacyCallValue) => Promise<void>;
+    updateMessagesPrivacy: (value: WAPrivacyMessagesValue) => Promise<void>;
     updateLastSeenPrivacy: (value: WAPrivacyValue) => Promise<void>;
     updateOnlinePrivacy: (value: WAPrivacyOnlineValue) => Promise<void>;
     updateProfilePicturePrivacy: (value: WAPrivacyValue) => Promise<void>;
@@ -71,6 +72,11 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     waitForMessage: <T_2>(msgId: string, timeoutMs?: number | undefined) => Promise<T_2>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
+    /**
+     * modify a chat -- mark unread, read etc.
+     * lastMessages must be sorted in reverse chronologically
+     * requires the last messages till the last message received; required for archive & unread
+    */
     sendNode: (frame: BinaryNode) => Promise<void>;
     logout: (msg?: string | undefined) => Promise<void>;
     end: (error: Error | undefined) => void;
@@ -78,6 +84,6 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
-    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
+    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
     sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };

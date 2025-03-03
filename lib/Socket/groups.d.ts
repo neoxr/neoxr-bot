@@ -61,6 +61,7 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     updateProfileName: (name: string) => Promise<void>;
     updateBlockStatus: (jid: string, action: "block" | "unblock") => Promise<void>;
     updateCallPrivacy: (value: import("../Types").WAPrivacyCallValue) => Promise<void>;
+    updateMessagesPrivacy: (value: import("../Types").WAPrivacyMessagesValue) => Promise<void>;
     updateLastSeenPrivacy: (value: import("../Types").WAPrivacyValue) => Promise<void>;
     updateOnlinePrivacy: (value: import("../Types").WAPrivacyOnlineValue) => Promise<void>;
     updateProfilePicturePrivacy: (value: import("../Types").WAPrivacyValue) => Promise<void>;
@@ -109,7 +110,7 @@ export declare const makeGroupsSocket: (config: SocketConfig) => {
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
-    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
+    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
     sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };
 export declare const extractGroupMetadata: (result: BinaryNode) => GroupMetadata;

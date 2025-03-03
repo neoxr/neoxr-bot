@@ -32,6 +32,6 @@ export declare const makeUSyncSocket: (config: SocketConfig) => {
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
-    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
+    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
     sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };

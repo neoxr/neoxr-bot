@@ -34,7 +34,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     newsletterUnfollow: (jid: string) => Promise<void>;
     newsletterFollow: (jid: string) => Promise<void>;
     newsletterUnmute: (jid: string) => Promise<void>;
-    newsletterMute: (jid: string) => Promise<void>;
+    newsletterMute: (jid: string) => Promise<void>; /** Correctly bulk send receipts to multiple chats, participants */
     newsletterAction: (jid: string, type: "mute" | "follow" | "unfollow" | "unmute") => Promise<void>;
     newsletterCreate: (name: string, description: string, reaction_codes: string) => Promise<import("../Types").NewsletterMetadata>;
     newsletterMetadata: (type: "invite" | "jid", key: string, role?: import("../Types").NewsletterViewRole | undefined) => Promise<import("../Types").NewsletterMetadata>;
@@ -84,7 +84,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     profilePictureUrl: (jid: string, type?: "image" | "preview", timeoutMs?: number | undefined) => Promise<string | undefined>;
     onWhatsApp: (...jids: string[]) => Promise<{
         jid: string;
-        exists: unknown;
+        exists: unknown; /** Bulk read messages. Keys can be from different chats & participants */
     }[] | undefined>;
     fetchBlocklist: () => Promise<string[]>;
     fetchStatus: (...jids: string[]) => Promise<import("../WAUSync/USyncQuery").USyncQueryResultList[] | undefined>;
@@ -95,6 +95,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     updateProfileName: (name: string) => Promise<void>;
     updateBlockStatus: (jid: string, action: "block" | "unblock") => Promise<void>;
     updateCallPrivacy: (value: import("../Types").WAPrivacyCallValue) => Promise<void>;
+    updateMessagesPrivacy: (value: import("../Types").WAPrivacyMessagesValue) => Promise<void>;
     updateLastSeenPrivacy: (value: import("../Types").WAPrivacyValue) => Promise<void>;
     updateOnlinePrivacy: (value: import("../Types").WAPrivacyOnlineValue) => Promise<void>;
     updateProfilePicturePrivacy: (value: import("../Types").WAPrivacyValue) => Promise<void>;
@@ -143,6 +144,6 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
-    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => boolean | undefined, timeoutMs?: number | undefined) => Promise<void>;
+    waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
     sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
 };

@@ -37,5 +37,5 @@ export declare function md5(buffer: Buffer): Buffer;
 export declare function hkdf(buffer: Uint8Array | Buffer, expandedLength: number, info: {
     salt?: Buffer;
     info?: string;
-}): Buffer;
-export declare function derivePairingCodeKey(pairingCode: string, salt: Buffer): Buffer;
+}): Promise<Buffer>;
+export declare function derivePairingCodeKey(pairingCode: string, salt: Buffer): Promise<Buffer>;

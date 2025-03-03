@@ -11,7 +11,7 @@ import { DownloadableMessage, MediaConnInfo, MediaDecryptionKeyInfo, MediaType, 
 import { BinaryNode } from '../WABinary';
 export declare const hkdfInfoKey: (type: MediaType) => string;
 /** generates all the keys required to encrypt/decrypt & sign a media message */
-export declare function getMediaKeys(buffer: Uint8Array | string | null | undefined, mediaType: MediaType): MediaDecryptionKeyInfo;
+export declare function getMediaKeys(buffer: Uint8Array | string | null | undefined, mediaType: MediaType): Promise<MediaDecryptionKeyInfo>;
 export declare const extractImageThumb: (bufferOrFilePath: Readable | Buffer | string, width?: number) => Promise<{
     buffer: Buffer;
     original: {
@@ -99,7 +99,7 @@ export declare const getWAUploadToServer: ({ customUploadHosts, fetchAgent, logg
 /**
  * Generate a binary node that will request the phone to re-upload the media & return the newly uploaded URL
  */
-export declare const encryptMediaRetryRequest: (key: proto.IMessageKey, mediaKey: Buffer | Uint8Array, meId: string) => BinaryNode;
+export declare const encryptMediaRetryRequest: (key: proto.IMessageKey, mediaKey: Buffer | Uint8Array, meId: string) => Promise<BinaryNode>;
 export declare const decodeMediaRetryNode: (node: BinaryNode) => {
     key: proto.IMessageKey;
     media?: {
@@ -111,6 +111,6 @@ export declare const decodeMediaRetryNode: (node: BinaryNode) => {
 export declare const decryptMediaRetryData: ({ ciphertext, iv }: {
     ciphertext: Uint8Array;
     iv: Uint8Array;
-}, mediaKey: Uint8Array, msgId: string) => proto.MediaRetryNotification;
+}, mediaKey: Uint8Array, msgId: string) => Promise<proto.MediaRetryNotification>;
 export declare const getStatusCodeForMediaRetry: (code: number) => any;
 export {};

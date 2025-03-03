@@ -4,8 +4,8 @@ declare class d {
     add(e: any, t: any): any;
     subtract(e: any, t: any): any;
     subtractThenAdd(e: any, t: any, r: any): any;
-    _addSingle(e: any, t: any): ArrayBuffer;
-    _subtractSingle(e: any, t: any): ArrayBuffer;
+    _addSingle(e: any, t: any): Promise<ArrayBuffer>;
+    _subtractSingle(e: any, t: any): Promise<ArrayBuffer>;
     performPointwiseWithOverflow(e: any, t: any, r: any): ArrayBuffer;
 }
 export declare const LT_HASH_ANTI_TAMPERING: d;
