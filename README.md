@@ -41,7 +41,7 @@ const client = new Baileys({
 **Special Features & Benefit :**
 - Auto Download
 - Porn Detector (Image Only)
-- 30 Mini Games
+- 32 Mini Games
 - Leveling & Roles
 - Email Verification
 - Send Email
@@ -74,20 +74,20 @@ const client = new Baileys({
 
 🏷️ Game Plugins (**+Rp. 70.000 / +$9.80**)
 
-> 30 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
+> 32 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 **Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
 
 ### Requirements
 
-- [x] NodeJS >= 18 (Recommended v20)
+- [x] NodeJS >= 20 (Recommended v20.18.1)
 - [x] FFMPEG
 - [x] Server vCPU/RAM 1/2GB (Min)
 
 ### Server
 
 - [x] NAT VPS [Hostdata](https://hostdata.id/nat-vps-usa/) (Recommended)
-- [x] Hosting Panel [Voxy Host](https://voxyhost.com/)
+- [x] Hosting Panel [The Hoster](https://thehoster.net/bot-hosting/)
 - [x] VPS [OVH Hosting](https://www.ovhcloud.com/asia/vps/)
 - [x] RDP Windows [RDP Win](https://www.rdpwin.com/rdpbot.php)
 
