@@ -6,6 +6,7 @@ import type { Logger } from 'pino';
 import type { URL } from 'url';
 import { proto } from '../../WAProto';
 import { AuthenticationState, SignalAuthState, TransactionCapabilityOptions } from './Auth';
+import { GroupMetadata } from './GroupMetadata';
 import { MediaConnInfo } from './Message';
 import { SignalRepository } from './Signal';
 export type WAVersion = [number, number, number];
@@ -109,6 +110,7 @@ export type SocketConfig = {
      * (solves the "this message can take a while" issue) can be retried
      * */
     getMessage: (key: proto.IMessageKey) => Promise<proto.IMessage | undefined>;
+    cachedGroupMetadata: (jid: string) => Promise<GroupMetadata | undefined>;
     makeSignalRepository: (auth: SignalAuthState) => SignalRepository;
     /** Socket passthrough */
     socket?: any;

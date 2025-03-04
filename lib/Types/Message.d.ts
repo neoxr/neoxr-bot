@@ -195,7 +195,7 @@ type MinimalRelayOptions = {
     /** override the message ID with a custom provided string */
     messageId?: string;
     /** cached group metadata, use to prevent redundant requests to WA & speed up msg sending */
-    cachedGroupMetadata?: (jid: string) => Promise<GroupMetadataParticipants | undefined>;
+    useCachedGroupMetadata?: boolean;
 };
 export type MessageRelayOptions = MinimalRelayOptions & {
     /** only send to a specific participant; used when a message decryption fails for a single user */

@@ -6,7 +6,7 @@ import { BinaryNode, JidWithDevice } from '../WABinary';
 export declare const makeMessagesSocket: (config: SocketConfig) => {
     getPrivacyTokens: (jids: string[]) => Promise<BinaryNode>;
     assertSessions: (jids: string[], force: boolean) => Promise<boolean>;
-    relayMessage: (jid: string, message: proto.IMessage, { messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, cachedGroupMetadata, statusJidList }: MessageRelayOptions) => Promise<string>;
+    relayMessage: (jid: string, message: proto.IMessage, { messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, useCachedGroupMetadata, statusJidList }: MessageRelayOptions) => Promise<string>;
     sendReceipt: (jid: string, participant: string | undefined, messageIds: string[], type: MessageReceiptType) => Promise<void>;
     sendReceipts: (keys: WAMessageKey[], type: MessageReceiptType) => Promise<void>;
     getButtonArgs: (message: proto.IMessage) => BinaryNode['attrs'];
@@ -34,7 +34,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     newsletterUnfollow: (jid: string) => Promise<void>;
     newsletterFollow: (jid: string) => Promise<void>;
     newsletterUnmute: (jid: string) => Promise<void>;
-    newsletterMute: (jid: string) => Promise<void>; /** Correctly bulk send receipts to multiple chats, participants */
+    newsletterMute: (jid: string) => Promise<void>;
     newsletterAction: (jid: string, type: "mute" | "follow" | "unfollow" | "unmute") => Promise<void>;
     newsletterCreate: (name: string, description: string, reaction_codes: string) => Promise<import("../Types").NewsletterMetadata>;
     newsletterMetadata: (type: "invite" | "jid", key: string, role?: import("../Types").NewsletterViewRole | undefined) => Promise<import("../Types").NewsletterMetadata>;
@@ -84,7 +84,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     profilePictureUrl: (jid: string, type?: "image" | "preview", timeoutMs?: number | undefined) => Promise<string | undefined>;
     onWhatsApp: (...jids: string[]) => Promise<{
         jid: string;
-        exists: unknown; /** Bulk read messages. Keys can be from different chats & participants */
+        exists: unknown;
     }[] | undefined>;
     fetchBlocklist: () => Promise<string[]>;
     fetchStatus: (...jids: string[]) => Promise<import("../WAUSync/USyncQuery").USyncQueryResultList[] | undefined>;
