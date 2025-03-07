@@ -20,7 +20,7 @@ const client = new Baileys({
    online: true,
    bypass_disappearing: true,
    // To see the latest version : https://wppconnect.io/whatsapp-versions/
-   version: [2, 3000, 1019430034]
+   version: [2, 3000, 1020608496]
 }, {
    browser: ['Ubuntu', 'Firefox', '20.0.00']
 })

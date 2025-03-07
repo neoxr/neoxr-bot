@@ -4,7 +4,7 @@
    "description": "WhatsApp Bot (Base)",
    "main": "index.js",
    "engines": {
-      "node": "18.x",
+      "node": "20.x",
       "npm": "9.x"
    },
    "repository": {
@@ -22,10 +22,10 @@
    },
    "homepage": "https://github.com/neoxr/wbot#readme",
    "dependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@7.6.3",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@7.6.9",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^4.7.7",
+      "@neoxr/wb": "^4.7.11",
       "@neoxr/youtube-scraper": "^2.2.2",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
