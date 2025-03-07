@@ -43,6 +43,11 @@ message ADVSignedKeyIndexList {
 message AIRichResponseMessage {
     optional AIRichResponseMessageType messageType = 1;
     repeated AIRichResponseSubMessage submessages = 2;
+    optional AIRichResponseAbstractData abstractData = 3;
+    message AIRichResponseAbstractData {
+        optional bytes data = 1;
+    }
+    
     message AIRichResponseCodeMetadata {
         optional string codeLanguage = 1;
         repeated AIRichResponseCodeBlock codeBlocks = 2;
@@ -58,6 +63,28 @@ message AIRichResponseMessage {
             AI_RICH_RESPONSE_CODE_HIGHLIGHT_STRING = 3;
             AI_RICH_RESPONSE_CODE_HIGHLIGHT_NUMBER = 4;
             AI_RICH_RESPONSE_CODE_HIGHLIGHT_COMMENT = 5;
+        }
+    }
+    
+    message AIRichResponseContentItemsMetadata {
+        repeated AIRichResponseContentItemMetadata itemsMetadata = 1;
+        optional ContentType contentType = 2;
+        message AIRichResponseContentItemMetadata {
+            oneof aIRichResponseContentItem {
+                AIRichResponseMessage.AIRichResponseContentItemsMetadata.AIRichResponseReelItem reelItem = 1;
+            }
+        }
+        
+        message AIRichResponseReelItem {
+            optional string title = 1;
+            optional string profileIconUrl = 2;
+            optional string thumbnailUrl = 3;
+            optional string videoUrl = 4;
+        }
+        
+        enum ContentType {
+            DEFAULT = 0;
+            CAROUSEL = 1;
         }
     }
     
@@ -96,6 +123,36 @@ message AIRichResponseMessage {
         }
     }
     
+    message AIRichResponseLatexMetadata {
+        optional string text = 1;
+        repeated AIRichResponseLatexExpression expressions = 2;
+        message AIRichResponseLatexExpression {
+            optional string latexExpression = 1;
+            optional string url = 2;
+            optional double width = 3;
+            optional double height = 4;
+            optional double fontHeight = 5;
+        }
+        
+    }
+    
+    message AIRichResponseMapMetadata {
+        optional double centerLatitude = 1;
+        optional double centerLongitude = 2;
+        optional double latitudeDelta = 3;
+        optional double longitudeDelta = 4;
+        repeated AIRichResponseMapAnnotation annotations = 5;
+        optional bool showInfoList = 6;
+        message AIRichResponseMapAnnotation {
+            optional uint32 annotationNumber = 1;
+            optional double latitude = 2;
+            optional double longitude = 3;
+            optional string title = 4;
+            optional string body = 5;
+        }
+        
+    }
+    
     enum AIRichResponseMessageType {
         AI_RICH_RESPONSE_TYPE_UNKNOWN = 0;
         AI_RICH_RESPONSE_TYPE_STANDARD = 1;
@@ -108,6 +165,9 @@ message AIRichResponseMessage {
         optional AIRichResponseMessage.AIRichResponseCodeMetadata codeMetadata = 5;
         optional AIRichResponseMessage.AIRichResponseTableMetadata tableMetadata = 6;
         optional AIRichResponseMessage.AIRichResponseDynamicMetadata dynamicMetadata = 7;
+        optional AIRichResponseMessage.AIRichResponseLatexMetadata latexMetadata = 8;
+        optional AIRichResponseMessage.AIRichResponseMapMetadata mapMetadata = 9;
+        optional AIRichResponseMessage.AIRichResponseContentItemsMetadata contentItemsMetadata = 10;
     }
     
     enum AIRichResponseSubMessageType {
@@ -118,6 +178,9 @@ message AIRichResponseMessage {
         AI_RICH_RESPONSE_TABLE = 4;
         AI_RICH_RESPONSE_CODE = 5;
         AI_RICH_RESPONSE_DYNAMIC = 6;
+        AI_RICH_RESPONSE_MAP = 7;
+        AI_RICH_RESPONSE_LATEX = 8;
+        AI_RICH_RESPONSE_CONTENT_ITEMS = 9;
     }
     message AIRichResponseTableMetadata {
         repeated AIRichResponseTableRow rows = 1;
@@ -202,6 +265,7 @@ message BotAvatarMetadata {
 message BotCapabilityMetadata {
     repeated BotCapabilityType capabilities = 1;
     enum BotCapabilityType {
+        UNKNOWN = 0;
         PROGRESS_INDICATOR = 1;
         RICH_RESPONSE_HEADING = 2;
         RICH_RESPONSE_NESTED_LIST = 3;
@@ -224,6 +288,13 @@ message BotCapabilityMetadata {
         WA_IG_1P_PLUGIN_RANKING_UPDATE_10 = 20;
         RICH_RESPONSE_SUB_HEADING = 21;
         RICH_RESPONSE_GRID_IMAGE = 22;
+        AI_STUDIO_UGC_MEMORY = 23;
+        RICH_RESPONSE_LATEX = 24;
+        RICH_RESPONSE_MAPS = 25;
+        RICH_RESPONSE_INLINE_REELS = 26;
+        AGENTIC_PLANNING = 27;
+        ACCOUNT_LINKING = 28;
+        STREAMING_DISAGGREGATION = 29;
     }
 }
 
@@ -247,6 +318,7 @@ message BotLinkedAccount {
 
 message BotLinkedAccountsMetadata {
     repeated BotLinkedAccount accounts = 1;
+    optional bytes acAuthTokens = 2;
 }
 
 message BotMediaMetadata {
@@ -298,6 +370,7 @@ message BotMetadata {
     optional BotRenderingMetadata renderingMetadata = 16;
     optional BotMetricsMetadata botMetricsMetadata = 17;
     optional BotLinkedAccountsMetadata botLinkedAccountsMetadata = 18;
+    optional BotSourcesMetadata richResponseSourcesMetadata = 19;
 }
 
 enum BotMetricsEntryPoint {
@@ -317,12 +390,24 @@ enum BotMetricsEntryPoint {
     PROFILE_MESSAGE_BUTTON = 14;
     FORWARD = 15;
     APP_SHORTCUT = 16;
+    FF_FAMILY = 17;
+    AI_TAB = 18;
+    AI_HOME = 19;
+    AI_DEEPLINK_IMMERSIVE = 20;
+    AI_DEEPLINK = 21;
 }
 message BotMetricsMetadata {
     optional string destinationId = 1;
     optional BotMetricsEntryPoint destinationEntryPoint = 2;
+    optional BotMetricsThreadEntryPoint threadOrigin = 3;
 }
 
+enum BotMetricsThreadEntryPoint {
+    AI_TAB_THREAD = 1;
+    AI_HOME_THREAD = 2;
+    AI_DEEPLINK_IMMERSIVE_THREAD = 3;
+    AI_DEEPLINK_THREAD = 4;
+}
 message BotModelMetadata {
     optional ModelType modelType = 1;
     optional PremiumModelStatus premiumModelStatus = 2;
@@ -366,6 +451,34 @@ message BotPluginMetadata {
 
 message BotProgressIndicatorMetadata {
     optional string progressDescription = 1;
+    repeated BotPlanningStepMetadata stepsMetadata = 2;
+    message BotPlanningStepMetadata {
+        optional string statusTitle = 1;
+        optional string statusBody = 2;
+        repeated BotPlanningSearchSourcesMetadata sourcesMetadata = 3;
+        optional PlanningStepStatus status = 4;
+        optional bool isReasoning = 5;
+        optional bool isEnhancedSearch = 6;
+        message BotPlanningSearchSourcesMetadata {
+            optional string sourceTitle = 1;
+            optional BotPlanningSearchSourceProvider provider = 2;
+            optional string sourceUrl = 3;
+            enum BotPlanningSearchSourceProvider {
+                UNKNOWN = 0;
+                OTHER = 1;
+                GOOGLE = 2;
+                BING = 3;
+            }
+        }
+        
+        enum PlanningStepStatus {
+            UNKNOWN = 0;
+            PLANNED = 1;
+            EXECUTING = 2;
+            FINISHED = 3;
+        }
+    }
+    
 }
 
 message BotPromptSuggestion {
@@ -421,6 +534,25 @@ enum BotSessionSource {
     EMU_FLASH_FOLLOWUP = 5;
     VOICE = 6;
 }
+message BotSourcesMetadata {
+    repeated BotSourceItem sources = 1;
+    message BotSourceItem {
+        optional SourceProvider provider = 1;
+        optional string thumbnailCdnUrl = 2;
+        optional string sourceProviderUrl = 3;
+        optional string sourceQuery = 4;
+        optional string faviconCdnUrl = 5;
+        optional uint32 citationNumber = 6;
+        enum SourceProvider {
+            UNKNOWN = 0;
+            BING = 1;
+            GOOGLE = 2;
+            SUPPORT = 3;
+        }
+    }
+    
+}
+
 message BotSuggestedPromptMetadata {
     repeated string suggestedPrompts = 1;
     optional uint32 selectedPromptIndex = 2;
@@ -535,6 +667,13 @@ message ChatRowOpaqueData {
         
     }
     
+}
+
+message Citation {
+    required string title = 1;
+    required string subtitle = 2;
+    required string cmsId = 3;
+    required string imageUrl = 4;
 }
 
 message ClientPairingProps {
@@ -814,6 +953,8 @@ message ContextInfo {
     optional ForwardedAIBotMessageInfo forwardedAiBotMessageInfo = 56;
     optional StatusAttributionType statusAttributionType = 57;
     optional UrlTrackingMap urlTrackingMap = 58;
+    optional PairedMediaType pairedMediaType = 59;
+    optional uint32 rankingVersion = 60;
     message AdReplyInfo {
         optional string advertiserName = 1;
         optional MediaType mediaType = 2;
@@ -900,6 +1041,13 @@ message ContextInfo {
         }
     }
     
+    enum PairedMediaType {
+        NOT_PAIRED_MEDIA = 0;
+        SD_VIDEO_PARENT = 1;
+        HD_VIDEO_CHILD = 2;
+        SD_IMAGE_PARENT = 3;
+        HD_IMAGE_CHILD = 4;
+    }
     enum StatusAttributionType {
         NONE = 0;
         RESHARED_FROM_MENTION = 1;
@@ -962,6 +1110,7 @@ message Conversation {
     optional PrivacySystemMessage systemMessageToInsert = 47;
     optional bool capiCreatedGroup = 48;
     optional string accountLid = 49;
+    optional bool limitSharing = 50;
     enum EndOfHistoryTransferType {
         COMPLETE_BUT_MORE_MESSAGES_REMAIN_ON_PRIMARY = 0;
         COMPLETE_AND_NO_MORE_MESSAGE_REMAIN_ON_PRIMARY = 1;
@@ -971,11 +1120,16 @@ message Conversation {
 
 message DeviceCapabilities {
     optional ChatLockSupportLevel chatLockSupportLevel = 1;
+    optional LIDMigration lidMigration = 2;
     enum ChatLockSupportLevel {
         NONE = 0;
         MINIMAL = 1;
         FULL = 2;
     }
+    message LIDMigration {
+        optional uint64 chatDbMigrationTimestamp = 1;
+    }
+    
 }
 
 message DeviceConsistencyCodeMessage {
@@ -1332,6 +1486,15 @@ message LIDMigrationMappingSyncPayload {
 message LegacyMessage {
     optional Message.EventResponseMessage eventResponseMessage = 1;
     optional Message.PollVoteMessage pollVote = 2;
+}
+
+message LimitSharing {
+    optional bool sharingLimited = 1;
+    optional Trigger trigger = 2;
+    enum Trigger {
+        CHAT_SETTING = 0;
+        BIZ_SUPPORTS_FB_HOSTING = 1;
+    }
 }
 
 message LocalizedName {
@@ -1974,6 +2137,7 @@ message Message {
             USER_IMAGE = 0;
             AI_GENERATED = 1;
             AI_MODIFIED = 2;
+            RASTERIZED_TEXT_STATUS = 3;
         }
     }
     
@@ -2487,6 +2651,7 @@ message Message {
         optional MediaNotifyMessage mediaNotifyMessage = 21;
         optional Message.CloudAPIThreadControlNotification cloudApiThreadControlNotification = 22;
         optional LIDMigrationMappingSyncMessage lidMigrationMappingSyncMessage = 23;
+        optional LimitSharing limitSharing = 24;
         enum Type {
             REVOKE = 0;
             EPHEMERAL_SETTING = 3;
@@ -2509,6 +2674,8 @@ message Message {
             REMINDER_MESSAGE = 23;
             BOT_MEMU_ONBOARDING_MESSAGE = 24;
             STATUS_MENTION_MESSAGE = 25;
+            STOP_GENERATION_MESSAGE = 26;
+            LIMIT_SHARING = 27;
         }
     }
     
@@ -2736,6 +2903,7 @@ message Message {
         repeated InteractiveAnnotation annotations = 25;
         optional string accessibilityLabel = 26;
         repeated ProcessedVideo processedVideos = 27;
+        optional uint32 externalShareFullVideoDurationInSeconds = 28;
         enum Attribution {
             NONE = 0;
             GIPHY = 1;
@@ -2783,6 +2951,8 @@ message MessageAssociation {
         MEDIA_POLL = 7;
         STATUS_ADD_YOURS = 8;
         STATUS_NOTIFICATION = 9;
+        HD_IMAGE_DUAL_UPLOAD = 10;
+        STICKER_ANNOTATION = 11;
     }
 }
 
@@ -3972,6 +4142,8 @@ message WebMessageInfo {
     optional StatusMentionMessage statusMentionMessageInfo = 69;
     optional bool isSupportAiMessage = 70;
     repeated string statusMentionSources = 71;
+    repeated Citation supportAiCitations = 72;
+    optional string botTargetId = 73;
     enum BizPrivacyStatus {
         E2EE = 0;
         FB = 2;
@@ -4199,6 +4371,10 @@ message WebMessageInfo {
         CAPI_GROUP_NE2EE_SYSTEM_MESSAGE = 209;
         STATUS_MENTION = 210;
         USER_CONTROLS_SYSTEM_MESSAGE = 211;
+        SUPPORT_SYSTEM_MESSAGE = 212;
+        CHANGE_LID = 213;
+        BIZ_CUSTOMER_3PD_DATA_SHARING_OPT_IN_MESSAGE = 214;
+        BIZ_CUSTOMER_3PD_DATA_SHARING_OPT_OUT_MESSAGE = 215;
     }
 }
 
