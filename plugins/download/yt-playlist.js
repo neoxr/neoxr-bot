@@ -1,7 +1,3 @@
-const { Youtube } = require('@neoxr/youtube-scraper')
-const yt = new Youtube({
-   fileAsUrl: false
-})
 exports.run = {
    usage: ['ytlist'],
    hidden: ['ytplaylist', 'playlist', 'getmp3', 'getmp4'],
@@ -26,14 +22,11 @@ exports.run = {
             if (Number(args[0]) > check.results.length) return m.reply(Func.texted('bold', `🚩 Exceed amount of data.`))
             client.sendReact(m.chat, '🕒', m.key)
             if (command === 'getmp3') {
-               var json = await yt.fetch(check.results[Number(args[0]) - 1])
-               if (!json.status) {
-                  var json = await Api.neoxr('/youtube', {
-                     url: check.results[Number(args[0]) - 1],
-                     type: 'audio',
-                     quality: '128kbps'
-                  })
-               }
+               var json = await Api.neoxr('/youtube', {
+                  url: check.results[Number(args[0]) - 1],
+                  type: 'audio',
+                  quality: '128kbps'
+               })
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                let caption = `乂  *Y T - P L A Y*\n\n`
                caption += `	◦  *Title* : ${json.title}\n`
@@ -54,23 +47,17 @@ exports.run = {
                   })
                })
             } else if (command === 'getmp4') {
-               var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '720p')
+               var json = await Api.neoxr('/youtube', {
+                  url: check.results[Number(args[0]) - 1],
+                  type: 'video',
+                  quality: '720p'
+               })
                if (!json.status) {
-                  var json = await yt.fetch(check.results[Number(args[0]) - 1], 'video', '480p')
-                  if (!json.status) {
-                     var json = await Api.neoxr('/youtube', {
-                        url: check.results[Number(args[0]) - 1],
-                        type: 'video',
-                        quality: '720p'
-                     })
-                     if (!json.status) {
-                        var json = await Api.neoxr('/youtube', {
-                           url: check.results[Number(args[0]) - 1],
-                           type: 'video',
-                           quality: '480p'
-                        })
-                     }
-                  }
+                  var json = await Api.neoxr('/youtube', {
+                     url: check.results[Number(args[0]) - 1],
+                     type: 'video',
+                     quality: '480p'
+                  })
                }
                if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                let caption = `乂  *Y T - M P 4*\n\n`
@@ -109,7 +96,7 @@ exports.run = {
             let p = `To download video use *${isPrefix}getmp4 number* and to get audio use *${isPrefix}getmp3 number*\n`
             p += `*Example* : ${isPrefix}getmp4 1\n\n`
             json.data.map((v, i) => {
-               p += `*${i+1}*. ${v.title}\n`
+               p += `*${i + 1}*. ${v.title}\n`
                p += `◦ *Link* : ${v.url}\n\n`
             }).join('\n\n')
             p += global.footer

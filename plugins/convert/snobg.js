@@ -18,7 +18,7 @@ exports.run = {
                client.sendReact(m.chat, '🕒', m.key)
                let img = await client.downloadMediaMessage(q)
                let image = await Scraper.uploadImageV2(img)
-               const json = await Api.neoxr('/nobg3', {
+               const json = await Api.neoxr('/nobg', {
                   image: image.data.url
                })
                if (!json.status) return m.reply(Func.jsonFormat(json))
@@ -35,7 +35,7 @@ exports.run = {
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
-            const json = await Api.neoxr('/nobg3', {
+            const json = await Api.neoxr('/nobg', {
                image: image.data.url
             })
             if (!json.status) return m.reply(Func.jsonFormat(json))
