@@ -9,4 +9,4 @@ nvm alias default 20
 nvm use default
 npm install -g pm2 yarn
 yarn
-pm2 start pm2.config.js && pm2 logs bot
+pm2 start pm2.config.js && pm2 logs neoxr
