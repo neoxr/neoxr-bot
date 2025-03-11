@@ -4,8 +4,9 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 source ~/.bashrc
-nvm install 18
-nvm alias default 18
+nvm install 20
+nvm alias default 20
 nvm use default
 npm install -g pm2 yarn
 yarn
+pm2 start pm2.config.js && pm2 logs bot
