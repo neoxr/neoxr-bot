@@ -11,6 +11,7 @@ process.on('uncaughtException', (err) => {
 		console.error('Uncaught Exception:', err)
 	}
 })
+
 process.on('unhandledRejection', (reason, promise) => {
 	unhandledRejections.set(promise, reason)
 	if (reason.code === 'ENOMEM') {
@@ -22,12 +23,15 @@ process.on('unhandledRejection', (reason, promise) => {
 		console.log('Unhandled Rejection at:', promise, 'reason:', reason)
 	}
 })
+
 process.on('rejectionHandled', (promise) => {
 	unhandledRejections.delete(promise)
 })
+
 process.on('Something went wrong', function (err) {
 	console.log('Caught exception: ', err)
 })
+
 process.on('warning', (warning) => {
 	if (warning.name === 'MaxListenersExceededWarning') {
 		console.warn('Potential memory leak detected:', warning.message)
@@ -48,6 +52,16 @@ function start() {
 		console.error('Exited with code:', code)
 		start()
 	})
+}
+
+const major = parseInt(process.versions.node.split('.')[0], 10)
+if (major < 20) {
+	console.error(
+		`\n❌ This script requires Node.js 20+ to run reliably.\n` +
+		`   You are using Node.js ${process.versions.node}.\n` +
+		`   Please upgrade to Node.js 20+ to proceed.\n`
+	);
+	process.exit(1)
 }
 
 CFonts.say('NEOXR BOT', {
