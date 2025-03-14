@@ -21,9 +21,6 @@ export type CacheStore = {
     /** flush all data */
     flushAll(): void;
 };
-export type PatchedMessageWithRecipientJID = proto.IMessage & {
-    recipientJid?: string;
-};
 export type SocketConfig = {
     /** the WS url to connect to WA */
     waWebSocketUrl: string | URL;
@@ -99,7 +96,7 @@ export type SocketConfig = {
     /**
      * Optionally patch the message before sending out
      * */
-    patchMessageBeforeSending: (msg: proto.IMessage, recipientJids?: string[]) => Promise<PatchedMessageWithRecipientJID[] | PatchedMessageWithRecipientJID> | PatchedMessageWithRecipientJID[] | PatchedMessageWithRecipientJID;
+    patchMessageBeforeSending: (msg: proto.IMessage, recipientJids: string[]) => Promise<proto.IMessage> | proto.IMessage;
     /** verify app state MACs */
     appStateMacVerification: {
         patch: boolean;

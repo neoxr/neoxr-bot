@@ -17,7 +17,6 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
         nodes: BinaryNode[];
         shouldIncludeDeviceIdentity: boolean;
     }>;
-    sendPeerDataOperationMessage: (pdoMessage: proto.Message.IPeerDataOperationRequestMessage) => Promise<string>;
     waUploadToServer: import("../Types").WAMediaUploadFunction;
     fetchPrivacySettings: (force?: boolean) => Promise<{
         [_: string]: string;

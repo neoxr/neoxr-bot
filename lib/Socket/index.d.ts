@@ -41,7 +41,6 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
         nodes: import("../index").BinaryNode[];
         shouldIncludeDeviceIdentity: boolean;
     }>;
-    sendPeerDataOperationMessage: (pdoMessage: import("../Types").WAProto.Message.IPeerDataOperationRequestMessage) => Promise<string>;
     waUploadToServer: import("../Types").WAMediaUploadFunction;
     fetchPrivacySettings: (force?: boolean) => Promise<{
         [_: string]: string;
