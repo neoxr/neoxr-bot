@@ -1,12 +1,24 @@
 ## NEOXR-BOT (BETA TEST)
 
-> An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.
+> An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.  
+
+> [!CAUTION]
+> [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) >= **5.x** version has used **TypeScript** and to use it there are slight changes
+
+```Javascript
+// From this : ---
+const { Baileys, Converter, ... } = new (require('@neoxr/wb'))
+
+// To this : ---
+const { Component } = require('@neoxr/wb')
+const { Baileys, Converter, ... } = new Component
+```
 
 ### External Session
 
-External sessions are a feature where you store sessions not locally except SQLite, there are 5 database providers that you can use and before using them read the [documentation](https://github.com/neoxr/session) first here : [https://github.com/neoxr/session](https://github.com/neoxr/session).
+External sessions are a feature where you store sessions not locally except sqlite, there are 5 database providers that you can use and before using them read the [documentation](https://github.com/neoxr/session) first here : [https://github.com/neoxr/session](https://github.com/neoxr/session).
 
-For example, here I use MongoDB to save sessions to the database, 1st add this to ```package.json``` and install it :
+For example, here I use Mongo to save sessions to the database, 1st add this to ```package.json``` and install it :
 
 ```JSON
 "session": "github:neoxr/session#mongo"
@@ -23,16 +35,16 @@ const client = new Baileys({
    online: true,
    bypass_disappearing: true,
    version: [2, 3000, 1017531287]
-}, {
-   browser: ['Ubuntu', 'Firefox', '20.0.00']
 })
 ```
 
+> [!TIP]
 > Each database provider has different function names, so read the [documentation](https://github.com/neoxr/session) and understand them.
 
 ### Script Delay 🤣
 
-> Untuk yang melapor masalah terkait script delay, itu memang sengaja dari sistem cooldown (anti spam) untuk meminimalisir banned dari pihak whatssapp dan jika fitur ini membuat tidak nyaman saat menggunakan bot silahkan matikan dengan command : **.antispam off**
+> [!NOTE]
+> Terkait laporan script delay, itu bukan delay tapi memang sistem anti spam (cooldown) jika ada 2 user mengirim command secara bersamaan hanya 1 yang akan di response untuk me-minimalisir banned dari pihak WhatsApp. Fitur ini bisa dimatikan dengan perintah : **.antispam off**
 
 ### Premium Script v4.1-Optima
 
@@ -40,7 +52,7 @@ const client = new Baileys({
 
 **Special Features & Benefit :**
 - Auto Download
-- Porn Detector (Image Only)
+- Chatbot (Supp. Audio, Image, Video, etc)
 - 32 Mini Games
 - Leveling & Roles
 - Email Verification
@@ -54,10 +66,12 @@ const client = new Baileys({
 - Free Updates
 - Bonus ApiKey 100K Request (for 1 year)
 
-> Note : Script Premium sudah terdapat semua additional features, kecuali payment gateway.
+> [!NOTE]
+> Script Premium sudah terdapat semua additional features, kecuali payment gateway.
 
 **Additional Features :**
 
+> [!NOTE]
 > Addional Features adalah fitur tambahan yang di jual terpisah / Additional features are features that are sold separately.
 
 🏷️ Cloud Storage (**+Rp. 35.000 / +$6.80**)
@@ -76,7 +90,8 @@ const client = new Baileys({
 
 > 32 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
-**Creator / Group** : [Wildan Izzudin](https://wa.me/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
+> [!IMPORTANT]
+> **Creator / Group** : [Wildan Izzudin](https://wa.me/p/6124894997634330/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
 
 ### Requirements
 
@@ -137,21 +152,23 @@ DATABASE_URL = ''
 TZ = 'Asia/Jakarta'
 ```
 
-**Notes** :
-+ ```ram_limit``` : ram usage limit, for example you have a server with 1gb of ram set before the maximum capacity is 900mb.
+> [!NOTE]
+> + ```ram_limit``` : ram usage limit, for example you have a server with 1gb of ram set before the maximum capacity is 900mb.
+>
+> + ```API_KEY``` : some of the features in this script use apikey, especially the downloader feature, to get an apiKey you can get it on the [Neoxr Api's](https://api.neoxr.my.id) with prices that vary according to your needs.
+>
+> + ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
 
-+ ```API_KEY``` : some of the features in this script use apikey, especially the downloader feature, to get an apiKey you can get it on the [Neoxr Api's](https://api.neoxr.my.id) with prices that vary according to your needs.
-
-+ ```DATABASE_URL``` : can be filled with mongo and postgresql URLs to use localdb just leave it blank and the data will be saved to the .json file.
-
-> Localdb is only for development state, for production state you must use a cloud database (mongo / postgres)
+> [!TIP]
+> Localdb is only for development stage, for production stage you must use a cloud database (mongo / postgres)
 
 ### High Level Spam Detection
 
 This program is equipped with a spam detector (anti-spam) which is very sensitive.
 
 ```Javascript
-const { Spam } = new(require('@neoxr/wb))
+const { Component } = require('@neoxr/wb')
+const { Spam } = new Component
 
 const spam = new Spam({
    RESET_TIMER: env.cooldown,
@@ -163,7 +180,7 @@ const spam = new Spam({
 
 const isSpam = spam.detection(client, m, {
    prefix, command, commands, users, cooldown,
-   show: 'all', // for logger in the terminal, choose 'all' or 'command-only'
+   show: 'all', // for logger in the terminal, choose : 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
    banned_times: users.ban_times
 })
 
@@ -199,14 +216,14 @@ with vscode it will be very easy to do recode and debugging scripts
 
 <p align="center"><img align="center" width="100%" src="https://telegra.ph/file/7e33c1e83a872f4f8d363.png" /></p>
 
-**Notes** :
-+ ```CLOVYR_APPNAME``` : application name on your clovyr
-
+> [!NOTE]
+> + ```CLOVYR_APPNAME``` : application name on your clovyr
+>
 > Specifically for the 2 configurations below, you must carry out an inspect element using a computer to get cookies and keep-alive links
-
-+ ```CLOVYR_URL``` : keep-alive link
-
-+ ```CLOVYR_COOKIE``` : cookie from clovyr
+>
+> + ```CLOVYR_URL``` : keep-alive link
+>
+> + ```CLOVYR_COOKIE``` : cookie from clovyr
 
 ### Pairing Code
 
@@ -355,4 +372,5 @@ event.async(m, { client, body, prefixes, groupMetadata, participants, users, cha
 
 Others please learn by yourself from other plugins.
 
-Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.
+> [!IMPORTANT]
+> Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.

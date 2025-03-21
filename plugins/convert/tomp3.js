@@ -1,8 +1,10 @@
-const { Converter } = new(require('@neoxr/wb'))
+const { Component } = require('@neoxr/wb')
+const { Converter } = new Component
 const { readFileSync: read, unlinkSync: remove, writeFileSync: create } = require('fs')
 const path = require('path')
 const { exec } = require('child_process')
 const { tmpdir } = require('os')
+
 exports.run = {
    usage: ['tomp3', 'tovn'],
    hidden: ['toaudio'],
@@ -53,7 +55,7 @@ exports.run = {
                      remove(result)
                   })
                })
-            } else if (/audio|video/.test(mime)) {   	
+            } else if (/audio|video/.test(mime)) {
                client.sendReact(m.chat, '🕒', m.key)
                const buff = await Converter.toAudio(await q.download(), 'mp3')
                if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m)

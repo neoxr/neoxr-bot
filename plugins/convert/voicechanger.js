@@ -1,6 +1,8 @@
-const { Converter } = new(require('@neoxr/wb'))
+const { Component } = require('@neoxr/wb')
+const { Converter } = new Component
 const fs = require('fs')
 const { exec } = require('child_process')
+
 exports.run = {
    usage: ['bass', 'blown', 'chipmunk', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth'],
    use: 'reply audio',

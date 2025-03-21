@@ -1,4 +1,7 @@
+const { Component } = require('@neoxr/wb')
+const { Version } = new Component
 const fs = require('fs')
+
 exports.run = {
    usage: ['menu', 'help', 'command'],
    async: async (m, {
@@ -17,7 +20,7 @@ exports.run = {
          const id = m.chat
          const local_size = fs.existsSync('./' + env.database + '.json') ? await Func.getSize(fs.statSync('./' + env.database + '.json').size) : ''
          const library = JSON.parse(require('fs').readFileSync('./package.json', 'utf-8'))
-         const message = setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? /mongo/.test(process.env.DATABASE_URL) ? 'MongoDB' : /postgre/.test(process.env.DATABASE_URL) ? 'PostgreSQL' : 'N/A' : `Local (${local_size})`)).replace('+version', (library.dependencies.bails ? library.dependencies.bails : library.dependencies['@adiwajshing/baileys'] ? '@adiwajshing/baileys' : library.dependencies.baileys).replace('^', '').replace('~', ''))
+         const message = setting.msg.replace('+tag', `@${m.sender.replace(/@.+/g, '')}`).replace('+name', m.pushName).replace('+greeting', Func.greeting()).replace('+db', (process.env.DATABASE_URL ? /mongo/.test(process.env.DATABASE_URL) ? 'Mongo' : /postgre/.test(process.env.DATABASE_URL) ? 'Postgres' : 'N/A' : `Local (${local_size})`)).replace('+module', Version).replace('+version', (library.dependencies.bails ? library.dependencies.bails : library.dependencies['@adiwajshing/baileys'] ? '@adiwajshing/baileys' : library.dependencies.baileys).replace('^', '').replace('~', ''))
          const style = setting.style
          if (style === 1) {
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
