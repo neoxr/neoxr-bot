@@ -3,16 +3,27 @@
 > An implementation of [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) which has been optimized to be lightweigth.  
 
 > [!CAUTION]
-> [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) >= **5.x** version has used **TypeScript** and to use it there are slight changes
+> [@neoxr/wb](https://www.npmjs.com/package/@neoxr/wb) >= **5.x** version has used **TypeScript** and to use it there are slight changes. It is recommended to re-download the script.
 
 ```Javascript
 // From this : ---
 const { Baileys, Converter, ... } = new (require('@neoxr/wb'))
+const client = new Baileys({
+   sf: 'session'
+   ...
+})
 
 // To this : ---
 const { Component } = require('@neoxr/wb')
 const { Baileys, Converter, ... } = new Component
+const client = new Baileys({
+   session: 'session'
+   ...
+})
 ```
+
+> [!WARNING]
+> "sf" option is deprecated use "session" instead
 
 ### External Session
 
