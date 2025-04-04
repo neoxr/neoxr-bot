@@ -1,5 +1,5 @@
 const { Component } = require('@neoxr/wb')
-const { Function: Func, Scraper, Cooldown, Spam, Store, Config: env } = new Component
+const { Function: Func, Scraper, Cooldown, Spam, Config: env } = new Component
 const cron = require('node-cron')
 const cooldown = new Cooldown(env.cooldown)
 const spam = new Spam({
@@ -13,8 +13,7 @@ const spam = new Spam({
 module.exports = async (client, ctx) => {
    var { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core, database } = ctx
    try {
-      // "Store" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
-      require('./lib/system/schema')(m, env), Store(store)
+      require('./lib/system/schema')(m, env)
       let groupSet = global.db.groups.find(v => v.jid === m.chat)
       let chats = global.db.chats.find(v => v.jid === m.chat)
       let users = global.db.users.find(v => v.jid === m.sender)
