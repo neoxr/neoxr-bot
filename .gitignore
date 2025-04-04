@@ -101,6 +101,7 @@ dist
 
 # Ignored component
 session/
+session_backup/*
 temp/
 data.*
 yarn.*
