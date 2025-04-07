@@ -1,5 +1,5 @@
 exports.run = {
-   usage: ['antidelete', 'antilink', 'antivirtex', 'autosticker', 'viewonce', 'left', 'filter', 'localonly', 'welcome'],
+   usage: ['antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'viewonce', 'left', 'filter', 'localonly', 'welcome'],
    use: 'on / off',
    category: 'admin tools',
    async: async (m, {
@@ -13,7 +13,7 @@ exports.run = {
       try {
          let setting = global.db.groups.find(v => v.jid == m.chat)
          let type = command.toLowerCase()
-         if (!isBotAdmin && /antilink|antivirtex|filter|localonly/.test(type)) return client.reply(m.chat, global.status.botAdmin, m)
+         if (!isBotAdmin && /antilink|antivirtex|filter|localonly|antitagsw/.test(type)) return client.reply(m.chat, global.status.botAdmin, m)
          if (!args || !args[0]) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
          let option = args[0].toLowerCase()
          let optionList = ['on', 'off']
