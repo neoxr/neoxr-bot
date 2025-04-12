@@ -34,7 +34,7 @@ const connect = async () => {
          session: session ? session(process.env.DATABASE_URL, 'session') : 'session',
          online: true,
          bypass_disappearing: true,
-         version: [2, 3000, 1020608496] // To see the latest version : https://wppconnect.io/whatsapp-versions/
+         version: [2, 3000, 1015901307] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       })
 
       /* starting to connect */
