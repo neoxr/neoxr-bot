@@ -2,7 +2,7 @@ exports.run = {
    usage: ['video'],
    hidden: ['playvid', 'playvideo'],
    use: 'query',
-   category: 'feature',
+   category: 'downloader',
    async: async (m, {
       client,
       text,
@@ -10,7 +10,6 @@ exports.run = {
       command,
       env,
       users,
-      Scraper,
       Func
    }) => {
       try {

@@ -14,6 +14,7 @@ exports.run = {
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'https://drive.google.com/file/d/1YTD7Ymux9puFNqu__5WPlYdFZHcGI3Wz/view?usp=drivesdk'), m)
+         client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/gdrive', {
             url: args[0]
          })

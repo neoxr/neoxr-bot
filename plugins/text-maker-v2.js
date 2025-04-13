@@ -11,7 +11,8 @@ exports.run = {
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'neoxr | bot'), m)
-         let [ text1, text2 ] = text.split`|`
+         let [text1, text2] = text.split`|`
+         if (!text1 || !text2) return client.reply(m.chat, Func.example(isPrefix, command, 'neoxr | bot'), m)
          if (text1.length > 10 || text2.length > 10) return client.reply(m.chat, Func.texted('bold', `🚩 Text is too long max 10 characters.`), m)
          let old = new Date()
          await client.sendReact(m.chat, '🕒', m.key)

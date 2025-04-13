@@ -19,12 +19,11 @@ exports.run = {
          })
          let old = new Date()
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-         for (let i = 0; i < json.data.length; i++) {
-            if (/jpg|mp4/.test(json.data[i].type)) {
-               client.sendFile(m.chat, json.data[i].url, `file.${json.data[i].type}`, '', m)
-               await Func.delay(1500)
-            } else if (json.data[i].type == 'gif') {
-               client.sendFile(m.chat, json.data[i].url, 'file.mp4', m, {
+         for (let v of json.data) {
+            if (/jpg|mp4/.test(v.type)) {
+               client.sendFile(m.chat, v.url, `file.${v.type}`, '', m)
+            } else if (/gif/.test(v.type)) {
+               client.sendFile(m.chat, v.url, 'file.mp4', '', m, {
                   gif: true
                })
             }

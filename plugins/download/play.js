@@ -9,8 +9,7 @@ exports.run = {
       command,
       users,
       env,
-      Func,
-      Scraper
+      Func
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
@@ -35,6 +34,8 @@ exports.run = {
             client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
                document: true,
                APIC: await Func.fetchBuffer(json.thumbnail)
+            }, {
+               jpegThumbnail: await Func.createThumb(json.thumbnail)
             })
          })
       } catch (e) {

@@ -5,14 +5,13 @@ exports.run = {
     client,
     command,
     isOwner,
-    env,
     blockList,
     Func
   }) => {
     if (command === 'listban') {
       const data = global.db.users.filter(v => v.banned)
       if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
-      let text = `乂 *L I S T B A N*\n\n`
+      let text = `乂  *L I S T B A N*\n\n`
       text += data.map((v, i) => {
         if (i == 0) {
           return `┌  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
@@ -27,16 +26,8 @@ exports.run = {
       if (!isOwner) return m.reply(global.status.owner)
       const data = global.db.users.filter(v => v.premium)
       if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
-      let text = `乂 *L I S T P R E M*\n\n`
-      text += data.map((v, i) => {
-        if (i == 0) {
-          return `┌  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
-        } else if (i == data.length - 1) {
-          return `└  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
-        } else {
-          return `│  ◦  @${client.decodeJid(v.jid).replace(/@.+/, '')}`
-        }
-      }).join('\n')
+      let text = `乂  *L I S T P R E M*\n\n`
+      text += data.map((v, i) => '   ┌ @' + client.decodeJid(v.jid).replace(/@.+/, '') + '\n   │ ' + Func.texted('bold', 'Hitstat') + ' : ' + Func.formatNumber(v.hit) + '\n   └ ' + Func.texted('bold', 'Expired') + ' : ' + Func.timeReverse(v.expired - new Date() * 1)).join`\n\n`
       m.reply(text + '\n\n' + global.footer)
     } else if (command === 'listblock') {
       if (blockList.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))

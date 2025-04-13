@@ -31,11 +31,10 @@ exports.run = {
                   })
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                   let text = `乂  *M E D I A F I R E*\n\n`
-                  text += '	◦  *Name* : ' + unescape(decode(json.data.filename)) + '\n'
+                  text += '	◦  *Name* : ' + unescape(decode(json.data.title)) + '\n'
                   text += '	◦  *Size* : ' + json.data.size + '\n'
                   text += '	◦  *Extension* : ' + json.data.extension + '\n'
-                  text += '	◦  *Mime* : ' + json.data.mime + '\n'
-                  text += '	◦  *Uploaded* : ' + json.data.uploaded + '\n\n'
+                  text += '	◦  *Mime* : ' + json.data.mime + '\n\n'
                   text += global.footer
                   const chSize = Func.sizeLimit(json.data.size, users.premium ? env.max_upload : env.max_upload_free)
                   const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${env.max_upload_free} MB and for premium users a maximum of ${env.max_upload} MB.`
@@ -44,7 +43,7 @@ exports.run = {
                      largeThumb: true,
                      thumbnail: 'https://telegra.ph/file/fcf56d646aa059af84126.jpg'
                   }).then(async () => {
-                     client.sendFile(m.chat, json.data.link, unescape(decode(json.data.filename)), '', m)
+                     client.sendFile(m.chat, json.data.url, unescape(decode(json.data.title)), '', m)
                   })
                })
             }

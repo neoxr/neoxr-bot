@@ -13,11 +13,7 @@ exports.run = {
          const json = await Api.neoxr('/asupan', {
             username: args[0] || Func.random([
                'itsbellefirst',
-               'aletaanovianda',
-               'faisafch',
-               '0rbby',
-               'cindyanastt',
-               'awaa.an'
+               'hosico_cat'
             ])
          })
          if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
@@ -27,11 +23,10 @@ exports.run = {
          caption += `	◦  *Likes* : ${Func.h2k(json.data.stats.digg_count)}\n`
          caption += `	◦  *Shares* : ${Func.h2k(json.data.stats.share_count)}\n`
          caption += `	◦  *Comments* : ${Func.h2k(json.data.stats.comment_count)}\n`
-         caption += `	◦  *Duration* : ${Func.toTime(json.data.duration)}\n`
-         caption += `	◦  *Sound* : ${json.data.music.title} - ${json.data.music.author}\n`
+         caption += `	◦  *Sound* : ${json.data.music.title} - ${json.data.music.authorName}\n`
          caption += `	◦  *Caption* : ${json.data.caption || '-'}\n\n`
          caption += global.footer
-         client.sendFile(m.chat, json.data.video, '', caption, m)
+         client.sendFile(m.chat, json.data.video.url, '', caption, m)
       } catch (e) {
          return client.reply(m.chat, Func.jsonFormat(e), m)
       }

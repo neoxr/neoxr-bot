@@ -44,6 +44,8 @@ exports.run = {
                   client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
                      document: true,
                      APIC: await Func.fetchBuffer(json.thumbnail)
+                  }, {
+                     jpegThumbnail: await Func.createThumb(json.thumbnail)
                   })
                })
             } else if (command === 'getmp4') {
@@ -76,6 +78,8 @@ exports.run = {
                }).then(async () => {
                   await client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
                      document: true
+                  }, {
+                     jpegThumbnail: await Func.createThumb(json.thumbnail)
                   })
                })
                client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
