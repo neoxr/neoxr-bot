@@ -35,6 +35,10 @@ const connect = async () => {
          online: true,
          bypass_disappearing: true,
          version: [2, 3000, 1021840494] // To see the latest version : https://wppconnect.io/whatsapp-versions/
+      }, {
+         shouldIgnoreJid: jid => {
+            return /(newsletter|bot)/.test(jid)
+         }
       })
 
       /* starting to connect */

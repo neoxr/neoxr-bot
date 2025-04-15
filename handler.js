@@ -95,6 +95,7 @@ module.exports = async (client, ctx) => {
          client.reply(m.chat, `You are back online after being offline for : ${Func.texted('bold', Func.toTime(new Date - users.afk))}\n\n• ${Func.texted('bold', 'Reason')}: ${users.afkReason ? users.afkReason : '-'}`, m)
          users.afk = -1
          users.afkReason = ''
+         users.afkObj = {}
       }
       cron.schedule('00 00 * * *', () => {
          setting.lastReset = new Date * 1
