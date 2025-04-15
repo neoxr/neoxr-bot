@@ -23,4 +23,6 @@ export declare class USyncQuery {
     withContactProtocol(): this;
     withStatusProtocol(): this;
     withDisappearingModeProtocol(): this;
+    withBotProfileProtocol(): this;
+    withLIDProtocol(): this;
 }
