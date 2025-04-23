@@ -5,17 +5,16 @@ exports.run = {
    async: async (m, {
       client,
       text,
-      isPrefix,
       command,
       participants,
       Func
    }) => {
-      let input = text ? text : m.quoted ? m.quoted.sender : m.mentionedJid.length > 0 ? m.mentioneJid[0] : false
+      const input = m?.mentionedJid?.[0] || m?.quoted?.sender || text
       if (!input) return client.reply(m.chat, Func.texted('bold', `🚩 Mention or reply chat target.`), m)
-      let p = await client.onWhatsApp(input.trim())
-      if (p.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid number.`), m)
-      let jid = client.decodeJid(p[0].jid)
-      let number = jid.replace(/@.+/, '')
+      const p = await client.onWhatsApp(input.trim())
+      if (!p.length) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid number.`), m)
+      const jid = client.decodeJid(p[0].jid)
+      const number = jid.replace(/@.+/, '')
       if (command == 'kick') {
          let member = participants.find(u => u.id == jid)
          if (!member) return client.reply(m.chat, Func.texted('bold', `🚩 @${number} already left or does not exist in this group.`), m)

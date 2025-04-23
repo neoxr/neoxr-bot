@@ -10,12 +10,12 @@ exports.run = {
       Func
    }) => {
       try {
-         let input = text ? text : m.quoted ? m.quoted.sender : m.mentionedJid.length > 0 ? m.mentioneJid[0] : false
+         const input = m?.mentionedJid?.[0] || m?.quoted?.sender || text
          if (!input) return client.reply(m.chat, Func.texted('bold', `🚩 Mention or reply chat target.`), m)
-         let p = await client.onWhatsApp(input.trim())
-         if (p.length == 0) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid number.`), m)
-         let jid = client.decodeJid(p[0].jid)
-         let number = jid.replace(/@.+/, '')
+         const p = await client.onWhatsApp(input.trim())
+         if (!p.length) return client.reply(m.chat, Func.texted('bold', `🚩 Invalid number.`), m)
+         const jid = client.decodeJid(p[0].jid)
+         const number = jid.replace(/@.+/, '')
          if (command == '+owner') { // add owner number
             let owners = global.db.setting.owners
             if (owners.includes(number)) return client.reply(m.chat, Func.texted('bold', `🚩 Target is already the owner.`), m)
@@ -43,7 +43,7 @@ exports.run = {
             client.updateBlockStatus(jid, 'unblock').then(res => m.reply(Func.jsonFormat(res)))
          } else if (command == 'ban') { // banned user
             let is_user = global.db.users
-            let is_owner = [client.decodeJid(client.user.id).split`@` [0], env.owner, ...global.db.setting.owners].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(jid)
+            let is_owner = [client.decodeJid(client.user.id).split`@`[0], env.owner, ...global.db.setting.owners].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(jid)
             if (!is_user.some(v => v.jid == jid)) return client.reply(m.chat, Func.texted('bold', `🚩 User data not found.`), m)
             if (is_owner) return client.reply(m.chat, Func.texted('bold', `🚩 Can't banned owner number.`), m)
             if (jid == client.decodeJid(client.user.id)) return client.reply(m.chat, Func.texted('bold', `🚩 ??`), m)
