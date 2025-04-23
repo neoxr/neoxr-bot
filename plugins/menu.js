@@ -65,7 +65,7 @@ exports.run = {
             client.sendMessageModify(m.chat, Func.Styles(print) + '\n\n' + global.footer, m, {
                ads: false,
                largeThumb: true,
-               thumbnail: setting.cover,
+               thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
          } else if (style === 2) {
@@ -119,7 +119,7 @@ exports.run = {
             client.sendMessageModify(m.chat, Func.Styles(print) + '\n\n' + global.footer, m, {
                ads: false,
                largeThumb: true,
-               thumbnail: setting.cover,
+               thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
          } else if (style === 3) {
@@ -173,7 +173,7 @@ exports.run = {
             client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
                ads: false,
                largeThumb: true,
-               thumbnail: setting.cover,
+               thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
          } else if (style === 4) {
@@ -236,7 +236,7 @@ exports.run = {
                client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
                   ads: false,
                   largeThumb: true,
-                  thumbnail: setting.cover,
+                  thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                   url: setting.link
                })
             }

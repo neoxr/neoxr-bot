@@ -21,7 +21,7 @@ exports.run = {
          client.sendMessageModify(m.chat, caption, m, {
             ads: false,
             largeThumb: true,
-            thumbnail: setting.cover
+            thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
          })
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)

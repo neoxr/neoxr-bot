@@ -36,7 +36,7 @@ exports.run = {
          const system = global.db.setting
          client.sendMessageModify(m.chat, statistic(Func, stats, system), m, {
             largeThumb: true,
-            thumbnail: setting.cover
+            thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
          })
       } catch (e) {
          client.reply(m.chat, Func.jsonFormat(e), m)
