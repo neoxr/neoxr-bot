@@ -311,7 +311,7 @@ exports.run = {
                   header: '',
                   content: print,
                   footer: global.footer,
-                  media: setting.cover
+                  media: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
                })
             }
          }

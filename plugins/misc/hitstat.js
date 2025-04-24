@@ -29,7 +29,7 @@ exports.run = {
       client.sendMessageModify(m.chat, teks, m, {
          ads: false,
          largeThumb: true,
-         thumbnail: setting.cover
+         thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
       })
    },
    error: false,

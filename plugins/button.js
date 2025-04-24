@@ -7,6 +7,7 @@ exports.run = {
       client,
       isPrefix,
       command,
+      setting,
       Func
    }) => {
       try {
@@ -39,7 +40,7 @@ exports.run = {
                   header: '',
                   content: 'Hi! @0',
                   footer: global.footer,
-                  media: global.db.setting.cover
+                  media: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                })
                break
 
@@ -80,7 +81,7 @@ exports.run = {
                }], m, {
                   text: 'Hi @0',
                   footer: global.footer,
-                  media: global.db.setting.cover, // video or image link
+                  media: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'), // video or image link
                   document: {
                      filename: 'neoxr-cover.jpg'
                   }
@@ -148,7 +149,7 @@ exports.run = {
                      extension: 'ppt'
                   },
                   body: 'WhatsApp Automation',
-                  thumbnail: global.db.setting.cover
+                  thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
                })
                break
          }
