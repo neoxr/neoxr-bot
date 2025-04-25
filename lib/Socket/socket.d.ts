@@ -25,8 +25,8 @@ export declare const makeSocket: (config: SocketConfig) => {
     signalRepository: import("../Types").SignalRepository;
     readonly user: import("../Types").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: BinaryNode, timeoutMs?: number) => Promise<BinaryNode>;
-    waitForMessage: <T_1>(msgId: string, timeoutMs?: number | undefined) => Promise<T_1>;
+    query: (node: BinaryNode, timeoutMs?: number) => Promise<any>;
+    waitForMessage: <T_1>(msgId: string, timeoutMs?: number | undefined) => Promise<any>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
     sendNode: (frame: BinaryNode) => Promise<void>;
@@ -38,6 +38,6 @@ export declare const makeSocket: (config: SocketConfig) => {
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     /** Waits for the connection to WA to reach a state */
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
-    sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
+    sendWAMBuffer: (wamBuffer: Buffer) => Promise<any>;
 };
 export type Socket = ReturnType<typeof makeSocket>;

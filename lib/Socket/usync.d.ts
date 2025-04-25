@@ -21,8 +21,8 @@ export declare const makeUSyncSocket: (config: SocketConfig) => {
     signalRepository: import("../Types").SignalRepository;
     user: import("../Types").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: BinaryNode, timeoutMs?: number | undefined) => Promise<BinaryNode>;
-    waitForMessage: <T_1>(msgId: string, timeoutMs?: number | undefined) => Promise<T_1>;
+    query: (node: BinaryNode, timeoutMs?: number | undefined) => Promise<any>;
+    waitForMessage: <T_1>(msgId: string, timeoutMs?: number | undefined) => Promise<any>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
     sendNode: (frame: BinaryNode) => Promise<void>;
@@ -33,5 +33,5 @@ export declare const makeUSyncSocket: (config: SocketConfig) => {
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
-    sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
+    sendWAMBuffer: (wamBuffer: Buffer) => Promise<any>;
 };

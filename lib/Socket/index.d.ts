@@ -24,7 +24,7 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
         to: string;
     }>;
     rejectCall: (callId: string, callFrom: string) => Promise<void>;
-    getPrivacyTokens: (jids: string[]) => Promise<import("../index").BinaryNode>;
+    getPrivacyTokens: (jids: string[]) => Promise<any>;
     assertSessions: (jids: string[], force: boolean) => Promise<boolean>;
     relayMessage: (jid: string, message: import("../Types").WAProto.IMessage, { messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, useCachedGroupMetadata, statusJidList }: import("../Types").MessageRelayOptions) => Promise<string>;
     sendReceipt: (jid: string, participant: string | undefined, messageIds: string[], type: import("../Types").MessageReceiptType) => Promise<void>;
@@ -89,7 +89,7 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
     groupInviteCode: (jid: string) => Promise<string | undefined>;
     groupRevokeInvite: (jid: string) => Promise<string | undefined>;
     groupAcceptInvite: (code: string) => Promise<string | undefined>;
-    groupAcceptInviteV4: (key: string | import("../Types").WAProto.IMessageKey, inviteMessage: import("../Types").WAProto.Message.IGroupInviteMessage) => Promise<string>;
+    groupAcceptInviteV4: (key: string | import("../Types").WAProto.IMessageKey, inviteMessage: import("../Types").WAProto.Message.IGroupInviteMessage) => Promise<any>;
     groupGetInviteInfo: (code: string) => Promise<import("../Types").GroupMetadata>;
     groupToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
     groupSettingUpdate: (jid: string, setting: "announcement" | "locked" | "not_announcement" | "unlocked") => Promise<void>;
@@ -157,8 +157,8 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
     signalRepository: import("../Types").SignalRepository;
     user: import("../Types").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: import("../index").BinaryNode, timeoutMs?: number | undefined) => Promise<import("../index").BinaryNode>;
-    waitForMessage: <T_2>(msgId: string, timeoutMs?: number | undefined) => Promise<T_2>;
+    query: (node: import("../index").BinaryNode, timeoutMs?: number | undefined) => Promise<any>;
+    waitForMessage: <T_2>(msgId: string, timeoutMs?: number | undefined) => Promise<any>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
     sendNode: (frame: import("../index").BinaryNode) => Promise<void>;
@@ -169,6 +169,6 @@ declare const makeWASocket: (config: UserFacingSocketConfig) => {
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
-    sendWAMBuffer: (wamBuffer: Buffer) => Promise<import("../index").BinaryNode>;
+    sendWAMBuffer: (wamBuffer: Buffer) => Promise<any>;
 };
 export default makeWASocket;

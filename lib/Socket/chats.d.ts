@@ -68,15 +68,10 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     signalRepository: import("../Types").SignalRepository;
     user: import("../Types").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: BinaryNode, timeoutMs?: number | undefined) => Promise<BinaryNode>;
-    waitForMessage: <T_2>(msgId: string, timeoutMs?: number | undefined) => Promise<T_2>;
+    query: (node: BinaryNode, timeoutMs?: number | undefined) => Promise<any>;
+    waitForMessage: <T_2>(msgId: string, timeoutMs?: number | undefined) => Promise<any>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
-    /**
-     * modify a chat -- mark unread, read etc.
-     * lastMessages must be sorted in reverse chronologically
-     * requires the last messages till the last message received; required for archive & unread
-    */
     sendNode: (frame: BinaryNode) => Promise<void>;
     logout: (msg?: string | undefined) => Promise<void>;
     end: (error: Error | undefined) => void;
@@ -85,5 +80,5 @@ export declare const makeChatsSocket: (config: SocketConfig) => {
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: string) => Promise<string>;
     waitForConnectionUpdate: (check: (u: Partial<import("../Types").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number | undefined) => Promise<void>;
-    sendWAMBuffer: (wamBuffer: Buffer) => Promise<BinaryNode>;
+    sendWAMBuffer: (wamBuffer: Buffer) => Promise<any>;
 };
