@@ -216,7 +216,6 @@ To run this bot on Heroku you only need to add 2 buildpacks and choose region EU
 
 delete the `package.json`, and rename `package-for-heroku.json` to `package.json`
 
-
 ### Run on Clovyr
 
 Clovyr is a free cloud compute with vscode based for running bot with specifications of 2 CPU and 4GB RAM (idk storage size)
@@ -266,6 +265,23 @@ $ pm2 start pm2.config.js
 ```
 
 > I don't know how to use Windows bacause I'm Linux user, so I didn't create files for installation on Windows :v
+
+### Install & Run Via Docker
+
+```bash
+$ sudo apt update -y && sudo apt install curl -y
+$ curl -fsSL https://get.docker.com | bash
+$ git clone https://github.com/neoxr/neoxr-bot
+$ cd neoxr-bot
+$ docker build -t bot .
+$ docker run -d --name neoxr bot && docker logs -f neoxr
+```
+
+How to stop ?
+
+```bash
+$ docker stop neoxr
+```
 
 ### Command Plugin
 
