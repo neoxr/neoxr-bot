@@ -64,7 +64,8 @@ const client = new Baileys({
 **Special Features & Benefit :**
 - Auto Download
 - Chatbot (Supp. Audio, Image, Video, etc)
-- 32 Mini Games
+- 30 Mini Games
+- RPG (Tournament, Battle Pet, Clan, etc)
 - Leveling & Roles
 - Email Verification
 - Send Email
