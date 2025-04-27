@@ -9,16 +9,20 @@ export type RequestJoinAction = 'created' | 'revoked' | 'rejected';
 export type RequestJoinMethod = 'invite_link' | 'linked_group_join' | 'non_admin_add' | undefined;
 export interface GroupMetadata {
     id: string;
+    addressingMode: string;
     owner: string | undefined;
     subject: string;
     /** group subject owner */
     subjectOwner?: string;
+    subjectOwnerPhoneNumber?: string;
     /** group subject modification date */
     subjectTime?: number;
     creation?: number;
     desc?: string;
     descOwner?: string;
+    descOwnerPhoneNumber?: string;
     descId?: string;
+    descTime?: number;
     /** if this group is part of a community, it returns the jid of the community to which it belongs */
     linkedParent?: string;
     /** is set when the group only allows admins to change group settings */

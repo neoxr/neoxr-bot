@@ -28,4 +28,6 @@ export declare const isJidGroup: (jid: string | undefined) => boolean | undefine
 export declare const isJidStatusBroadcast: (jid: string) => boolean;
 /** is the jid the newsletter */
 export declare const isJidNewsLetter: (jid: string | undefined) => boolean | undefined;
+/** is the jid the meta ai bot */
+export declare const isJidMetaIa: (jid: string | undefined) => boolean | undefined;
 export declare const jidNormalizedUser: (jid: string | undefined) => string;
