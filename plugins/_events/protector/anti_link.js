@@ -7,9 +7,11 @@ exports.run = {
       Func
    }) => {
       try {
+         const regex = /https?:\/\/(?:chat\.whatsapp\.com\/[A-Za-z0-9]+|whatsapp\.com\/channel\/[A-Za-z0-9]+|wa\.me\/\d+)/gi
+
          // delete link then kick when antilink is turned on
-         if (groupSet.antilink && !isAdmin && body) {
-            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || body.match(/(wa.me)/gi)) return client.sendMessage(m.chat, {
+         if (groupSet.antilink && !isAdmin) {
+            if ((body?.match(regex) || m?.msg?.name?.match(regex)) && !body?.includes(await client.groupInviteCode(m.chat))) return client.sendMessage(m.chat, {
                delete: {
                   remoteJid: m.chat,
                   fromMe: false,
@@ -20,8 +22,8 @@ exports.run = {
          }
          
          // it only removes the link when antilink turned off
-         if (!groupSet.antilink && !isAdmin && body) {
-            if (body.match(/(chat.whatsapp.com)/gi) && !body.includes(await client.groupInviteCode(m.chat)) || body.match(/(wa.me)/gi)) return client.sendMessage(m.chat, {
+         if (!groupSet.antilink && !isAdmin) {
+            if ((body?.match(regex) || m?.msg?.name?.match(regex)) && !body?.includes(await client.groupInviteCode(m.chat))) return client.sendMessage(m.chat, {
                delete: {
                   remoteJid: m.chat,
                   fromMe: false,
