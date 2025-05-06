@@ -1,0 +1,66 @@
+name: BUG Report - English
+title: "[BUG] "
+description: Use this template to report an issue
+labels: [bug]
+body:
+  
+  - type: input
+    id: baileys-version
+    attributes:
+      label: Version of @neoxr/baileys
+      description: Enter the version of the @neoxr/baileys package you are using.
+      placeholder: 1.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: neoxr-wb-version
+    attributes:
+      label: Version of @neoxr/wb
+      description: Enter the version of the @neoxr/wb package you are using.
+      placeholder: 1.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: nodejs-version
+    attributes:
+      label: NodeJS Version
+      description: Enter the version of NodeJS you are using.
+      placeholder: 1.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: Enter the server operating system you are using.
+      placeholder: Linux Ubuntu 22
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: |
+        Describe the issue you're facing. You may attach log files or screenshots if needed.
+      placeholder: Describe the issue in detail here...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I am using the latest version.
+        - label: I have checked the documentation and found no answer.
+          required: true
+        - label: I have searched existing issues to ensure this is not a duplicate.
+          required: true
+        - label: I have provided sufficient information.
+          required: true
+        - label: If my report lacks clarity, I understand it might not receive a response.
+          required: true

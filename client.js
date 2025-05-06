@@ -20,7 +20,6 @@ const connect = async () => {
             ? require('@session/postgres').usePostgresAuthState
             : null
 
-
       // Documentation : https://github.com/neoxr/database
       const database = await ((process?.env?.DATABASE_URL && /mongo/.test(process.env.DATABASE_URL))
          ? require('@database/mongo').createDatabase(process.env.DATABASE_URL, env.database, 'database')
@@ -34,7 +33,7 @@ const connect = async () => {
          session: session ? session(process.env.DATABASE_URL, 'session') : 'session',
          online: true,
          bypass_disappearing: true,
-         version: [2, 3000, 1021840494] // To see the latest version : https://wppconnect.io/whatsapp-versions/
+         version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
          shouldIgnoreJid: jid => {
             return /(newsletter|bot)/.test(jid)
