@@ -1,4 +1,3 @@
-const axios = require('axios')
 exports.run = {
    regex: /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/,
    async: async (m, {
@@ -6,10 +5,7 @@ exports.run = {
       body,
       users,
       env,
-      setting,
-      prefixes,
-      Func,
-      Scraper
+      Func
    }) => {
       try {
          const regex = /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/;
@@ -27,7 +23,18 @@ exports.run = {
                let old = new Date()
                Func.hitstat('ytmp4', m.sender)
                links.map(async link => {
-                  const json = await Scraper.youtube(link, 'video')
+                  var json = await Api.neoxr('/youtube', {
+                     url: link,
+                     type: 'video',
+                     quality: '720p'
+                  })
+                  if (!json.status) {
+                     var json = await Api.neoxr('/youtube', {
+                        url: link,
+                        type: 'video',
+                        quality: '480p'
+                     })
+                  }
                   if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
                   let caption = `乂  *Y T - M P 4*\n\n`
                   caption += `	◦  *Title* : ${json.title}\n`
