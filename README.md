@@ -103,7 +103,9 @@ const client = new Baileys({
 > 32 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 > [!IMPORTANT]
-> **Creator / Group** : [Wildan Izzudin](https://wa.me/p/6124894997634330/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
+> **Creator / Group** : [Ferdy firanda](
+https://wa.me/6283137119847)
+> 
 
 ### Requirements
 
@@ -131,8 +133,8 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
 
 ```Javascript
 {
-   "owner": "6285887776722",
-   "owner_name": "Wildan Izzudin",
+   "owner": "6283152441868",
+   "owner_name": "Ferdy firanda",
    "database": "data",
    "limit": 15,
    "ram_limit": "900mb",
@@ -148,8 +150,8 @@ There are 2 configuration files namely ```.env``` and ```config.json```, adjust 
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true, // "true" if you want to use the pairing code
-      "number": 62xxxx // start number with country code
-   }
+   "number": 6283152441868//
+start number with country code   }
 }
 ```
 
