@@ -73,9 +73,6 @@ export declare const makeRegistrationSocket: (config: SocketConfig) => {
     groupMetadata: (jid: string) => Promise<import("../Types").GroupMetadata>;
     groupCreate: (subject: string, participants: string[]) => Promise<import("../Types").GroupMetadata>;
     groupLeave: (id: string) => Promise<void>;
-    /** the network code of your mobile network
-     * @see {@link https://de.wikipedia.org/wiki/Mobile_Network_Code}
-     */
     groupUpdateSubject: (jid: string, subject: string) => Promise<void>;
     groupRequestParticipantsList: (jid: string) => Promise<{
         [key: string]: string;
