@@ -72,9 +72,9 @@ const client = new Baileys({
 - Cloud Storage
 - Menfess w/ Session
 - Store Plugin (Product)
-- Jadibot (Auto Connect)
+- Bot Hosting (Jadibot Auto Reconnect)
 - Mistery Box
-- Plugins Model (CJS)
+- Plugin Model (CJS)
 - High Optimation
 - Free Updates
 - Bonus ApiKey 100K Request (for 1 year)
@@ -101,7 +101,7 @@ const client = new Baileys({
 
 🏷️ Game Plugins (**+Rp. 70.000 / +$9.80**)
 
-> 32 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
+> 30 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 > [!IMPORTANT]
 > **Creator / Group / Channel** : [Wildan Izzudin](https://wa.me/p/6124894997634330/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff) / [Update Notifier](https://www.whatsapp.com/channel/0029Vb5ekjf4dTnMuADBHX1j)
