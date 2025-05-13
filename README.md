@@ -63,7 +63,7 @@ const client = new Baileys({
 
 **Special Features & Benefit :**
 - Auto Download
-- Chatbot (Supp. Audio, Image, Video, etc)
+- Chatbot + Logic (Supp. Audio, Image, Video, etc)
 - 30 Mini Games
 - RPG (Tournament, Battle Pet, Clan, etc)
 - Leveling & Roles
@@ -74,6 +74,7 @@ const client = new Baileys({
 - Store Plugin (Product)
 - Jadibot (Auto Connect)
 - Mistery Box
+- Plugins Model (CJS)
 - High Optimation
 - Free Updates
 - Bonus ApiKey 100K Request (for 1 year)
@@ -103,7 +104,7 @@ const client = new Baileys({
 > 32 plugin game yang semuanya tanpa menggunakan api dan tanpa di enskripsi, dengan ini ada tambahan update schema, profile, rank, pocket, dll.
 
 > [!IMPORTANT]
-> **Creator / Group** : [Wildan Izzudin](https://wa.me/p/6124894997634330/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff)
+> **Creator / Group / Channel** : [Wildan Izzudin](https://wa.me/p/6124894997634330/6285887776722) / [Chatbot](https://chat.whatsapp.com/D4OaImtQwH48CtlR0yt4Ff) / [Update Notifier](https://www.whatsapp.com/channel/0029Vb5ekjf4dTnMuADBHX1j)
 
 ### Requirements
 
