@@ -34,12 +34,15 @@ exports.run = {
             })
             if (!json.status) return client.reply(m.chat, global.status.fail, m)
             for (let i = 0; i < 5; i++) {
-               var rand = Math.floor(json.data.length * Math.random())
+               const index = Math.floor(json.data.length * Math.random())
+               const url = json.data[index].url
+               const fn = await Func.getFile(url)
+               if (!fn?.status || (fn?.status && !/image\/(png|jpe?g)/i.test(fn.mime))) continue
                let caption = `乂  *G O O G L E - I M A G E*\n\n`
-               caption += `	◦ *Title* : ${json.data[i].origin.title}\n`
-               caption += `	◦ *Dimensions* : ${json.data[i].width} × ${json.data[i].height}\n\n`
+               caption += `	◦ *Title* : ${json.data[index].origin.title}\n`
+               caption += `	◦ *Dimensions* : ${json.data[index].width} × ${json.data[index].height}\n\n`
                caption += global.footer
-               client.sendFile(m.chat, json.data[rand].url, '', caption, m)
+               client.sendFile(m.chat, url, '', caption, m)
                await Func.delay(2500)
             }
          }
