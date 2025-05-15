@@ -32,7 +32,7 @@
       "@neoxr/wb": "^5.7.13",
       "@session/mongo": "github:neoxr/session#mongo",
       "@session/postgres": "github:neoxr/session#postgresql",
-      "cfonts": "3.1.1",
+      "cfonts": "3.3.0",
       "html-entities": "^2.5.2",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
