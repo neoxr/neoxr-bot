@@ -9,7 +9,7 @@ export type RequestJoinAction = 'created' | 'revoked' | 'rejected';
 export type RequestJoinMethod = 'invite_link' | 'linked_group_join' | 'non_admin_add' | undefined;
 export interface GroupMetadata {
     id: string;
-    addressingMode: string;
+    addressingMode: "pn" | "lid";
     owner: string | undefined;
     subject: string;
     /** group subject owner */
