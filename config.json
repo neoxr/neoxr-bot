@@ -15,7 +15,7 @@
    "blocks": ["994", "91", "92"],
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
-      "state": false,
+      "state": true,
       "number": 6282258694977
    }
 }
