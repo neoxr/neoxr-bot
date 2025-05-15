@@ -12,6 +12,7 @@ export declare const Browsers: {
     /** The appropriate browser based on your OS & release */
     appropriate: (browser: any) => [string, string, string];
 };
+export declare const getPlatformId: (browser: string) => any;
 export declare const BufferJSON: {
     replacer: (k: any, value: any) => any;
     reviver: (_: any, value: any) => any;
