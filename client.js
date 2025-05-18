@@ -4,6 +4,7 @@ require('events').EventEmitter.defaultMaxListeners = 500
 const { Component } = require('@neoxr/wb')
 const { Baileys, Function: Func, Config: env } = new Component
 require('./lib/system/functions'), require('./lib/system/scraper'), require('./lib/system/config')
+const cron = require('node-cron')
 const fs = require('fs')
 const colors = require('@colors/colors')
 const { NodeCache } = require('@cacheable/node-cache')
@@ -35,7 +36,7 @@ const connect = async () => {
          bypass_disappearing: true,
          bot: id => {
             // Detect message from bot by message ID, you can add another logic here
-            return (id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE')|| /[-]/.test(id)
+            return (id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id)
          },
          version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
@@ -88,6 +89,15 @@ const connect = async () => {
          setInterval(async () => {
             if (global.db) await database.save(global.db)
          }, 60 * 1000 * 5)
+
+         /* backup database every day at 12:00 PM (send .json file to owner) */
+         cron.schedule('0 12 * * *', async () => {
+            if (global?.db?.setting?.autobackup) {
+               await database.save(global.db)
+               fs.writeFileSync(env.database + '.json', JSON.stringify(global.db, null, 3), 'utf-8')
+               await client.sock.sendFile(env.owner + '@s.whatsapp.net', fs.readFileSync('./' + env.database + '.json'), env.database + '.json', '', null)
+            }
+         })
       })
 
       /* print all message object */

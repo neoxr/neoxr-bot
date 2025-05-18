@@ -62,7 +62,8 @@ const statistic = (Func, stats, system) => {
 
  –  *S Y S T E M*
 
-┌  ◦  ${Func.texted('bold', system.autodownload ? '[ √ ]' : '[ × ]')}  Auto Download
+┌  ◦  ${Func.texted('bold', system.autobackup ? '[ √ ]' : '[ × ]')}  Auto Backup
+│  ◦  ${Func.texted('bold', system.autodownload ? '[ √ ]' : '[ × ]')}  Auto Download
 │  ◦  ${Func.texted('bold', system.antispam ? '[ √ ]' : '[ × ]')}  Anti Spam
 │  ◦  ${Func.texted('bold', system.debug ? '[ √ ]' : '[ × ]')}  Debug Mode
 │  ◦  ${Func.texted('bold', system.groupmode ? '[ √ ]' : '[ × ]')}  Group Mode
@@ -87,6 +88,7 @@ ${global.footer}`
 
 乂  *S Y S T E M*
 
+	◦  ${Func.texted('bold', system.autobackup ? '[ √ ]' : '[ × ]')}  Auto Backup
 	◦  ${Func.texted('bold', system.autodownload ? '[ √ ]' : '[ × ]')}  Auto Download
 	◦  ${Func.texted('bold', system.antispam ? '[ √ ]' : '[ × ]')}  Anti Spam
 	◦  ${Func.texted('bold', system.debug ? '[ √ ]' : '[ × ]')}  Debug Mode
