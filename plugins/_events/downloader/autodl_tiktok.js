@@ -13,7 +13,7 @@ exports.run = {
          const regex = /^(?:https?:\/\/)?(?:www\.|vt\.|vm\.|t\.)?(?:tiktok\.com\/)(?:\S+)?$/;
          const extract = body ? Func.generateLink(body) : null
          if (extract) {
-            const links = extract.filter(v => Func.ttFixed(v).match(regex))
+            const links = extract.filter(v => Func.ttFixed(v).match(regex) && !/tiktoklite/i.test(v))
             if (links.length != 0) {
                if (users.limit > 0) {
                   let limit = 1

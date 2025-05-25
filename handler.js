@@ -221,7 +221,7 @@ module.exports = async (client, ctx) => {
             if (event.botAdmin && !isBotAdmin) continue
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue
-            if (event.download && (!setting.autodownload || (body && env.evaluate_chars.some(v => body.startsWith(v))))) continue
+            if (event.download && body && Func.socmed(body) && !setting.autodownload && Func.generateLink(body) && Func.generateLink(body).some(v => Func.socmed(v))) continue
             event.async(m, { client, body, prefixes, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, env, ctx, store, database, Func, Scraper })
          }
       }
