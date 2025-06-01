@@ -142,10 +142,10 @@ const connect = async () => {
          try {
             var pic = await sock.profilePictureUrl(ctx.member, 'image')
             if (!pic) {
-               var pic = 'https://qu.ax/uPqo.jpg'
+               var pic = fs.readFileSync('./media/image/default.jpg')
             }
          } catch {
-            var pic = 'https://qu.ax/uPqo.jpg'
+            var pic = fs.readFileSync('./media/image/default.jpg')
          }
 
          /* localonly to remove new member when the number not from indonesia */
@@ -173,10 +173,10 @@ const connect = async () => {
          try {
             var pic = await sock.profilePictureUrl(ctx.member, 'image')
             if (!pic) {
-               var pic = 'https://qu.ax/uPqo.jpg'
+               var pic = fs.readFileSync('./media/image/default.jpg')
             }
          } catch {
-            var pic = 'https://qu.ax/uPqo.jpg'
+            var pic = fs.readFileSync('./media/image/default.jpg')
          }
          const txt = (groupSet && groupSet.text_left ? groupSet.text_left : text).replace('+tag', `@${ctx.member.split`@`[0]}`).replace('+grup', `${ctx.subject}`)
          if (groupSet && groupSet.left) sock.sendMessageModify(ctx.jid, txt, null, {
