@@ -36,20 +36,6 @@ module.exports = async (client, ctx) => {
       // exception disabled plugin
       var plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
 
-      // stories reaction
-      client.storyJid = client.storyJid ? client.storyJid : []
-      if (m.chat.endsWith('broadcast') && !client.storyJid.includes(m.sender) && m.sender != client.decodeJid(client.user.id)) client.storyJid.push(m.sender)
-      if (m.chat.endsWith('broadcast') && [...new Set(client.storyJid)].includes(m.sender) && !/protocol/.test(m.mtype)) {
-         await client.sendMessage('status@broadcast', {
-            react: {
-               text: Func.random(['🤣', '🥹', '😂', '😋', '😎', '🤓', '🤪', '🥳', '😠', '😱', '🤔']),
-               key: m.key
-            }
-         }, {
-            statusJidList: [m.sender]
-         })
-      }
-
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
          client.sendPresenceUpdate('available', m.chat)

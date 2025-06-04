@@ -106,6 +106,18 @@ const connect = async () => {
          require('./lib/system/baileys')(client.sock)
       })
 
+      /* stories reaction */
+      client.register('stories', async ctx => {
+         if (ctx.message.key && ctx.sender !== client.sock.decodeJid(client.sock.user.id)) await client.sock.sendMessage('status@broadcast', {
+            react: {
+               text: Func.random(['🤣', '🥹', '😂', '😋', '😎', '🤓', '🤪', '🥳', '😠', '😱', '🤔']),
+               key: ctx.message.key
+            }
+         }, {
+            statusJidList: [ctx.sender]
+         })
+      })
+
       /* print deleted message object */
       client.register('message.delete', ctx => {
          const sock = client.sock
