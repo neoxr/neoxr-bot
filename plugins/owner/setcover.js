@@ -32,9 +32,10 @@ exports.run = {
  * Crops an image buffer to a specified landscape aspect ratio.
  * @param {Buffer} inputBuffer - The input image buffer.
  * @param {number} aspectRatio - The desired aspect ratio (default is 16:9).
+ * @param {Buffer} quality - Image quality. (default is 50)
  * @returns {Promise<Buffer>} - The cropped image buffer.
  */
-const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9) => {
+const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9, quality = 50) => {
    try {
       const image = await Jimp.read(inputBuffer)
       const { width, height } = image.bitmap
@@ -54,6 +55,9 @@ const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9) => {
       const y = Math.floor((height - cropHeight) / 2)
 
       image.crop(x, y, cropWidth, cropHeight)
+
+      // Tambahkan kompresi JPEG (semakin kecil, semakin terkompres)
+      image.quality(quality) // default: 100
 
       const outputBuffer = await image.getBufferAsync(Jimp.MIME_JPEG)
       return outputBuffer
