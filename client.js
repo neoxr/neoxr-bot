@@ -36,7 +36,7 @@ const connect = async () => {
          bypass_disappearing: true,
          bot: id => {
             // Detect message from bot by message ID, you can add another logic here
-            return id && (id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id)
+            return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
          },
          version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
