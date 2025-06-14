@@ -36,7 +36,7 @@
       "html-entities": "^2.5.2",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
-      "qrcode": "1.5.0",
+      "qrcode": "1.5.4",
       "speedtest-net": "1.6.2",
       "streamifier": "^0.1.1",
       "translate-google-api": "1.0.4"
