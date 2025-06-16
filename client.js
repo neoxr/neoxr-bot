@@ -40,7 +40,7 @@ const connect = async () => {
          },
          version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
-         browser: ['Ubuntu', 'Chrome', '22.04.4'],
+         browser: ['Windows', 'Chrome', '137.0.7151.107'],
          shouldIgnoreJid: jid => {
             return /(newsletter|bot)/.test(jid)
          }
