@@ -9,6 +9,10 @@ const spam = new Spam({
    NOTIFY_THRESHOLD: env.notify_threshold,
    BANNED_THRESHOLD: env.banned_threshold
 })
+const { NodeCache } = require('@cacheable/node-cache')
+const cache = new NodeCache({
+   checkPeriod: 1
+})
 
 module.exports = async (client, ctx) => {
    var { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core, database } = ctx
@@ -26,6 +30,12 @@ module.exports = async (client, ctx) => {
       let isAdmin = m.isGroup ? adminList.includes(m.sender) : false
       let isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
       let blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
+
+      // prevent duplicate messages
+      if (m?.id && cache.has(m.id)) return
+      if (m?.id) {
+         cache.set(m.id, true, 5 * 60) // store message ID with a 5 mins TTL
+      }
 
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
