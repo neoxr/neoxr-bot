@@ -44,6 +44,11 @@ const client = new Baileys({
    plugsdir: 'plugins',
    session: useMongoAuthState(process.env.DATABASE_URL, 'session'), // like this
    online: true,
+   bot: id => {
+      // Detect message from bot by message ID, you can add another logic here
+      return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
+   },
+   code: '', // Custom pairing code 8 chars (e.g: NEOXRBOT)
    bypass_disappearing: true,
    version: [2, 3000, 1017531287]
 })

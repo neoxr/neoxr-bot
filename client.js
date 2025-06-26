@@ -1,6 +1,6 @@
 "use strict";
 // process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-require('events').EventEmitter.defaultMaxListeners = 500
+require('./error'), require('events').EventEmitter.defaultMaxListeners = 500
 const { Component } = require('@neoxr/wb')
 const { Baileys, Function: Func, Config: env } = new Component
 require('./lib/system/functions'), require('./lib/system/scraper'), require('./lib/system/config')
@@ -38,6 +38,7 @@ const connect = async () => {
             // Detect message from bot by message ID, you can add another logic here
             return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
          },
+         code: '', // Custom pairing code 8 chars (e.g: NEOXRBOT)
          version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
          browser: ['Windows', 'Chrome', '137.0.7151.107'],
