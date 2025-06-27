@@ -10,6 +10,9 @@ const unhandledRejections = new Map()
 
 process.on('unhandledRejection', (reason, promise) => {
    unhandledRejections.set(promise, reason)
+   if (reason?.message?.includes('Timed')) return
+   console.error(colors.red(`Unhandled rejection detected: ${reason}`))
+   setTimeout(() => process.exit(1), 100)
 })
 
 process.on('rejectionHandled', promise => {
