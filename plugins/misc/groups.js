@@ -1,6 +1,6 @@
 const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
 const { models } = require('../../lib/system/models')
+
 exports.run = {
    usage: ['groups'],
    category: 'miscs',
@@ -9,27 +9,49 @@ exports.run = {
       isPrefix,
       Func
    }) => {
-      let groupList = async () => Object.entries(await client.groupFetchAllParticipating()).slice(0).map(entry => entry[1])
-      let groups = await groupList()
-      let rows = []
-      let caption = `乂  *G R O U P - L I S T*\n\n`
-      caption += `*“Bot has joined into ${groups.length} groups, send _${isPrefix}gc_ or _${isPrefix}gcopt_ to show all setup options.”*\n\n`
-      groups.map((x, i) => {
-         let v = global.db.groups.find(v => v.jid == x.id)
-         if (v) {
-            caption += `›  *${(i + 1)}.* ${x.subject}\n`
-            caption += `   *💳* : ${x.id.split`@`[0]}\n`
-            caption += `${v.stay ? '   FOREVER' : (v.expired == 0 ? '   NOT SET' : '   ' + Func.timeReverse(v.expired - new Date() * 1))} | ${x.participants.length} | ${(v.mute ? 'OFF' : 'ON')} | ${moment(v.activity).format('DD/MM/YY HH:mm:ss')}\n\n`
+      let group = global.db.groups
+      if (!group) group = []
+
+      const participatingGroups = Object.values(await client.groupFetchAllParticipating())
+
+      const groupDetails = participatingGroups.map((_group, i) => {
+         const { id, subject, participants } = _group
+         let entry = group.find(g => g.jid === id)
+
+         if (entry) {
+            const expiryStatus = entry.stay ? 'FOREVER' : (entry.expired == 0 ? 'NOT SET' : '' + Func.timeReverse(entry.expired - new Date() * 1))
+            const memberCount = participants.length
+            const muteStatus = entry.mute ? 'OFF' : 'ON'
+            const lastActivity = moment(entry.activity).format('DD/MM/YY HH:mm:ss')
+
+            return (
+               `›  *${i + 1}.* ${subject}\n` +
+               `   *💳* : ${id.split('@')[0]}\n` +
+               `   ${expiryStatus} | ${memberCount} | ${muteStatus} | ${lastActivity}`
+            )
          } else {
-            global.db.groups.push({
-               jid: x.id,
-               ...(models?.groups || {})
-            })
+            const newEntry = {
+               jid: id,
+               ...models.groups
+            }
+            group.push(newEntry)
+
+            return (
+               `›  *${i + 1}.* ${subject}\n` +
+               `   *💳* : ${id.split('@')[0]}\n` +
+               `   *✅ NEW - Added to database, details will show on next run.*`
+            )
          }
-      })
-      caption += `${global.footer}`
+      }).join('\n\n')
+
+      let caption = `乂  *G R O U P - L I S T*\n\n`
+      caption += `*“Bot has joined ${participatingGroups.length} groups, send _${isPrefix}gc_ or _${isPrefix}gcopt_ to show all setup options.”*\n\n`
+      caption += groupDetails
+      caption += `\n\n${global.footer}`
+
       m.reply(caption)
    },
    cache: true,
+   owner: true,
    location: __filename
 }
