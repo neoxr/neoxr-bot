@@ -29,7 +29,7 @@
       "@colors/colors": "^1.6.0",
       "@database/mongo": "github:neoxr/database#mongo",
       "@database/postgres": "github:neoxr/database#postgresql",
-      "@neoxr/wb": "^5.10.7",
+      "@neoxr/wb": "^5.10.8",
       "@session/mongo": "github:neoxr/session#mongo",
       "@session/postgres": "github:neoxr/session#postgresql",
       "cfonts": "3.1.1",
