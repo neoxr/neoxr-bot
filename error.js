@@ -16,7 +16,7 @@ const unhandledRejections = new Map()
 
 process.on('unhandledRejection', (reason, promise) => {
    unhandledRejections.set(promise, reason)
-   if (reason?.message?.includes('Timed') || reason?.message?.includes('ENOENT')) return
+   if (reason?.message?.includes('Timed') || reason?.message?.includes('SessionError') || reason?.message?.includes('ENOENT')) return
    const date = moment(Date.now()).format('DD/MM/YY HH:mm:ss')
    console.log(chalk.black(chalk.bgRed(` Rejection `)), chalk.black(chalk.bgBlue(` ${date} `)), ':', colors.gray(reason))
    setTimeout(() => process.exit(1), 100)
