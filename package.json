@@ -42,6 +42,6 @@
       "translate-google-api": "1.0.4"
    },
    "devDependencies": {
-      "css-select": "5.1.0"
+      "css-select": "6.0.0"
    }
 }
