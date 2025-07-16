@@ -107,8 +107,8 @@ module.exports = async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
-      if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && !isOwner) return client.reply(m.chat, Func.texted('bold', `🚩 ${isSpam.msg}`), m)
-      if (setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) return
+      // if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && !isOwner) return client.reply(m.chat, Func.texted('bold', `🚩 ${isSpam.msg}`), m)
+      // if (setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) return
       // if (body && !setting.self && !setting.noprefix && !core.corePrefix.includes(core.prefix) && commands.includes(core.command) && !env.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Prefix needed!*, this bot uses prefix : *[ ${setting.multiprefix ? setting.prefix.join(', ') : setting.onlyprefix} ]*\n\n➠ ${setting.multiprefix ? setting.prefix[0] : setting.onlyprefix}${core.command} ${text || ''}`, m)
       if (body && !setting.self && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !env.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
       const matcher = Func.matcher(command, commands).filter(v => v.accuracy >= 60)
@@ -142,6 +142,11 @@ module.exports = async (client, ctx) => {
             }
             if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < env.timeout)) continue
             if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
+            if (!cmd.exception && setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && !isOwner) {
+               client.reply(m.chat, Func.texted('bold', `🚩 ${isSpam.msg}`), m)
+               continue
+            }
+            if (!cmd.exception && setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) continue
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
@@ -202,6 +207,11 @@ module.exports = async (client, ctx) => {
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg'),
                url: setting.link
             }).then(() => chats.lastchat = new Date() * 1)
+            if (!event.exception && setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && isOwner) {
+               client.reply(m.chat, Func.texted('bold', `🚩 ${isSpam.msg}`), m)
+               continue
+            }
+            if (!event.exception && setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) continue
             if (event.error) continue
             if (event.owner && !isOwner) continue
             if (event.group && !m.isGroup) continue

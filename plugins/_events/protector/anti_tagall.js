@@ -14,6 +14,7 @@ exports.run = {
    error: false,
    group: true,
    botAdmin: true,
+   exception: true,
    cache: true,
    location: __filename
 }
