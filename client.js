@@ -39,7 +39,7 @@ const connect = async () => {
             return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
          },
          code: '', // Custom pairing code 8 chars (e.g: NEOXRBOT)
-         version: [2, 3000, 1022545672] // To see the latest version : https://wppconnect.io/whatsapp-versions/
+         version: [2, 3000, 1023223821] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
          browser: ['Windows', 'Chrome', '137.0.7151.107'],
          shouldIgnoreJid: jid => {
