@@ -1,4 +1,5 @@
 const axios = require('axios')
+
 exports.run = {
    usage: ['qc'],
    use: 'text',
@@ -8,16 +9,16 @@ exports.run = {
       text,
       isPrefix,
       command,
+      setting: exif,
       Func
    }) => {
       try {
          if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Hi!'), m)
          if (text.length > 30) return client.reply(m.chat, Func.texted('bold', `🚩 Max 30 character.`), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const exif = global.db.setting
-         var pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
+         let pic = await client.profilePictureUrl(m.quoted ? m.quoted.sender : m.sender, 'image')
          if (!pic) {
-            var pic = 'https://i.ibb.co/nsDv3ZJ/image.jpg'
+            pic = 'https://i.ibb.co/nsDv3ZJ/image.jpg'
          }
          const json = {
             "type": "quote",
@@ -40,11 +41,11 @@ exports.run = {
                "replyMessage": {}
             }]
          }
-         const result = await axios.post('https://s.neoxr.eu/api/generate', json, {
+         const result = await (await axios.post('https://s.neoxr.eu/api/generate', json, {
             headers: {
                'Content-Type': 'application/json'
             }
-         })
+         })).data
          const buffer = Buffer.from(result.data.image, 'base64')
          client.sendSticker(m.chat, buffer, m, {
             packname: exif.sk_pack,
