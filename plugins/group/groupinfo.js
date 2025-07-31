@@ -7,21 +7,21 @@ exports.run = {
    async: async (m, {
       client,
       participants,
+      groupSet: setting,
       Func
    }) => {
       try {
-         let setting = global.db.groups.find(v => v.jid == m.chat)
-         var pic = await Func.fetchBuffer('./media/image/default.jpg')
-         let meta = await (await client.groupMetadata(m.chat))
-         let admin = await client.groupAdmin(m.chat)
-         let member = participants.map(u => u.id)
-         var pic = await client.profilePictureUrl(m.chat, 'image')
+         const meta = await (await client.groupMetadata(m.chat))
+         const creator = (meta?.owner?.endsWith('lid') ? meta?.ownerJid : meta.owner)?.replace(/@.+/, '')
+         const admin = await client.groupAdmin(m.chat)
+         const member = participants.map(u => u.id)
+         let pic = await client.profilePictureUrl(m.chat, 'image')
          let caption = `乂  *G R O U P - I N F O*\n\n`
          caption += `	◦  *Name* : ${meta.subject}\n`
          caption += `	◦  *Member* : ${member.length}\n`
          caption += `	◦  *Admin* : ${admin.length}\n`
          caption += `	◦  *Created* : ${moment(meta.creation * 1000).format('DD/MM/YY HH:mm:ss')}\n`
-         caption += `	◦  *Owner* : ${meta.owner ? '@' + meta.owner.split('@')[0] : m.chat.match('-') ? '@' + m.chat.split('-')[0] : ''}\n\n`
+         caption += `	◦  *Owner* : ${creator ? '@' + creator : '-'}\n\n`
          caption += `乂  *M O D E R A T I O N*\n\n`
          caption += `	◦  ${Func.switcher(setting.antidelete, '[ √ ]', '[ × ]')} Anti Delete\n`
          caption += `	◦  ${Func.switcher(setting.antilink, '[ √ ]', '[ × ]')} Anti Link\n`
