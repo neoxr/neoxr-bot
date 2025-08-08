@@ -134,15 +134,21 @@ const connect = async () => {
       client.register('presence.update', update => {
          if (!update) return
          const sock = client.sock
+         if (!global.db) return
          const { id, presences } = update
          if (id.endsWith('g.us')) {
-            for (let jid in presences) {
-               if (!presences[jid] || jid == sock.decodeJid(sock.user.id)) continue
-               if ((presences[jid].lastKnownPresence === 'composing' || presences[jid].lastKnownPresence === 'recording') && global.db && global.db.users && global.db.users.find(v => v.jid == jid) && global.db.users.find(v => v.jid == jid).afk > -1) {
-                  sock.reply(id, `System detects activity from @${jid.replace(/@.+/, '')} after being offline for : ${Func.texted('bold', Func.toTime(new Date - global.db.users.find(v => v.jid == jid).afk))}\n\n➠ ${Func.texted('bold', 'Reason')} : ${global.db.users.find(v => v.jid == jid).afkReason ? global.db.users.find(v => v.jid == jid).afkReason : '-'}`, global.db.users.find(v => v.jid == jid).afkObj)
-                  global.db.users.find(v => v.jid == jid).afk = -1
-                  global.db.users.find(v => v.jid == jid).afkReason = ''
-                  global.db.users.find(v => v.jid == jid).afkObj = {}
+            let groupSet = global.db?.groups?.find(v => v.jid === id)
+            for (let sender in presences) {
+               let user = global.db?.users?.find(v =>
+                  v.jid === sender || v.lid === sender
+               )
+               const presence = presences[user?.jid] || presences[user?.lid]
+               if (!presence || user?.lid === sock.decodeJid(sock.user.lid)) continue
+               if ((presence.lastKnownPresence === 'composing' || presence.lastKnownPresence === 'recording') && user.afk > -1) {
+                  sock.reply(id, `System detects activity from @${user.jid.replace(/@.+/, '')} after being offline for : ${Func.texted('bold', Func.toTime(new Date - (user?.afk || 0)))}\n\n➠ ${Func.texted('bold', 'Reason')} : ${user?.afkReason || '-'}`, user?.afkObj)
+                  user.afk = -1
+                  user.afkReason = ''
+                  user.afkObj = {}
                }
             }
          } else { }
