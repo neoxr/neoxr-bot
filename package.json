@@ -24,7 +24,7 @@
    },
    "homepage": "https://github.com/neoxr/neoxr-bot#readme",
    "dependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@8.2.13",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@8.2.14",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
       "@database/mongo": "github:neoxr/database#mongo",
