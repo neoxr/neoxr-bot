@@ -38,8 +38,9 @@ const connect = async () => {
             // Detect message from bot by message ID, you can add another logic here
             return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
          },
+         presence: true, // 'true' if you want to see the bot typing or recording
          code: '', // Custom pairing code 8 chars (e.g: NEOXRBOT)
-         version: [2, 3000, 1025503119] // To see the latest version : https://wppconnect.io/whatsapp-versions/
+         version: [2, 3000, 1023223821] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
          browser: ['Windows', 'Chrome', '137.0.7151.107'],
          shouldIgnoreJid: jid => {

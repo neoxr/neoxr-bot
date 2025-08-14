@@ -36,11 +36,11 @@ module.exports = async (client, ctx) => {
       // exception disabled plugin
       var plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
 
-      // if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
-      // if (setting.online) {
-      //    client.sendPresenceUpdate('available', m.chat)
-      //    client.readMessages([m.key])
-      // }
+      if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
+      if (setting.online) {
+         client.sendPresenceUpdate('available', m.chat)
+         client.readMessages([m.key])
+      }
       if (m.isGroup && !isBotAdmin) {
          groupSet.localonly = false
       }
