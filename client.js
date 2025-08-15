@@ -42,7 +42,7 @@ const connect = async () => {
          code: '', // Custom pairing code 8 chars (e.g: NEOXRBOT)
          version: [2, 3000, 1023223821] // To see the latest version : https://wppconnect.io/whatsapp-versions/
       }, {
-         browser: ['Windows', 'Chrome', '137.0.7151.107'],
+         browser: ['Ubuntu', 'Firefox', '20.0.00'],
          shouldIgnoreJid: jid => {
             return /(newsletter|bot)/.test(jid)
          }
