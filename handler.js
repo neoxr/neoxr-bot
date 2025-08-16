@@ -22,9 +22,11 @@ module.exports = async (client, ctx) => {
       let isPrem = users && users.premium || isOwner
       let groupMetadata = m.isGroup ? await client.getGroupMetadata(m.chat) : {}
       let participants = m.isGroup ? groupMetadata ? client.lidParser(groupMetadata.participants) : [] : [] || []
-      let adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
-      let isAdmin = m.isGroup ? adminList.includes(m.sender) : false
-      let isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
+      const admins = m.isGroup ? participants?.filter(i =>
+         i.admin === 'admin' || i.admin === 'superadmin'
+      )?.map(i => i.id) || [] : []
+      const isAdmin = m.isGroup ? admins.includes(m.sender) : false
+      const isBotAdmin = m.isGroup ? admins.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
       let blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
 
       const isSpam = spam.detection(client, m, {
