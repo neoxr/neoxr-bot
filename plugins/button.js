@@ -109,7 +109,7 @@ exports.run = {
                   }
                }, {
                   header: {
-                     imageMessage: global.db.setting.cover,
+                     imageMessage: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                      hasMediaAttachment: true,
                   },
                   body: {

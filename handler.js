@@ -13,6 +13,7 @@ const spam = new Spam({
 module.exports = async (client, ctx) => {
    var { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core, database } = ctx
    try {
+      if (m.sender && m.sender.endsWith('lid')) m.sender = client.getRealJid(m.sender) || m.sender
       require('./lib/system/schema')(m, env)
       let groupSet = global.db.groups.find(v => v.jid === m.chat)
       let chats = global.db.chats.find(v => v.jid === m.chat)
