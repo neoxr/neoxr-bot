@@ -6,7 +6,7 @@ exports.run = {
       isAdmin
    }) => {
       try {
-         const regex = /\b(?:https?:\/\/)?(?:chat\.whatsapp\.com|wa\.me|whatsapp\.com\/channel)(?:\/[^\s]*)?/gi
+         const regex = /\bhttps?:\/\/(?:chat\.whatsapp\.com\/[a-zA-Z0-9]+|wa\.me\/[0-9]+|whatsapp\.com\/channel\/[a-zA-Z0-9]+)/gi
          const cleanUrl = url => {
             const urlObj = new URL(url)
             urlObj.search = ''
