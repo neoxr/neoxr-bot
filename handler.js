@@ -39,11 +39,23 @@ module.exports = async (client, ctx) => {
       // exception disabled plugin
       var plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
 
+      /*
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
          client.sendPresenceUpdate('available', m.chat)
          client.readMessages([m.key])
       }
+      */
+      // auto read & status online ( fixed )
+      if (setting.online) {
+         await client.sendPresenceUpdate('available', m.chat)
+      if (m.message && m.key.id) {
+         await client.chatModify({ markRead: true, lastMessages: [m] }, m.chat)
+      }
+      } else {
+         await client.sendPresenceUpdate('unavailable', m.chat)
+      }
+
       if (m.isGroup && !isBotAdmin) {
          groupSet.localonly = false
       }
@@ -235,4 +247,5 @@ module.exports = async (client, ctx) => {
       if (!m.fromMe) return m.reply(Func.jsonFormat(new Error('neoxr-bot encountered an error :' + e)))
    }
    Func.reload(require.resolve(__filename))
+
 }
