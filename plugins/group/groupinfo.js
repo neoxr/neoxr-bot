@@ -1,6 +1,6 @@
-const moment = require('moment-timezone')
-moment.tz.setDefault(global.timezone)
-exports.run = {
+import { format } from 'date-fns'
+
+export const run = {
    usage: ['groupinfo'],
    hidden: ['gcinfo'],
    category: 'group',
@@ -8,7 +8,7 @@ exports.run = {
       client,
       participants,
       groupSet: setting,
-      Func
+      Utils
    }) => {
       try {
          const meta = await (await client.groupMetadata(m.chat))
@@ -20,33 +20,31 @@ exports.run = {
          caption += `	◦  *Name* : ${meta.subject}\n`
          caption += `	◦  *Member* : ${member.length}\n`
          caption += `	◦  *Admin* : ${admin.length}\n`
-         caption += `	◦  *Created* : ${moment(meta.creation * 1000).format('DD/MM/YY HH:mm:ss')}\n`
+         caption += `	◦  *Created* : ${format(meta.creation * 1000, 'dd/MM/yy HH:mm:ss')}\n`
          caption += `	◦  *Owner* : ${creator ? '@' + creator : '-'}\n\n`
          caption += `乂  *M O D E R A T I O N*\n\n`
-         caption += `	◦  ${Func.switcher(setting.antidelete, '[ √ ]', '[ × ]')} Anti Delete\n`
-         caption += `	◦  ${Func.switcher(setting.antilink, '[ √ ]', '[ × ]')} Anti Link\n`
-         caption += `	◦  ${Func.switcher(setting.antivirtex, '[ √ ]', '[ × ]')} Anti Virtex\n`
-         caption += `	◦  ${Func.switcher(setting.filter, '[ √ ]', '[ × ]')} Filter\n`
-         caption += `	◦  ${Func.switcher(setting.antitagsw, '[ √ ]', '[ × ]')} Anti Story Tag\n`
-         caption += `	◦  ${Func.switcher(setting.autosticker, '[ √ ]', '[ × ]')} Auto Sticker\n`
-         caption += `	◦  ${Func.switcher(setting.left, '[ √ ]', '[ × ]')} Left Message\n`
-         caption += `	◦  ${Func.switcher(setting.localonly, '[ √ ]', '[ × ]')} Localonly\n`
-         caption += `	◦  ${Func.switcher(setting.viewonce, '[ √ ]', '[ × ]')} Viewonce Forwarder\n`
-         caption += `	◦  ${Func.switcher(setting.welcome, '[ √ ]', '[ × ]')} Welcome Message\n\n`
+         caption += `	◦  ${Utils.switcher(setting.antidelete, '[ √ ]', '[ × ]')} Anti Delete\n`
+         caption += `	◦  ${Utils.switcher(setting.antilink, '[ √ ]', '[ × ]')} Anti Link\n`
+         caption += `	◦  ${Utils.switcher(setting.antivirtex, '[ √ ]', '[ × ]')} Anti Virtex\n`
+         caption += `	◦  ${Utils.switcher(setting.filter, '[ √ ]', '[ × ]')} Filter\n`
+         caption += `	◦  ${Utils.switcher(setting.antitagsw, '[ √ ]', '[ × ]')} Anti Story Tag\n`
+         caption += `	◦  ${Utils.switcher(setting.autosticker, '[ √ ]', '[ × ]')} Auto Sticker\n`
+         caption += `	◦  ${Utils.switcher(setting.left, '[ √ ]', '[ × ]')} Left Message\n`
+         caption += `	◦  ${Utils.switcher(setting.localonly, '[ √ ]', '[ × ]')} Localonly\n`
+         caption += `	◦  ${Utils.switcher(setting.viewonce, '[ √ ]', '[ × ]')} Viewonce Forwarder\n`
+         caption += `	◦  ${Utils.switcher(setting.welcome, '[ √ ]', '[ × ]')} Welcome Message\n\n`
          caption += `乂  *G R O U P - S T A T U S*\n\n`
-         caption += `	◦  *Muted* : ${Func.switcher(setting.mute, '√', '×')}\n`
-         caption += `	◦  *Stay* : ${Func.switcher(setting.stay, '√', '×')}\n`
-         caption += `	◦  *Expired* : ${setting.expired == 0 ? 'NOT SET' : Func.timeReverse(setting.expired - new Date * 1)}\n\n`
+         caption += `	◦  *Muted* : ${Utils.switcher(setting.mute, '√', '×')}\n`
+         caption += `	◦  *Stay* : ${Utils.switcher(setting.stay, '√', '×')}\n`
+         caption += `	◦  *Expired* : ${setting.expired == 0 ? 'NOT SET' : Utils.timeReverse(setting.expired - new Date * 1)}\n\n`
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
-            thumbnail: pic ? await Func.fetchBuffer(pic) : await Func.fetchBuffer('./media/image/default.jpg')
+            thumbnail: pic ? await Utils.fetchAsBuffer(pic) : await Utils.fetchAsBuffer('./media/image/default.jpg')
          })
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   group: true,
-   cache: true,
-   location: __filename
+   group: true
 }

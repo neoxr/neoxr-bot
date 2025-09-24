@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['ohidetag'],
    hidden: ['o'],
    use: 'text',

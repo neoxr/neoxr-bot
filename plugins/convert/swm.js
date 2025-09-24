@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['swm'],
    use: 'packname | author',
    category: 'converter',
@@ -7,7 +7,7 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
          let [packname, ...author] = text.split`|`
@@ -17,7 +17,7 @@ exports.run = {
             let q = m.quoted ? m.quoted.message[type] : m.msg
             let img = await client.downloadMediaMessage(q)
             if (/video/.test(type)) {
-               if (q.seconds > 10) return client.reply(m.chat, Func.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
+               if (q.seconds > 10) return client.reply(m.chat, Utils.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
                return await client.sendSticker(m.chat, img, m, {
                   packname: packname || '',
                   author: author || ''
@@ -39,7 +39,7 @@ exports.run = {
                   author: author || ''
                })
             } else if (/video/.test(mime)) {
-               if ((q.msg || q).seconds > 10) return client.reply(m.chat, Func.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
+               if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
                let img = await q.download()
                if (!img) return client.reply(m.chat, global.status.wrong, m)
                return await client.sendSticker(m.chat, img, m, {
@@ -50,11 +50,9 @@ exports.run = {
          }
       } catch (e) {
          console.log(e)
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

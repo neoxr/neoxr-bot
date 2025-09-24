@@ -1,13 +1,13 @@
-const moment = require('moment-timezone')
-const { models } = require('../../lib/system/models')
+import { format } from 'date-fns'
+import { models } from '../../lib/models.js'
 
-exports.run = {
+export const run = {
    usage: ['groups'],
    category: 'miscs',
    async: async (m, {
       client,
       isPrefix,
-      Func
+      Utils
    }) => {
       let group = global.db.groups
       if (!group) group = []
@@ -19,10 +19,10 @@ exports.run = {
          let entry = group.find(g => g.jid === id)
 
          if (entry) {
-            const expiryStatus = entry.stay ? 'FOREVER' : (entry.expired == 0 ? 'NOT SET' : '' + Func.timeReverse(entry.expired - new Date() * 1))
+            const expiryStatus = entry.stay ? 'FOREVER' : (entry.expired == 0 ? 'NOT SET' : '' + Utils.timeReverse(entry.expired - new Date() * 1))
             const memberCount = participants.length
             const muteStatus = entry.mute ? 'OFF' : 'ON'
-            const lastActivity = moment(entry.activity).format('DD/MM/YY HH:mm:ss')
+            const lastActivity = format(Date.now(), 'dd/MM/yy HH:mm:ss')
 
             return (
                `›  *${i + 1}.* ${subject}\n` +
@@ -51,7 +51,5 @@ exports.run = {
 
       m.reply(caption)
    },
-   cache: true,
-   owner: true,
-   location: __filename
+   error: false
 }

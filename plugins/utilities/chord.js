@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['chord'],
    use: 'query',
    category: 'utilities',
@@ -7,23 +7,21 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/chord', {
             q: text
          })
-         if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
+         if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          client.reply(m.chat, json.data.chord, m)
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
    limit: true,
-   restrict: true,
-   cache: true,
-   location: __filename
+   restrict: true
 }

@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['remini'],
    use: 'reply photo',
    category: 'utilities',
@@ -6,7 +6,7 @@ exports.run = {
       client,
       isPrefix,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
@@ -20,30 +20,28 @@ exports.run = {
                const json = await Api.neoxr('/remini', {
                   image: image.data.url
                })
-               if (!json.status) return m.reply(Func.jsonFormat(json))
+               if (!json.status) return m.reply(Utils.jsonFormat(json))
                client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
-            } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
             const json = await Api.neoxr('/remini', {
                image: image.data.url
             })
-            if (!json.status) return m.reply(Func.jsonFormat(json))
+            if (!json.status) return m.reply(Utils.jsonFormat(json))
             client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
          }
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
    limit: true,
-   premium: true,
-   cache: true,
-   location: __filename
+   premium: true
 }

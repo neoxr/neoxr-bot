@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['video'],
    hidden: ['playvid', 'playvideo'],
    use: 'query',
@@ -8,39 +8,37 @@ exports.run = {
       text,
       isPrefix,
       command,
-      env,
+      Config,
       users,
-      Func
+      Utils
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'lathi'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'lathi'), m)
          client.sendReact(m.chat, '🕒', m.key)
          var json = await Api.neoxr('/video', {
             q: text
          })
-         if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
+         if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          let caption = `乂  *Y T - V I D E O*\n\n`
          caption += `	◦  *Title* : ${json.title}\n`
          caption += `	◦  *Size* : ${json.data.size}\n`
          caption += `	◦  *Duration* : ${json.duration}\n`
          caption += `	◦  *Bitrate* : ${json.data.quality}\n\n`
          caption += global.footer
-         const chSize = Func.sizeLimit(json.data.size, users.premium ? env.max_upload : env.max_upload_free)
-         const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${env.max_upload_free} MB and for premium users a maximum of ${env.max_upload} MB.`
+         const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
+         const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
          if (chSize.oversize) return client.reply(m.chat, isOver, m)
          let isSize = (json.data.size).replace(/MB/g, '').trim()
          if (isSize > 99) return client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
             document: true
          }, {
-            jpegThumbnail: await Func.createThumb(json.thumbnail)
+            jpegThumbnail: await Utils.generateImageThumbnail(json.thumbnail)
          })
          client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
       } catch (e) {
-         client.reply(m.chat, FuncjsonFormat(e), m)
+         client.reply(m.chat, UtilsjsonFormat(e), m)
       }
    },
    error: false,
-   restrict: true,
-   cache: true,
-   location: __filename
+   restrict: true
 }

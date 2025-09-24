@@ -1,6 +1,6 @@
-const Jimp = require('jimp')
+import Jimp from 'jimp'
 
-exports.run = {
+export const run = {
    usage: ['setcover'],
    hidden: ['cover'],
    use: 'reply foto',
@@ -8,24 +8,22 @@ exports.run = {
    async: async (m, {
       client,
       setting,
-      Func
+      Utils
    }) => {
       try {
          const q = m.quoted ? m.quoted : m
          const mime = (q.msg || q).mimetype || ''
-         if (!/image/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Image not found.`), m)
+         if (!/image/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Image not found.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const buffer = await cropToLandscapeBuffer(await q.download())
          if (!buffer) throw new Error(global.status.wrong)
          setting.cover = Buffer.from(buffer).toString('base64')
-         client.reply(m.chat, Func.texted('bold', `🚩 Cover successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `🚩 Cover successfully set.`), m)
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   owner: true,
-   cache: true,
-   location: __filename
+   owner: true
 }
 
 /**

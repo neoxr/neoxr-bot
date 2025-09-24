@@ -1,11 +1,10 @@
-const { Component } = require('@neoxr/wb')
-const { Converter } = new Component
-const { readFileSync: read, unlinkSync: remove, writeFileSync: create } = require('fs')
-const path = require('path')
-const { exec } = require('child_process')
-const { tmpdir } = require('os')
+import { Converter } from '@neoxr/wb'
+import { readFileSync as read, unlinkSync as remove, writeFileSync as create } from 'fs'
+import path from 'path'
+import { exec } from 'child_process'
+import { tmpdir } from 'node:os'
 
-exports.run = {
+export const run = {
    usage: ['tomp3', 'tovn'],
    hidden: ['toaudio'],
    use: 'reply media',
@@ -13,16 +12,16 @@ exports.run = {
    async: async (m, {
       client,
       command,
-      Func
+      Utils
    }) => {
       try {
          if (m.quoted && typeof m.quoted.buttons != 'undefined' && typeof m.quoted.videoMessage != 'undefined') {
             client.sendReact(m.chat, '🕒', m.key)
             const media = await client.saveMediaMessage(m.quoted.videoMessage)
-            const result = Func.filename('mp3')
+            const result = Utils.filename('mp3')
             exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
                remove(media)
-               if (err) return client.reply(m.chat, Func.texted('bold', `🚩 Conversion failed.`), m)
+               if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
                let buff = read(result)
                if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
                   remove(result)
@@ -39,12 +38,12 @@ exports.run = {
             if (/ogg/.test(mime)) {
                client.sendReact(m.chat, '🕒', m.key)
                let buffer = await q.download()
-               const media = path.join(tmpdir(), Func.filename('mp3'))
+               const media = path.join(tmpdir(), Utils.filename('mp3'))
                let save = create(media, buffer)
-               const result = Func.filename('mp3')
+               const result = Utils.filename('mp3')
                exec(`ffmpeg -i ${media} ${result}`, async (err, stderr, stdout) => {
                   remove(media)
-                  if (err) return client.reply(m.chat, Func.texted('bold', `🚩 Conversion failed.`), m)
+                  if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
                   let buff = read(result)
                   if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
                      remove(result)
@@ -63,15 +62,13 @@ exports.run = {
                   ptt: true
                })
             } else {
-               client.reply(m.chat, Func.texted('bold', `🚩 This feature only for audio / video.`), m)
+               client.reply(m.chat, Utils.texted('bold', `🚩 This feature only for audio / video.`), m)
             }
          }
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

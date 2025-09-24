@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['smeme'],
    use: 'text | text',
    category: 'converter',
@@ -7,12 +7,12 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
          let exif = global.db.setting
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'Hi | Dude'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'Hi | Dude'), m)
          client.sendReact(m.chat, '🕒', m.key)
          let [top, bottom] = text.split`|`
          if (m.quoted ? m.quoted.message : m.msg.viewOnce) {
@@ -26,12 +26,12 @@ exports.run = {
                   packname: exif.sk_pack,
                   author: exif.sk_author
                })
-            } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
             let img = await q.download()
             let json = await Scraper.uploadImageV2(img)
             let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
@@ -41,11 +41,9 @@ exports.run = {
             })
          }
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

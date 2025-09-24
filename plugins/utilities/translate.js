@@ -1,5 +1,6 @@
-const translate = require('translate-google-api')
-exports.run = {
+import translate from 'translate-google-api'
+
+export const run = {
    usage: ['translate'],
    hidden: ['tr'],
    use: 'iso text',
@@ -9,9 +10,9 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
-      if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'id i love you'), m)
+      if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'id i love you'), m)
       if (text && m.quoted && m.quoted.text) {
          let lang = text.slice(0, 2)
          try {
@@ -21,7 +22,7 @@ exports.run = {
             })
             client.reply(m.chat, result[0], m)
          } catch {
-            return client.reply(m.chat, Func.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
          }
       } else if (text) {
          let lang = text.slice(0, 2)
@@ -32,11 +33,9 @@ exports.run = {
             })
             client.reply(m.chat, result[0], m)
          } catch {
-            return client.reply(m.chat, Func.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
          }
       }
    },
-   error: false,
-   cache: true,
-   location: __filename
+   error: false
 }

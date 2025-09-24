@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['hidetag'],
    use: 'text',
    category: 'admin tools',

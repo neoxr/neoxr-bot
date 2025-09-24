@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['scrop'],
    use: 'style',
    category: 'converter',
@@ -7,7 +7,7 @@ exports.run = {
       args,
       isPrefix,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
@@ -37,35 +37,33 @@ exports.run = {
                   image: json.data.url,
                   style: args[0].toLowerCase()
                })
-               if (!res.status) return m.reply(Func.jsonFormat(res))
+               if (!res.status) return m.reply(Utils.jsonFormat(res))
                client.sendSticker(m.chat, res.data.url, m, {
                   packname: exif.sk_pack,
                   author: exif.sk_author
                })
-            } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
             let img = await q.download()
             let json = await Scraper.uploadImage(img)
             let res = await Api.neoxr('/cropshape', {
                image: json.data.url,
                style: args[0].toLowerCase()
             })
-            if (!res.status) return m.reply(Func.jsonFormat(res))
+            if (!res.status) return m.reply(Utils.jsonFormat(res))
             client.sendSticker(m.chat, res.data.url, m, {
                packname: exif.sk_pack,
                author: exif.sk_author
             })
          }
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

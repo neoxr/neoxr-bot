@@ -1,19 +1,17 @@
-exports.run = {
+export const run = {
    usage: ['fromai'],
    category: 'example',
    async: async (m, {
       client,
-      Func
+      Utils
    }) => {
       try {
          // only work in private chat
          client.sendFromAI(m.chat, 'Hi!', m)
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   private: true,
-   cache: true,
-   location: __filename
+   private: true
 }

@@ -1,19 +1,19 @@
-const { Component } = require('@neoxr/wb')
-const { Converter } = new Component
-const fs = require('fs')
-const { exec } = require('child_process')
 
-exports.run = {
+import { Converter } from '@neoxr/wb'
+import fs from 'node:fs'
+import { exec } from 'child_process'
+
+export const run = {
    usage: ['bass', 'blown', 'chipmunk', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth'],
    use: 'reply audio',
    category: 'voice changer',
    async: async (m, {
       client,
       command,
-      Func
+      Utils
    }) => {
       try {
-         if (!m.quoted) return client.reply(m.chat, Func.texted('bold', `🚩 Reply audio to use this command.`), m)
+         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply audio to use this command.`), m)
          let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
          let set
          if (/bass/.test(command)) set = '-af equalizer=f=94:width_type=o:width=2:g=30'
@@ -31,11 +31,11 @@ exports.run = {
          if (/audio/.test(mime)) {
             client.sendReact(m.chat, '🕒', m.key)
             const buffer = await Converter.toAudio(await m.quoted.download(), 'mp3')
-            const parse = await Func.getFile(buffer)
-            let ran = Func.filename('mp3')
+            const parse = await Utils.getFile(buffer)
+            let ran = Utils.filename('mp3')
             exec(`ffmpeg -i ${parse.file} ${set} ${ran}`, async (err, stderr, stdout) => {
                fs.unlinkSync(parse.file)
-               if (err) return client.reply(m.chat, Func.texted('bold', `🚩 Conversion failed.`), m)
+               if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
                let buff = fs.readFileSync(ran)
                if (m.quoted.ptt) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
                   ptt: true
@@ -47,15 +47,13 @@ exports.run = {
                })
             })
          } else {
-            client.reply(m.chat, Func.texted('bold', `🚩 Reply audio to use this command.`), m)
+            client.reply(m.chat, Utils.texted('bold', `🚩 Reply audio to use this command.`), m)
          }
       } catch (e) {
          console.log(e)
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

@@ -1,6 +1,6 @@
-const moment = require('moment-timezone')
-moment.tz.setDefault('Asia/Jakarta').locale('id')
-exports.run = {
+import { format } from 'date-fns'
+
+export const run = {
    usage: ['hitstat', 'hitdaily'],
    category: 'miscs',
    async: async (m, {
@@ -8,11 +8,11 @@ exports.run = {
       isPrefix,
       command,
       setting,
-      Func
+      Utils
    }) => {
       const types = command == 'hitstat' ? global.db.statistic : Object.fromEntries(Object.entries(global.db.statistic).filter(([_, prop]) => moment(prop.lasthit).format('DDMMYY') == moment(new Date).format('DDMMYY')))
       let stat = Object.keys(types)
-      if (stat.length == 0) return client.reply(true, Func.texted('bold', `🚩 No command used.`), m)
+      if (stat.length == 0) return client.reply(true, Utils.texted('bold', `🚩 No command used.`), m)
       class Hit extends Array {
          total(key) {
             return this.reduce((a, b) => a + (b[key] || 0), 0)
@@ -23,16 +23,14 @@ exports.run = {
       let prepare = sorted.map(v => v[0])
       let show = Math.min(10, prepare.length)
       let teks = `乂  *H I T S T A T*\n\n`
-      teks += Func.texted('bold', `“Total command hit statistics ${command == 'hitstat' ? 'are currently' : 'for today'} ${Func.formatNumber(command == 'hitstat' ? sum.total('hitstat') : sum.total('today'))} hits.”`) + '\n\n'
-      teks += sorted.slice(0, show).map(([cmd, prop], i) => '   ┌ ' + Func.texted('bold', 'Command') + ' :  ' + Func.texted('monospace', isPrefix + cmd) + '\n   │ ' + Func.texted('bold', 'Hit') + ' : ' + Func.formatNumber(command == 'hitstat' ? prop.hitstat : prop.today) + 'x\n   └ ' + Func.texted('bold', 'Last Hit') + ' : ' + moment(prop.lasthit).format('DD/MM/YY HH:mm:ss')).join`\n\n`
+      teks += Utils.texted('bold', `“Total command hit statistics ${command == 'hitstat' ? 'are currently' : 'for today'} ${Utils.formatNumber(command == 'hitstat' ? sum.total('hitstat') : sum.total('today'))} hits.”`) + '\n\n'
+      teks += sorted.slice(0, show).map(([cmd, prop], i) => '   ┌ ' + Utils.texted('bold', 'Command') + ' :  ' + Utils.texted('monospace', isPrefix + cmd) + '\n   │ ' + Utils.texted('bold', 'Hit') + ' : ' + Utils.formatNumber(command == 'hitstat' ? prop.hitstat : prop.today) + 'x\n   └ ' + Utils.texted('bold', 'Last Hit') + ' : ' + format(prop.lasthit, 'dd/MM/yy HH:mm:ss')).join`\n\n`
       teks += `\n\n${global.footer}`
       client.sendMessageModify(m.chat, teks, m, {
          ads: false,
          largeThumb: true,
-         thumbnail: Func.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
+         thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
       })
    },
-   error: false,
-   cache: true,
-   location: __filename
+   error: false
 }

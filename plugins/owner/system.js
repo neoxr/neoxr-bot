@@ -1,5 +1,5 @@
-exports.run = {
-   usage: ['autobackup', 'autodownload', 'antispam', 'debug', 'groupmode', 'multiprefix', 'noprefix', 'online', 'self'],
+export const run = {
+   usage: ['autobackup', 'autodownload', 'antispam', 'debug', 'groupmode', 'multiprefix', 'noprefix', 'online', 'self', 'notifier'],
    use: 'on / off',
    category: 'owner',
    async: async (m, {
@@ -7,7 +7,7 @@ exports.run = {
       args,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       let system = global.db.setting
       let type = command.toLowerCase()
@@ -16,11 +16,9 @@ exports.run = {
       let optionList = ['on', 'off']
       if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${system[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
       let status = option != 'on' ? false : true
-      if (system[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
+      if (system[type] == status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
       system[type] = status
-      client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
+      client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
    },
-   owner: true,
-   cache: true,
-   location: __filename
+   owner: true
 }

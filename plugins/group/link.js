@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['link'],
    hidden: ['getlink'],
    category: 'group',

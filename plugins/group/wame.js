@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['wame'],
    category: 'group',
    async: async (m, {

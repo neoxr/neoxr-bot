@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['tovideo'],
    hidden: ['tovid'],
    use: 'reply gif sticker',
@@ -6,18 +6,18 @@ exports.run = {
    async: async (m, {
       client,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
          let exif = global.db.setting
-         if (!m.quoted) return client.reply(m.chat, Func.texted('bold', `🚩 Reply to gif sticker.`), m)
+         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to gif sticker.`), m)
          let q = m.quoted ? m.quoted : m
          let mime = (q.msg || q).mimetype || ''
-         if (!/webp/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Reply to gif sticker.`), m)
+         if (!/webp/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to gif sticker.`), m)
          let buffer = await q.download()
          const file = await Scraper.uploadImageV2(buffer)
-         if (!file.status) return m.reply(Func.jsonFormat(file))
+         if (!file.status) return m.reply(Utils.jsonFormat(file))
          let old = new Date()
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/webp2mp4', {
@@ -29,7 +29,5 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

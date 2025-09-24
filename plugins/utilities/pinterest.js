@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['pinterest'],
    use: 'query',
    category: 'utilities',
@@ -7,10 +7,10 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, `panda`), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, `panda`), m)
          client.sendReact(m.chat, '🕒', m.key)
          let old = new Date()
          const json = await Api.neoxr('/pinterest', {
@@ -20,16 +20,14 @@ exports.run = {
          for (let i = 0; i < 3; i++) {
             var rand = Math.floor(json.data.length * Math.random())
             client.sendFile(m.chat, json.data[rand], '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
-            await Func.delay(2000)
+            await Utils.delay(2000)
          }
       } catch (e) {
          console.log(e)
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
    limit: true,
-   restrict: true,
-   cache: true,
-   location: __filename
+   restrict: true
 }

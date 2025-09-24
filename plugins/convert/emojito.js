@@ -1,5 +1,4 @@
-const fetch = require('node-fetch')
-exports.run = {
+export const run = {
    usage: ['emojito'],
    use: 'emoji',
    category: 'converter',
@@ -8,28 +7,26 @@ exports.run = {
       args,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
          let exif = global.db.setting
-         if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, '😳'), m)
+         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, '😳'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/emojito', {
             q: args[0]
          })
-         if (!json.status) return client.reply(m.chat, Func.texted('bold', `🚩 ${json.msg}`), m)
-         const buffer = await Func.fetchBuffer(json.data.url)
+         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${json.msg}`), m)
+         const buffer = await Utils.fetchAsBuffer(json.data.url)
          client.sendSticker(m.chat, buffer, m, {
             packname: exif.sk_pack,
             author: exif.sk_author,
             categories: [args[0]]
          })
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

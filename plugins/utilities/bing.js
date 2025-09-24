@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['bing'],
    use: 'prompt',
    category: 'utilities',
@@ -7,24 +7,22 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
          if (command === 'bing') {
-            if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'apa itu kucing'), m)
+            if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'apa itu kucing'), m)
             client.sendReact(m.chat, '🕒', m.key)
             const json = await Api.neoxr('/bing-chat', {
                q: text
             })
-            if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
+            if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
             client.reply(m.chat, json.data.message, m)
          }
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

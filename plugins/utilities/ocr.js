@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['ocr'],
    use: 'reply photo',
    category: 'utilities',
@@ -6,7 +6,7 @@ exports.run = {
       client,
       isPrefix,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
@@ -20,29 +20,27 @@ exports.run = {
                const json = await Api.neoxr('/ocr', {
                   image: image.data.url
                })
-               if (!json.status) return m.reply(Func.jsonFormat(json))
+               if (!json.status) return m.reply(Utils.jsonFormat(json))
                client.reply(m.chat, json.data.text, m)
-            } else client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Func.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
             const json = await Api.neoxr('/ocr', {
                image: image.data.url
             })
-            if (!json.status) return m.reply(Func.jsonFormat(json))
+            if (!json.status) return m.reply(Utils.jsonFormat(json))
             client.reply(m.chat, json.data.text, m)
          }
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

@@ -1,14 +1,14 @@
-exports.run = {
+export const run = {
    usage: ['gempa'],
    category: 'utilities',
    async: async (m, {
       client,
-      Func
+      Utils
    }) => {
       try {
          client.sendReact(m.chat, '🕒', m.key)
          let json = await Api.neoxr('/gempa')
-         if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
+         if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          let caption = `乂  *G E M P A*\n\n`
          caption += `	◦  *Lintang* : ${json.data.lintang}\n`
          caption += `	◦  *Bujur* : ${json.data.bujur}\n`
@@ -19,10 +19,10 @@ exports.run = {
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
-            thumbnail: await Func.fetchBuffer(json.data.map)
+            thumbnail: await Utils.fetchAsBuffer(json.data.map)
          })
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false

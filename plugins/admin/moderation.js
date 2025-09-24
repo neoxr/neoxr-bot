@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'viewonce', 'left', 'filter', 'localonly', 'welcome'],
    use: 'on / off',
    category: 'admin tools',
@@ -8,7 +8,7 @@ exports.run = {
       isPrefix,
       command,
       isBotAdmin,
-      Func
+      Utils
    }) => {
       try {
          let setting = global.db.groups.find(v => v.jid == m.chat)
@@ -19,15 +19,13 @@ exports.run = {
          let optionList = ['on', 'off']
          if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
          let status = option != 'on' ? false : true
-         if (setting[type] == status) return client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
+         if (setting[type] == status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
          setting[type] = status
-         client.reply(m.chat, Func.texted('bold', `🚩 ${Func.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
+         client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    admin: true,
-   group: true,
-   cache: true,
-   location: __filename
+   group: true
 }

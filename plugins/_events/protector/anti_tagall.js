@@ -1,20 +1,18 @@
-exports.run = {
+export const run = {
    async: async (m, {
       client,
       isAdmin,
       isOwner,
-      Func
+      Utils
    }) => {
       try {
          if (!isOwner && !isAdmin && m.mentionedJid.length > 10) return client.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
       } catch (e) {
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
    group: true,
    botAdmin: true,
-   exception: true,
-   cache: true,
-   location: __filename
+   exception: true
 }

@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['+toxic', '-toxic'],
    use: 'word',
    category: 'owner',
@@ -7,12 +7,12 @@ exports.run = {
       args,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
          if (command == '+toxic') {
-            if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'fuck'), m)
-            if (global.db.setting.toxic.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 '${args[0]}' already in the database.`), m)
+            if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'fuck'), m)
+            if (global.db.setting.toxic.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 '${args[0]}' already in the database.`), m)
             global.db.setting.toxic.push(args[0])
             global.db.setting.toxic.sort(function(a, b) {
                if (a < b) {
@@ -23,15 +23,15 @@ exports.run = {
                }
                return 0
             })
-            client.reply(m.chat, Func.texted('bold', `🚩 '${args[0]}' added successfully!`), m)
+            client.reply(m.chat, Utils.texted('bold', `🚩 '${args[0]}' added successfully!`), m)
          } else if (command == '-toxic') {
-            if (!args || !args[0]) return client.reply(m.chat, Func.example(isPrefix, command, 'fuck'), m)
-            if (global.db.setting.toxic.length < 2) return client.reply(m.chat, Func.texted('bold', `🚩 Sorry, you can't remove more.`), m)
-            if (!global.db.setting.toxic.includes(args[0])) return client.reply(m.chat, Func.texted('bold', `🚩 '${args[0]}' not in database.`), m)
+            if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'fuck'), m)
+            if (global.db.setting.toxic.length < 2) return client.reply(m.chat, Utils.texted('bold', `🚩 Sorry, you can't remove more.`), m)
+            if (!global.db.setting.toxic.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 '${args[0]}' not in database.`), m)
             global.db.setting.toxic.forEach((data, index) => {
                if (data === args[0]) global.db.setting.toxic.splice(index, 1)
             })
-            client.reply(m.chat, Func.texted('bold', `🚩 '${args[0]}' has been removed.`), m)
+            client.reply(m.chat, Utils.texted('bold', `🚩 '${args[0]}' has been removed.`), m)
          }
       } catch (e) {
          console.log(e)
@@ -39,7 +39,5 @@ exports.run = {
       }
    },
    error: false,
-   owner: true,
-   cache: true,
-   location: __filename
+   owner: true
 }

@@ -1,9 +1,8 @@
-exports.run = {
+export const run = {
    usage: ['ping'],
    category: 'miscs',
    async: async (m, {
-      client,
-      Func
+      client
    }) => {
       const start = Date.now()
       const msg = await client.reply(m.chat, 'Checking ...', m)

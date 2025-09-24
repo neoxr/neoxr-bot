@@ -1,8 +1,9 @@
 {
    "name": "neoxr-bot",
-   "version": "4.0",
+   "version": "5.0",
    "description": "WhatsApp Bot (Base)",
    "main": "index.js",
+   "type": "module",
    "engines": {
       "node": ">= 20.x"
    },
@@ -24,21 +25,13 @@
    },
    "homepage": "https://github.com/neoxr/neoxr-bot#readme",
    "dependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@8.2.18",
       "@adiwajshing/keyed-db": "^0.2.4",
-      "@colors/colors": "^1.6.0",
-      "@database/mongo": "github:neoxr/database#mongo",
-      "@database/postgres": "github:neoxr/database#postgresql",
-      "@neoxr/wb": "5.10.21",
-      "@session/mongo": "github:neoxr/session#mongo",
-      "@session/postgres": "github:neoxr/session#postgresql",
+      "@neoxr/wb": "^6.0.0-rc.2",
+      "baileys": "^7.0.0-rc.3",
       "cfonts": "3.1.1",
       "html-entities": "^2.5.2",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
-      "qrcode": "1.5.0",
-      "speedtest-net": "1.6.2",
-      "streamifier": "^0.1.1",
       "translate-google-api": "1.0.4"
    },
    "devDependencies": {

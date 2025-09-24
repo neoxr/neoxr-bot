@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
   usage: ['listban', 'listprem', 'listblock'],
   category: 'miscs',
   async: async (m, {
@@ -6,11 +6,11 @@ exports.run = {
     command,
     isOwner,
     blockList,
-    Func
+    Utils
   }) => {
     if (command === 'listban') {
       const data = global.db.users.filter(v => v.banned)
-      if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
+      if (data.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
       let text = `乂  *L I S T B A N*\n\n`
       text += data.map((v, i) => {
         if (i == 0) {
@@ -25,12 +25,12 @@ exports.run = {
     } else if (command === 'listprem') {
       if (!isOwner) return m.reply(global.status.owner)
       const data = global.db.users.filter(v => v.premium)
-      if (data.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
+      if (data.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
       let text = `乂  *L I S T P R E M*\n\n`
-      text += data.map((v, i) => '   ┌ @' + client.decodeJid(v.jid).replace(/@.+/, '') + '\n   │ ' + Func.texted('bold', 'Hitstat') + ' : ' + Func.formatNumber(v.hit) + '\n   └ ' + Func.texted('bold', 'Expired') + ' : ' + Func.timeReverse(v.expired - new Date() * 1)).join`\n\n`
+      text += data.map((v, i) => '   ┌ @' + client.decodeJid(v.jid).replace(/@.+/, '') + '\n   │ ' + Utils.texted('bold', 'Hitstat') + ' : ' + Utils.formatNumber(v.hit) + '\n   └ ' + Utils.texted('bold', 'Expired') + ' : ' + Utils.timeReverse(v.expired - new Date() * 1)).join`\n\n`
       m.reply(text + '\n\n' + global.footer)
     } else if (command === 'listblock') {
-      if (blockList.length < 1) return m.reply(Func.texted('bold', `🚩 Data empty.`))
+      if (blockList.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
       let text = `乂 *L I S T B L O C K*\n\n`
       text += blockList.map((v, i) => {
         if (i == 0) {
@@ -44,7 +44,5 @@ exports.run = {
       m.reply(text + '\n\n' + global.footer)
     }
   },
-  error: false,
-  cache: true,
-  location: __filename
+  error: false
 }

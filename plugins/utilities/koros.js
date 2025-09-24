@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['koros'],
    use: 'query & reply media',
    category: 'utilities',
@@ -7,7 +7,7 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
@@ -15,15 +15,15 @@ exports.run = {
             let type = m.quoted ? Object.keys(m.quoted.message)[0] : m.mtype
             let q = m.quoted ? m.quoted.message[type] : m.msg
             let img = await client.downloadMediaMessage(q)
-            if (!/image/.test(type)) return client.reply(m.chat, Func.texted('bold', `Stress ??`), m)
+            if (!/image/.test(type)) return client.reply(m.chat, Utils.texted('bold', `Stress ??`), m)
             client.sendReact(m.chat, '🕒', m.key)
             const srv = await Scraper.uploadImageV2(img)
-            if (!srv.status) return m.reply(Func.jsonFormat(srv))
+            if (!srv.status) return m.reply(Utils.jsonFormat(srv))
             const json = await Api.neoxr('/koros', {
                image: srv.data.url,
                q: text ? text : (m.quoted && m.quoted.text) ? m.quoted.text : 'deskripsikan tentang foto ini'
             })
-            if (!json.status) return m.reply(Func.jsonFormat(json))
+            if (!json.status) return m.reply(Utils.jsonFormat(json))
             let caption = `*Prompt* : ${json.data.question}\n\n`
             caption += `—\n`
             caption += `${json.data.description}`
@@ -31,17 +31,17 @@ exports.run = {
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Func.texted('bold', `Stress ??`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `Stress ??`), m)
             let img = await q.download()
             if (!img) return client.reply(m.chat, global.status.wrong, m)
             client.sendReact(m.chat, '🕒', m.key)
             const srv = await Scraper.uploadImageV2(img)
-            if (!srv.status) return m.reply(Func.jsonFormat(srv))
+            if (!srv.status) return m.reply(Utils.jsonFormat(srv))
             const json = await Api.neoxr('/koros', {
                image: srv.data.url,
                q: text ? text : (m.quoted && m.quoted.text) ? m.quoted.text : 'deskripsikan tentang foto ini'
             })
-            if (!json.status) return m.reply(Func.jsonFormat(json))
+            if (!json.status) return m.reply(Utils.jsonFormat(json))
             let caption = `*Prompt* : ${json.data.question}\n\n`
             caption += `—\n`
             caption += `${json.data.description}`
@@ -49,11 +49,9 @@ exports.run = {
          }
       } catch (e) {
          console.log(e)
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

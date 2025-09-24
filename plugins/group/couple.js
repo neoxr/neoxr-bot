@@ -1,6 +1,6 @@
-const moment = require('moment-timezone')
-moment.tz.setDefault(global.timezone)
-exports.run = {
+import { format } from 'date-fns'
+
+export const run = {
    usage: ['couple'],
    category: 'group',
    async: async (m, {
@@ -20,7 +20,7 @@ exports.run = {
             }
          }
       }
-      client.reply(m.chat, `Random Best Couple : @${tag1.replace(/@.+/, '')} 💞 @${tag2.replace(/@.+/, '')}, New couple of the day may be chosen at _${moment(now).format('DD/MM/YYYY HH:mm')}._`)
+      client.reply(m.chat, `Random Best Couple : @${tag1.replace(/@.+/, '')} 💞 @${tag2.replace(/@.+/, '')}, New couple of the day may be chosen at _${format(now, 'dd/MM/yy HH:mm')}._`)
    },
    group: true
 }

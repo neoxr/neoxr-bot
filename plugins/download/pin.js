@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['pin'],
    hidden: ['pinterest'],
    use: 'link / query',
@@ -8,17 +8,17 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'https://pin.it/5fXaAWE'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://pin.it/5fXaAWE'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         if (Func.isUrl(text.trim())) {
+         if (Utils.isUrl(text.trim())) {
             if (!text.match(/pin(?:terest)?(?:\.it|\.com)/)) return m.reply(global.status.invalid)
             const json = await Api.neoxr('/pin', {
                url: text.trim()
             })
-            if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
+            if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
             if (/jpg|mp4/.test(json.data.type)) return client.sendFile(m.chat, json.data.url, '', '', m)
             if (json.data.type == 'gif') return client.sendFile(m.chat, json.data.url, '', ``, m, {
                gif: true
@@ -27,8 +27,8 @@ exports.run = {
             const json = await Api.neoxr('/pinterest', {
                q: text.trim()
             })
-            if (!json.status) return client.reply(m.chat, Func.jsonFormat(json), m)
-            const imgUrl = Func.random(json.data)
+            if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
+            const imgUrl = Utils.random(json.data)
             client.sendFile(m.chat, imgUrl, '', '', m)
          }
       } catch {
@@ -36,7 +36,5 @@ exports.run = {
       }
    },
    error: false,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }

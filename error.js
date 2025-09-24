@@ -1,32 +1,37 @@
-const colors = require('colors')
-const chalk = require('chalk')
-const moment = require('moment-timezone')
+import colors from 'colors'
+import chalk from 'chalk'
+import { format } from 'date-fns'
 
 process.on('uncaughtException', err => {
-   const date = moment(Date.now()).format('DD/MM/YY HH:mm:ss')
+   const date = format(Date.now(), 'dd/MM/yy HH:mm:ss')
    if (err?.code === 'ENOMEM') {
       console.error(chalk.black(chalk.bgRed(` Exception `)), chalk.black(chalk.bgBlue(` ${date} `)), ':', colors.gray('Out of memory error detected. Cleaning up resources'))
    } else {
       console.error(chalk.black(chalk.bgRed(` Exception `)), chalk.black(chalk.bgBlue(` ${date} `)), ':', colors.gray(err))
    }
-   setTimeout(() => process.exit(1), 100)
+   process.removeAllListeners()
+   setTimeout(() => process.exit(1), 1000)
 })
 
 const unhandledRejections = new Map()
 
 process.on('unhandledRejection', (reason, promise) => {
    unhandledRejections.set(promise, reason)
-   if (reason?.message?.includes('Timed') || reason?.message?.includes('SessionError') || reason?.message?.includes('ENOENT')) return
-   const date = moment(Date.now()).format('DD/MM/YY HH:mm:ss')
+   if (
+      reason?.message?.includes('Timed') ||
+      reason?.message?.includes('SessionError') ||
+      reason?.message?.includes('ENOENT') ||
+      reason?.message?.includes('Device logged out')
+   ) return
+   const date = format(Date.now(), 'dd/MM/yy HH:mm:ss')
    console.error(chalk.black(chalk.bgRed(` Rejection `)), chalk.black(chalk.bgBlue(` ${date} `)), ':', colors.gray(reason))
-   setTimeout(() => process.exit(1), 100)
+   process.removeAllListeners()
+   setTimeout(() => process.exit(1), 1000)
 })
 
 process.on('rejectionHandled', promise => {
    unhandledRejections.delete(promise)
 })
-
-// process.on('exit', () => { })
 
 process.on('warning', (warning) => {
    if (warning?.name === 'MaxListenersExceededWarning') {

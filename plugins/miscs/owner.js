@@ -1,14 +1,13 @@
-exports.run = {
+export const run = {
    usage: ['owner'],
    category: 'miscs',
    async: async (m, {
       client,
-      env,
-      Func
+      Config
    }) => {
       client.sendContact(m.chat, [{
-         name: env.owner_name,
-         number: env.owner,
+         name: Config.owner_name,
+         number: Config.owner,
          about: 'Owner & Creator'
       }], m, {
          org: 'Neoxr Network',
@@ -16,7 +15,5 @@ exports.run = {
          email: 'contact@neoxr.my.id'
       })
    },
-   error: false,
-   cache: true,
-   location: __filename
+   error: false
 }

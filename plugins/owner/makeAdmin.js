@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['admin'],
    async: async (m, {
       client,
@@ -6,10 +6,10 @@ exports.run = {
       isPrefix,
       command,
       participants,
-      Func
+      Utils
    }) => {
       try {
-         return client.groupParticipantsUpdate(m.chat, [m.sender], 'promote').then(res => client.reply(m.chat, Func.jsonFormat(res), m))
+         return client.groupParticipantsUpdate(m.chat, [m.sender], 'promote').then(res => client.reply(m.chat, Utils.jsonFormat(res), m))
       } catch (e) {
          console.log(e)
          client.reply(m.chat, global.status.error, m)

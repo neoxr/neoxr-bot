@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['delete'],
    hidden: ['del'],
    use: 'reply chat',

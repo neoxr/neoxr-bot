@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['setmsg'],
    use: 'text',
    category: 'owner',
@@ -7,20 +7,18 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
          let setting = global.db.setting
          if (!text) return client.reply(m.chat, explain(isPrefix, command), m)
          setting.msg = text
-         client.reply(m.chat, Func.texted('bold', `🚩 Menu Message successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `🚩 Menu Message successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   owner: true,
-   cache: true,
-   location: __filename
+   owner: true
 }
 
 const explain = (prefix, command) => {

@@ -1,11 +1,11 @@
-exports.run = {
+export const run = {
    async: async (m, {
       client,
       body,
       isOwner,
       groupSet,
       setting,
-      Func
+      Utils
    }) => {
       try {
          if (groupSet.autosticker && /video|image/.test(m.mtype)) {
@@ -29,11 +29,9 @@ exports.run = {
          }
       } catch (e) {
          console.log(e)
-         return client.reply(m.chat, Func.jsonFormat(e), m)
+         return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
-   group: true,
-   cache: true,
-   location: __filename
+   group: true
 }

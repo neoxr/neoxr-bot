@@ -1,12 +1,13 @@
-const { S_WHATSAPP_NET } = require('@adiwajshing/baileys')
-const Jimp = require('jimp')
-exports.run = {
+import { S_WHATSAPP_NET } from 'baileys'
+import Jimp from 'jimp'
+
+export const run = {
    usage: ['setpp'],
    use: 'reply photo',
    category: 'owner',
    async: async (m, {
       client,
-      Func,
+      Utils,
       Scraper
    }) => {
       try {
@@ -33,15 +34,13 @@ exports.run = {
                   }
                ]
             })
-            client.reply(m.chat, Func.texted('bold', `🚩 Profile photo has been successfully changed.`), m)
-         } else return client.reply(m.chat, Func.texted('bold', `🚩 Reply to the photo that will be made into the bot's profile photo.`), m)
+            client.reply(m.chat, Utils.texted('bold', `🚩 Profile photo has been successfully changed.`), m)
+         } else return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to the photo that will be made into the bot's profile photo.`), m)
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   owner: true,
-   cache: true,
-   location: __filename
+   owner: true
 }
 
 async function generate(media) {

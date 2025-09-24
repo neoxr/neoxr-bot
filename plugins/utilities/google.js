@@ -1,4 +1,4 @@
-exports.run = {
+export const run = {
    usage: ['google', 'goimg'],
    use: 'query',
    category: 'utilities',
@@ -7,10 +7,10 @@ exports.run = {
       text,
       isPrefix,
       command,
-      Func
+      Utils
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Func.example(isPrefix, command, 'cat'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'cat'), m)
          client.sendReact(m.chat, '🕒', m.key)
          if (command == 'google') {
             const json = await Api.neoxr('/google', {
@@ -26,7 +26,7 @@ exports.run = {
             client.sendMessageModify(m.chat, teks + global.footer, m, {
                ads: false,
                largeThumb: true,
-               thumbnail: await Func.fetchBuffer('https://telegra.ph/file/d7b761ea856b5ba7b0713.jpg')
+               thumbnail: await Utils.fetchAsBuffer('https://telegra.ph/file/d7b761ea856b5ba7b0713.jpg')
             })
          } else if (command == 'goimg') {
             const json = await Api.neoxr('/goimg', {
@@ -36,23 +36,21 @@ exports.run = {
             for (let i = 0; i < 5; i++) {
                const index = Math.floor(json.data.length * Math.random())
                const url = json.data[index].url
-               const fn = await Func.getFile(url)
+               const fn = await Utils.getFile(url)
                if (!fn?.status || (fn?.status && !/image\/(png|jpe?g)/i.test(fn.mime))) continue
                let caption = `乂  *G O O G L E - I M A G E*\n\n`
                caption += `	◦ *Title* : ${json.data[index].origin.title}\n`
                caption += `	◦ *Dimensions* : ${json.data[index].width} × ${json.data[index].height}\n\n`
                caption += global.footer
                client.sendFile(m.chat, url, '', caption, m)
-               await Func.delay(2500)
+               await Utils.delay(2500)
             }
          }
       } catch (e) {
-         client.reply(m.chat, Func.jsonFormat(e), m)
+         client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
    error: false,
    restrict: true,
-   limit: true,
-   cache: true,
-   location: __filename
+   limit: true
 }
