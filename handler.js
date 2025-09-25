@@ -34,7 +34,8 @@ export default async (client, ctx) => {
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
          show: 'all', // options: 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
-         banned_times: users.ban_times
+         banned_times: users.ban_times,
+         exception: isOwner || isPrem
       })
 
       plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
@@ -57,7 +58,7 @@ export default async (client, ctx) => {
       })
       if (!setting.multiprefix) setting.noprefix = false
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Utils.jsonFormat(m), m)
-      
+
       if (m.isGroup) groupSet.activity = new Date() * 1
       if (users) {
          if (!users.lid) {
@@ -96,6 +97,8 @@ export default async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
+      if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state)) return client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
+      if (setting.antispam && isSpam && /HOLD/.test(isSpam.state)) return
       if (body && !setting.self && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !Config.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
       const matcher = Utils.matcher(command, commands).filter(v => v.accuracy >= 60)
       if (prefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
@@ -109,7 +112,7 @@ export default async (client, ctx) => {
          body && !prefix && commands.includes(command) && Config.evaluate_chars.includes(command)
       ) {
          if (setting.error.includes(command)) return client.reply(m.chat, Utils.texted('bold', `🚩 Command _${(prefix ? prefix : '') + command}_ disabled.`), m)
-         if (!m.isGroup && Config.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
+         if (!m.isGroup && Config.blocks.some(no => m.sender?.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
          if (commands.includes(command)) {
             users.hit += 1
             users.usebot = new Date() * 1
@@ -134,11 +137,6 @@ export default async (client, ctx) => {
             }
             if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < Config.timeout)) continue
             if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
-            if (!cmd.exception && setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && !isOwner) {
-               client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
-               continue
-            }
-            if (!cmd.exception && setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) continue
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
@@ -199,11 +197,6 @@ export default async (client, ctx) => {
                thumbnail: await Utils.fetchAsBuffer('https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg'),
                url: setting.link
             }).then(() => chats.lastchat = new Date() * 1)
-            if (!event.exception && setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state) && isOwner) {
-               client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
-               continue
-            }
-            if (!event.exception && setting.antispam && isSpam && /HOLD/.test(isSpam.state) && !isOwner) continue
             if (event.error) continue
             if (event.owner && !isOwner) continue
             if (event.group && !m.isGroup) continue

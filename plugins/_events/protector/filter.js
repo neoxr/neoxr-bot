@@ -42,6 +42,5 @@ export const run = {
          return client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   group: true,
-   exception: true
+   group: true
 }

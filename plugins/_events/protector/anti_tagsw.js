@@ -20,6 +20,5 @@ export const run = {
    },
    error: false,
    group: true,
-   botAdmin: true,
-   exception: true
+   botAdmin: true
 }

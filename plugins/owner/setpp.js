@@ -1,4 +1,5 @@
-import { S_WHATSAPP_NET } from 'baileys'
+import baileys from '../../lib/engine.js'
+const { S_WHATSAPP_NET } = 'baileys'
 import Jimp from 'jimp'
 
 export const run = {
@@ -27,8 +28,8 @@ export const run = {
                content: [
                   {
                      tag: 'picture',
-                     attrs: { 
-                        type: 'image' 
+                     attrs: {
+                        type: 'image'
                      },
                      content: img
                   }

@@ -1,5 +1,5 @@
-import * as baileys from 'baileys'
 import { Client, Config, Database, Utils } from '@neoxr/wb'
+import baileys from './lib/engine.js'
 import './error.js'
 import './lib/config.js'
 import './lib/functions.js'
@@ -31,8 +31,9 @@ const connect = async () => {
          bypass_disappearing: true,
          bot: id => {
             // Detect message from bot by message ID, you can add another logic here
-            return id && ((id.startsWith('3EB0') && id.length === 40) || id.startsWith('BAE') || /[-]/.test(id))
+            return id && (id.startsWith('BAE') || /[-]/.test(id))
          },
+         custom_id: 'neoxr', // Prefix for Custom Message ID (automatically detects isBot for itself)
          presence: true, // Set to 'true' if you want to see the bot typing or recording
          create_session: {
             type: system.session,
