@@ -97,8 +97,8 @@ export default async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
-      if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state)) return client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
-      if (setting.antispam && isSpam && /HOLD/.test(isSpam.state)) return
+      // if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state)) return client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
+      // if (setting.antispam && isSpam && /HOLD/.test(isSpam.state)) return
       if (body && !setting.self && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !Config.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
       const matcher = Utils.matcher(command, commands).filter(v => v.accuracy >= 60)
       if (prefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
@@ -148,6 +148,11 @@ export default async (client, ctx) => {
                })
                continue
             }
+            if (setting.antispam && isSpam && /(BANNED|NOTIFY|TEMPORARY)/.test(isSpam.state)) {
+               client.reply(m.chat, Utils.texted('bold', `🚩 ${isSpam.msg}`), m)
+               continue
+            }
+            if (setting.antispam && isSpam && /HOLD/.test(isSpam.state)) continue
             if (cmd.premium && !isPrem) {
                client.reply(m.chat, global.status.premium, m)
                continue
