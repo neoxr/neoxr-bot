@@ -21,7 +21,8 @@ process.on('unhandledRejection', (reason, promise) => {
       reason?.message?.includes('Timed') ||
       reason?.message?.includes('SessionError') ||
       reason?.message?.includes('ENOENT') ||
-      reason?.message?.includes('Device logged out')
+      reason?.message?.includes('Device logged out') ||
+      reason?.message?.includes('Connection Closed')
    ) return
    const date = format(Date.now(), 'dd/MM/yy HH:mm:ss')
    console.error(chalk.black(chalk.bgRed(` Rejection `)), chalk.black(chalk.bgBlue(` ${date} `)), ':', colors.gray(reason))
