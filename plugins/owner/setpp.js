@@ -1,5 +1,5 @@
 import baileys from '../../lib/engine.js'
-const { S_WHATSAPP_NET } = 'baileys'
+const { S_WHATSAPP_NET } = baileys
 import Jimp from 'jimp'
 
 export const run = {
