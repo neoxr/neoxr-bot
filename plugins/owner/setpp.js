@@ -8,8 +8,7 @@ export const run = {
    category: 'owner',
    async: async (m, {
       client,
-      Utils,
-      Scraper
+      Utils
    }) => {
       try {
          let q = m.quoted ? m.quoted : m

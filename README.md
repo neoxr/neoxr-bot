@@ -11,7 +11,7 @@
 > [!NOTE]
 > Terkait laporan script delay, itu bukan delay tapi memang sistem anti spam (cooldown) jika ada 2 user mengirim command secara bersamaan hanya 1 yang akan di response untuk me-minimalisir banned dari pihak WhatsApp. Fitur ini bisa dimatikan dengan perintah : **.antispam off**
 
-### Premium Script v4.1-Optima
+### Premium Script v5.1-Optima
 
 🏷️ Price : **Rp. 150.000 / $20.80**
 
