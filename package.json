@@ -31,6 +31,7 @@
       "baileys": "^7.0.0-rc.3",
       "cfonts": "3.1.1",
       "html-entities": "^2.5.2",
+      "jimp": "^0.22.12",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
       "translate-google-api": "1.0.4"

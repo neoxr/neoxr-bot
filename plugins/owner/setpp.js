@@ -1,6 +1,5 @@
 import baileys from '../../lib/engine.js'
 const { S_WHATSAPP_NET } = baileys
-import Jimp from 'jimp'
 
 export const run = {
    usage: ['setpp'],
@@ -44,6 +43,7 @@ export const run = {
 }
 
 async function generate(media) {
+   const Jimp = (await import('jimp')).default
    const jimp = await Jimp.read(media)
    const min = jimp.getWidth()
    const max = jimp.getHeight()

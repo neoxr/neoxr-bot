@@ -1,5 +1,3 @@
-import Jimp from 'jimp'
-
 export const run = {
    usage: ['setcover'],
    hidden: ['cover'],
@@ -35,6 +33,7 @@ export const run = {
  */
 const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9, quality = 50) => {
    try {
+      const Jimp = (await import('jimp')).default
       const image = await Jimp.read(inputBuffer)
       const { width, height } = image.bitmap
       const currentAspectRatio = width / height
