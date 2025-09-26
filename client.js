@@ -84,7 +84,7 @@ const connect = async () => {
 
          setInterval(async () => {
             if (global.db) await system.database.save(global.db)
-         }, 60 * 1000 * 5)
+         }, 60 * 1000 * (['local', 'sqlite'].includes(system.session) ? 3 : 5))
 
          cron.schedule('0 12 * * *', async () => {
             if (global?.db?.setting?.autobackup) {
