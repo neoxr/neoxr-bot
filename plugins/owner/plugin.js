@@ -1,3 +1,5 @@
+import path from 'path'
+
 export const run = {
    usage: ['plugen', 'plugdis'],
    use: 'plugin name',
@@ -7,13 +9,14 @@ export const run = {
       args,
       isPrefix,
       command,
-      plugins: plugs,
+      ctx,
+      setting,
       Utils
    }) => {
-      let pluginDisable = global.db.setting.pluginDisable
+      let pluginDisable = setting.pluginDisable
       if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'tiktok'), m)
       if (command == 'plugdis') {
-         let plugins = Object.keys(plugs)
+         let plugins = Object.keys(ctx.plugins).map(dir => path.basename(dir, '.js'))
          if (!plugins.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 Plugin ${args[0]}.js not found.`), m)
          if (pluginDisable.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 Plugin ${args[0]}.js previously has been disabled.`), m)
          pluginDisable.push(args[0])

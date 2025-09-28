@@ -1,5 +1,6 @@
 import { Utils, Scraper, Cooldown, Spam, Config } from '@neoxr/wb'
 import cron from 'node-cron'
+import path from 'path'
 const cooldown = new Cooldown(Config.cooldown)
 const spam = new Spam({
    RESET_TIMER: Config.cooldown,
@@ -14,11 +15,12 @@ export default async (client, ctx) => {
    let { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core, system } = ctx
    try {
       if (m.sender && m.sender.endsWith('lid')) m.sender = client.getRealJid(m.sender) || m.sender
-      schema(m, Config)
       const [groupMetadata, blockList] = await Promise.all([
-         m.isGroup ? client.getGroupMetadata(m.chat) : Promise.resolve({}),
+         m.isGroup ? client.resolveGroupMetadata(m.chat) : Promise.resolve({}),
          client.fetchBlocklist().catch(() => [])
       ])
+
+      schema(m, Config)
 
       let groupSet = global.db.groups.find(v => v.jid === m.chat)
       let chats = global.db.chats.find(v => v.jid === m.chat)
@@ -34,11 +36,11 @@ export default async (client, ctx) => {
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
          show: 'all', // options: 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
-         banned_times: users.ban_times,
+         banned_times: users?.ban_times,
          exception: isOwner || isPrem
       })
 
-      plugins = Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name)))
+      plugins = Object.fromEntries(Object.entries(plugins).filter(([dir, _]) => !setting.pluginDisable.includes(path.basename(dir, '.js'))))
 
       if (!setting.online) client.sendPresenceUpdate('unavailable', m.chat)
       if (setting.online) {
@@ -119,8 +121,9 @@ export default async (client, ctx) => {
             Utils.hitstat(command, m.sender)
          }
          const is_commands = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))
-         for (let name in is_commands) {
-            const cmd = is_commands[name].run
+         for (let pluginPath in is_commands) {
+            const name = path.basename(pluginPath, '.js')
+            const cmd = is_commands[pluginPath].run
             const turn = cmd.usage instanceof Array ? cmd.usage.includes(command) : cmd.usage instanceof String ? cmd.usage == command : false
             const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
             if (!turn && !turn_hidden) continue
@@ -189,8 +192,9 @@ export default async (client, ctx) => {
          }
       } else {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
-         for (let name in is_events) {
-            let event = is_events[name].run
+         for (let pluginPath in is_events) {
+            const name = path.basename(pluginPath, '.js')
+            const event = is_events[pluginPath].run
             if ((m.fromMe && m.isBot) || m.chat.endsWith('broadcast') || /pollUpdate/.test(m.mtype)) continue
             if (!m.isGroup && Config.blocks.some(no => m.sender.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
             if (setting.self && !['menfess_ev', 'anti_link', 'anti_tagall', 'anti_virtex', 'filter'].includes(event.pluginName) && !isOwner && !m.fromMe) continue

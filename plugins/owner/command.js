@@ -8,11 +8,12 @@ export const run = {
       isPrefix,
       command,
       plugins,
+      setting: cmd,
       Utils
    }) => {
-      let cmd = global.db.setting
       if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'tiktok'), m)
-      let commands = Utils.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))).map(v => v.run.usage))
+      const parser = Utils.arrayJoin(Object.values(Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => prop.run.usage))))
+      const commands = Utils.arrayJoin(parser.map(v => v.run.usage).concat(parser.map(v => v.run.hidden)))
       if (!commands.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 Command ${isPrefix + args[0]} does not exist.`), m)
       if (command == 'disable') {
          if (cmd.error.includes(args[0])) return client.reply(m.chat, Utils.texted('bold', `🚩 ${isPrefix + args[0]} command was previously disabled.`), m)
