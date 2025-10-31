@@ -1,6 +1,6 @@
 {
-   "owner": "6285xxxxxxxx",
-   "owner_name": "Wildan Izzudin",
+   "owner": "62895326456182",
+   "owner_name": "arya bot WhatsApp",
    "database": "data",
    "limit": 15,
    "ram_limit": "900mb",
@@ -16,7 +16,8 @@
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true,
-      "number": 6282258694977,
+      "number": 083848810730,
       "code": "NEOXRBOT"
    }
+
 }
