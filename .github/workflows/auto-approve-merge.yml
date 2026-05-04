@@ -30,8 +30,8 @@ jobs:
       - name: Get AI Code Review
         id: ai-review
         env:
-          NODE_TLS_REJECT_UNAUTHORIZED: 0
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          NODE_TLS_REJECT_UNAUTHORIZED: 0
         run: |
           DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 3000)
           
