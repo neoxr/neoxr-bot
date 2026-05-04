@@ -37,7 +37,7 @@ jobs:
           if [ -z "$DIFF" ]; then
             MESSAGE="✅ Approved automatically (No code changes detected)."
           else
-            RESPONSE=$(curl -s -X POST "https://s.neoxr.eu/api/review" \
+            RESPONSE=$(curl -s -X POST "https://xorasync-ai.hf.space/api/review" \
               --data-urlencode "prompt=Berikan review singkat untuk kode ini: $DIFF" \
               --data-urlencode "apikey=${{ secrets.NEOXR_API_KEY }}")
             
