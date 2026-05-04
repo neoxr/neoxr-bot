@@ -38,7 +38,7 @@ jobs:
             MESSAGE="✅ Approved automatically (No code changes detected)."
           else
             RESPONSE=$(curl -s -X POST "https://xorasync-ai.hf.space/api/review" \
-              --data-urlencode "prompt=Berikan review singkat untuk kode ini: $DIFF" \
+              --data-urlencode "prompt=$DIFF" \
               --data-urlencode "apikey=${{ secrets.NEOXR_API_KEY }}")
             
             MESSAGE=$(echo "$RESPONSE" | jq -r '.data.message // "✅ Approved automatically"')
