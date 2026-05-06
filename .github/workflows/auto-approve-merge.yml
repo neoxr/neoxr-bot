@@ -27,7 +27,41 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Get AI Code Review
+      - name: Update PR Title and Body
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          # Fetch PR diff
+          DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 3000)
+          
+          if [ -n "$DIFF" ]; then
+            # Send diff to revision API
+            RESPONSE=$(curl -s -X POST "https://xorasync-ai.hf.space/api/revisi" \
+              --data-urlencode "prompt=$DIFF" \
+              --data-urlencode "apikey=${{ secrets.NEOXR_API_KEY }}")
+            
+            # Extract generated text (assuming the API returns standard JSON like the review endpoint)
+            CONTENT=$(echo "$RESPONSE" | jq -r '.data.message')
+            
+            # If content is valid, process and update PR
+            if [ -n "$CONTENT" ] && [ "$CONTENT" != "null" ]; then
+              # The first line is treated as the Title
+              TITLE=$(echo "$CONTENT" | head -n 1)
+              
+              # The rest of the content (starting from line 3 to skip the blank line) is the Body
+              echo "$CONTENT" | tail -n +3 > pr_body.txt
+              
+              # Fallback if body becomes empty (no blank line was provided by AI)
+              if [ ! -s pr_body.txt ]; then
+                 echo "$CONTENT" | tail -n +2 > pr_body.txt
+              fi
+
+              # Apply changes to the Pull Request
+              gh pr edit ${{ github.event.pull_request.number }} --title "$TITLE" --body-file pr_body.txt
+            fi
+          fi
+
+      - name: AI Code Review
         id: ai-review
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
