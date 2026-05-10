@@ -20,8 +20,10 @@ export const run = {
          caption += `└  ◦  Processor : ${os.cpus()[0].model}\n\n`
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
-            ads: false,
             largeThumb: true,
+            type: 'preview-link',
+            /* choose: landscape (default), potrait, square */
+            ratio: 'landscape',
             thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
          })
       } catch (e) {

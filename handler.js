@@ -198,6 +198,9 @@ export default async (client, ctx) => {
                client.sendMessageModify(m.chat, `⚠️ Using bot in private chat only for premium user, want to upgrade to premium plan ? send *${prefixes[0]}premium* to see benefit and prices.`, m, {
                   largeThumb: true,
                   thumbnail: 'https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg',
+                  type: 'preview-link',
+                  /* choose: landscape (default), potrait, square */
+                  ratio: 'landscape',
                   url: setting.link
                }).then(() => chats.lastchat = new Date() * 1)
                continue

@@ -19,6 +19,9 @@ export const run = {
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
+            type: 'preview-link',
+            /* choose: landscape (default), potrait, square */
+            ratio: 'square',
             thumbnail: await Utils.fetchAsBuffer(json.data.map)
          })
       } catch (e) {

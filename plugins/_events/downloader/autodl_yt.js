@@ -48,6 +48,9 @@ export const run = {
                   let isSize = (json.data.size).replace(/MB/g, '').trim()
                   if (isSize > 99) return client.sendMessageModify(m.chat, caption, m, {
                      largeThumb: true,
+                     type: 'preview-link',
+                     /* choose: landscape (default), potrait, square */
+                     ratio: 'landscape',
                      thumbnail: await Utils.fetchAsBuffer(json.thumbnail)
                   }).then(async () => {
                      await client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m, {

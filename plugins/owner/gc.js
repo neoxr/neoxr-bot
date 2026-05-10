@@ -143,6 +143,9 @@ export const run = {
                   group
                }) + '\n\n' + global.footer, m, {
                   largeThumb: true,
+                  type: 'preview-link',
+                  /* choose: landscape (default), potrait, square */
+                  ratio: 'landscape',
                   thumbnail: picture
                })
             }

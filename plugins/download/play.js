@@ -29,6 +29,9 @@ export const run = {
          if (chSize.oversize) return client.reply(m.chat, isOver, m)
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
+            type: 'preview-link',
+            /* choose: landscape (default), potrait, square */
+            ratio: 'landscape',
             thumbnail: json.thumbnail
          }).then(async () => {
             client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {

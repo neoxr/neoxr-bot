@@ -40,6 +40,9 @@ export const run = {
                   if (chSize.oversize) return client.reply(m.chat, isOver, m)
                   client.sendMessageModify(m.chat, text, m, {
                      largeThumb: true,
+                     type: 'preview-link',
+                     /* choose: landscape (default), potrait, square */
+                     ratio: 'landscape',
                      thumbnail: 'https://telegra.ph/file/fcf56d646aa059af84126.jpg'
                   }).then(async () => {
                      client.sendFile(m.chat, json.data.url, unescape(decode(json.data.title)), '', m)

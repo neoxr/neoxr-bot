@@ -23,11 +23,7 @@ export const run = {
                teks += '	◦  *Snippet* : ' + v.description + '\n'
                teks += '	◦  *Link* : ' + v.url + '\n\n'
             })
-            client.sendMessageModify(m.chat, teks + global.footer, m, {
-               ads: false,
-               largeThumb: true,
-               thumbnail: await Utils.fetchAsBuffer('https://telegra.ph/file/d7b761ea856b5ba7b0713.jpg')
-            })
+            client.reply(m.chat, teks + global.footer, m)
          } else if (command == 'goimg') {
             const json = await Api.neoxr('/goimg', {
                q: text

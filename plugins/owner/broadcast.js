@@ -136,6 +136,9 @@ export const run = {
                   title: global.botname,
                   thumbnail: await Utils.fetchAsBuffer('https://telegra.ph/file/aa76cce9a61dc6f91f55a.jpg'),
                   largeThumb: true,
+                  type: 'preview-link',
+                  /* choose: landscape (default), potrait, square */
+                  ratio: 'landscape',
                   url: setting.link,
                   mentions: command == 'bcgc' ? member : []
                })

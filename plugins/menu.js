@@ -68,6 +68,9 @@ export const run = {
             client.sendMessageModify(m.chat, Utils.Styles(print) + '\n\n' + global.footer, m, {
                ads: false,
                largeThumb: true,
+               type: 'preview-link',
+               /* choose: landscape (default), potrait, square */
+               ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
@@ -120,8 +123,10 @@ export const run = {
                }).join('\n')
             }
             client.sendMessageModify(m.chat, Utils.Styles(print) + '\n\n' + global.footer, m, {
-               ads: false,
                largeThumb: true,
+               type: 'preview-link',
+               /* choose: landscape (default), potrait, square */
+               ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
@@ -174,8 +179,10 @@ export const run = {
                }).join('\n')
             }
             client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-               ads: false,
                largeThumb: true,
+               type: 'preview-link',
+               /* choose: landscape (default), potrait, square */
+               ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                url: setting.link
             })
@@ -237,8 +244,10 @@ export const run = {
                   }
                }).join('\n')
                client.sendMessageModify(m.chat, print + '\n\n' + global.footer, m, {
-                  ads: false,
                   largeThumb: true,
+                  type: 'preview-link',
+                  /* choose: landscape (default), potrait, square */
+                  ratio: 'landscape',
                   thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
                   url: setting.link
                })

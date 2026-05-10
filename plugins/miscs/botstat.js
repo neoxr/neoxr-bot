@@ -32,6 +32,9 @@ export const run = {
 
          await client.sendMessageModify(m.chat, buildStatisticMessage(Utils, stats, system), m, {
             largeThumb: true,
+            type: 'preview-link',
+            /* choose: landscape (default), potrait, square */
+            ratio: 'landscape',
             thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
          })
       } catch (error) {
