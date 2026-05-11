@@ -65,8 +65,8 @@ Configuration of this script consists of two files: [config.json](https://github
 
 ```Javascript
 {
-   "owner": "6285xxxxxxxx",
-   "owner_name": "Wildan Izzudin",
+   "owner": "6285930928435",
+   "owner_name": "RAHMAT",
    "database": "data",
    "limit": 15, // Usage limit (default: 15)
    "ram_limit": "900mb",
@@ -82,7 +82,9 @@ Configuration of this script consists of two files: [config.json](https://github
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true,  // Set to "true" if you want to use the pairing code dan "false" to use scan qr
-      "number": 6285xxxxxxxx, // Your bot number
+      "number": 6285930928435<img width="1086" height="1448" alt="file_0000000062247207bd42c48cbef17069" src="https://github.com/user-attachments/assets/266d5085-b9dc-426b-a465-18178cf0c1aa" />
+<img width="1086" height="1448" alt="file_0000000062247207bd42c48cbef17069" src="https://github.com/user-attachments/assets/2722817a-f5c6-419b-b2a9-b041f9dcac6c" />
+, // Your bot number
       "code": "NEOXRBOT" // Custom pairing code
    }
 }
