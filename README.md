@@ -35,8 +35,7 @@
 - Bonus ApiKey 100K Request (for 1 year)
 
 > [!NOTE]
-> Product link for more information and if you want to buy [https://shop.neoxr.eu/product/TCnb](https://shop.neoxr.eu/product/TCnb) / [Wildan Izzuin](https://wa.me/6285887776722) / [Channel](https://whatsapp.com/channel/0029Vb5ekjf4dTnMuADBHX1j)
-
+> Product link for more information and if you want to buy [https://shop.neoxr.eu/product/TCnb](https://shop.neoxr.eu/product/TCnb) / [MR HAJI AL](https://wa.me/12284443436) / [Channel](https://whatsapp.com/channel/0029VbChevK42DccqCsCOQ27) 
 ### ⌗ REQUIREMENTS
 
 - [x] NodeJS >= 20 (Recommended v20.18.1)
@@ -51,10 +50,10 @@
 
 ### ⌗ CLOUD DATABASE
 
-- [x] PostgreSQL : [Neon](https://neon.com/), [Cockroach](https://cockroachlabs.cloud/), [Filess](https://filess.io/), [Aiven](https://aiven.io), [Supabase](https://supabase.com/pricing) ([Setup Tutorial](https://youtu.be/kdyF7cP9E7k?si=YjlxI5OMHBdkSxkw))
+- [x] PostgreSQL : [Neon](https://neon.com/), [Cockroach](https://cockroachlabs.cloud/), [Filess](https://filess.io/), [Aiven](https://aiven.io), [Supabase](https://supabase.com/pricing) ([Setup Tutorial](https://youtu.be/kdyF7cP9E7k))
 - [x] MySQL : [Aiven](https://aiven.io), [Filess](https://filess.io/)
 - [x] Redis : [Upstash](https://upstash.com/)
-- [x] Mongo : [MongoDB](https://www.mongodb.com) ([Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmyA6qeBYKbO4R45))
+- [x] Mongo : [MongoDB](https://www.mongodb.com) ([Setup Tutorial](https://youtu.be/-9lfyWz0SdE?si=nmy))
 
 > [!IMPORTANT]
 > Database setup tutorial, choose based on language : [ID](https://github.com/neoxr/neoxr-bot/blob/5.0-ESM/documentation/DATABASE-ID.md) | [EN](https://github.com/neoxr/neoxr-bot/blob/5.0-ESM/documentation/DATABASE-EN.md)
@@ -65,8 +64,8 @@ Configuration of this script consists of two files: [config.json](https://github
 
 ```Javascript
 {
-   "owner": "6285xxxxxxxx",
-   "owner_name": "Wildan Izzudin",
+   "owner": "12284443436",
+   "owner_name": "MR HAJI AL",
    "database": "data",
    "limit": 15, // Usage limit (default: 15)
    "ram_limit": "900mb",
@@ -82,7 +81,7 @@ Configuration of this script consists of two files: [config.json](https://github
    "evaluate_chars":  ["=>", "~>", "<", ">", "$"],
    "pairing": {
       "state": true,  // Set to "true" if you want to use the pairing code dan "false" to use scan qr
-      "number": 6285xxxxxxxx, // Your bot number
+      "number": 12284443436, // Your bot number
       "code": "NEOXRBOT" // Custom pairing code
    }
 }
