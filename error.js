@@ -31,7 +31,9 @@ console.error = (...args) => {
       message?.includes('closed session') ||
       message?.includes('Failed to decrypt') ||
       message?.includes('sslmode') ||
-      message?.includes('ssl-mode')
+      message?.includes('ssl-mode') ||
+      message?.includes('Connection Closed') || 
+      message?.includes('Connection closed')
    ) {
       return
    }
