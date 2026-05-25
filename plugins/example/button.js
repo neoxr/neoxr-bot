@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 export const run = {
-   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7'],
+   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8'],
    category: 'example',
    async: async (m, {
       client,
@@ -213,6 +213,16 @@ export const run = {
                })
                break
             }
+
+            case 'button8':
+               client.sendIAMessage(m.chat, [{
+                  name: 'inapp_signup',
+                  buttonParamsJson: JSON.stringify({})
+               }], m, {
+                  header: global.header,
+                  content: 'Hi! @0'
+               })
+               break
          }
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)

@@ -131,17 +131,13 @@ export const run = {
             for (let jid of id) {
                const room = group ? jid.id : jid
                const member = group ? client.lidParser(jid?.participants)?.map(v => v.id) : []
-               await client.sendMessageModify(room, text, null, {
-                  netral: true,
-                  title: global.botname,
-                  thumbnail: await Utils.fetchAsBuffer('https://telegra.ph/file/aa76cce9a61dc6f91f55a.jpg'),
-                  largeThumb: true,
-                  type: 'preview-link',
-                  /* choose: landscape (default), potrait, square */
-                  ratio: 'landscape',
-                  url: setting.link,
-                  mentions: command == 'bcgc' ? member : []
-               })
+               client.sendIAMessage(room, [{
+                  name: 'inapp_signup',
+                  buttonParamsJson: JSON.stringify({})
+               }], null, {
+                  header: 'Broadcast Message 📢',
+                  content: text
+               }, { mentionedJid: command === 'bcgc' ? member : [] })
                await Utils.delay(1500)
             }
             return client.reply(m.chat, Utils.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m)
