@@ -157,7 +157,9 @@ $ docker stop neoxr
 > [!IMPORTANT]
 > To add new data to global.db (e.g., global.db.reports), add data structure in the structure() block method in [models.js.](https://github.com/neoxrjs/v5.1-optima/blob/a5b88906d1ffffa8610fbbcd84fb957e1bf649b9/lib/system/models.js#L216)
 
-### ⌗ TROUBLESHOOTING (BAILEYS)
+## ⌗ TROUBLESHOOTING
+
+### 1. Baileys
 
 If you encounter issues or get stuck using ```npm:neoxr/baileys```, consider using one of the alternative Baileys packages listed below.
 
@@ -184,6 +186,17 @@ If you encounter issues or get stuck using ```npm:neoxr/baileys```, consider usi
 ```JSON
 "baileys": "git+https://github.com/whiskeySockets/Baileys.git"
 ```
+
+### 2. Sharp (Error on Termux)
+
+If you encounter an error when installing or building the `sharp` module in Termux, it is usually due to CPU architecture compatibility issues on Android. 
+
+To fix this, manually run the following command in your Termux console to install the WebAssembly version of sharp:
+
+```bash
+npm install --cpu=wasm32 sharp
+```
+Related issue : [#213](https://github.com/neoxr/neoxr-bot/issues/213)
 
 > [!IMPORTANT]
 > Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.

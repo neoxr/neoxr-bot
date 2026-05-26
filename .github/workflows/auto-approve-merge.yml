@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           # Fetch PR diff
-          DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 3000)
+          DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 5000)
           
           if [ -n "$DIFF" ]; then
             # Send diff to revision API
@@ -66,7 +66,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 3000)
+          DIFF=$(gh pr diff ${{ github.event.pull_request.number }} | head -c 5000)
           
           if [ -z "$DIFF" ]; then
             MESSAGE="✅ Approved automatically (No code changes detected)."
