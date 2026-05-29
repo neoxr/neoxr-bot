@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 export const run = {
-   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8'],
+   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9'],
    category: 'example',
    async: async (m, {
       client,
@@ -17,8 +17,9 @@ export const run = {
                   name: 'quick_reply',
                   buttonParamsJson: JSON.stringify({
                      display_text: 'Runtime',
-                     id: `${isPrefix}run`
-                  })
+                     id: `${isPrefix}run`,
+                     icon: 'REVIEW'
+                  }),
                }, {
                   name: 'single_select',
                   buttonParamsJson: JSON.stringify({
@@ -33,7 +34,8 @@ export const run = {
                            // description: `Y`,
                            id: `${isPrefix}run`
                         }]
-                     }]
+                     }],
+                     icon: 'DEFAULT'
                   })
                }]
                client.sendIAMessage(m.chat, buttons, m, {
@@ -133,28 +135,29 @@ export const run = {
                })
                break
 
-            case 'button6': // Button 6 (Message Modify)
-               client.replyButton(m.chat, [{
-                  text: 'Runtime',
-                  command: '.runtime'
-               }, {
-                  text: 'Statistic',
-                  command: '.stat'
-               }], m, {
-                  text: 'Hi @0',
-                  footer: global.footer,
-                  docs: {
-                     name: 'オートメーション',
-                     pages: 20,
-                     size: '1GB',
-                     extension: 'ppt'
-                  },
-                  body: 'WhatsApp Automation',
-                  thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
-               })
-               break
+            // case 'button6': // Button 6 (Message Modify)
+            //    client.replyButton(m.chat, [{
+            //       text: 'Runtime',
+            //       command: '.runtime'
+            //    }, {
+            //       text: 'Statistic',
+            //       command: '.stat'
+            //    }], m, {
+            //       text: 'Hi @0',
+            //       footer: global.footer,
+            //       docs: {
+            //          name: 'オートメーション',
+            //          pages: 20,
+            //          size: '1GB',
+            //          extension: 'ppt'
+            //       },
+            //       document: true,
+            //       body: 'WhatsApp Automation',
+            //       thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
+            //    })
+            //    break
 
-            case 'button7': {
+            case 'button6': {
                const buttons = [{
                   name: "quick_reply",
                   buttonParamsJson: JSON.stringify({
@@ -214,7 +217,7 @@ export const run = {
                break
             }
 
-            case 'button8':
+            case 'button7':
                client.sendIAMessage(m.chat, [{
                   name: 'inapp_signup',
                   buttonParamsJson: JSON.stringify({})
@@ -223,6 +226,39 @@ export const run = {
                   content: 'Hi! @0'
                })
                break
+
+            case 'button8':
+               client.sendIAMessage(m.chat, [{
+                  name: 'inapp_signup',
+                  buttonParamsJson: JSON.stringify({
+                     signup_id: '1885845738738391',
+                     subscription_timestamp: String(Math.floor(Date.now() / 1000)),
+                     promo_code: 'AKU YAHUDI'
+                  })
+               }], m, {
+                  header: global.header,
+                  content: 'Hi! @0'
+               })
+               break
+
+            case 'button9': {
+               client.replyButton(m.chat, [{
+                  text: 'Runtime',
+                  command: '.runtime'
+               }, {
+                  text: 'Statistic',
+                  command: '.stat'
+               }], m, {
+                  text: 'Hi @0',
+                  footer: global.footer,
+                  location: {
+                     name: global.header,
+                     description: 'オートメーション'
+                  },
+                  media: 'https://i.pinimg.com/736x/e9/84/8e/e9848e90f9a4cc57c839c6e579472169.jpg' // url or buffer
+               })
+               break
+            }
          }
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
