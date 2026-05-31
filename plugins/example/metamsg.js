@@ -14,7 +14,7 @@ export const run = {
 
          if (command === 'metamsg1') {
             client.sendMetaMsg(m.chat, [{
-               text: `Hi @${m.sender.replace(/@.+/, '')} ✨, This is an example of a simple meta message that supports *mentions*, *tables* and *code format*.\n\nAnd below is an example of the code format.`
+               text: `Hi @${m.sender.replace(/@.+/, '')} ✨, This is an example of a simple meta message (rich message) that supports *mentions*, *tables* and *code format*.\n\nAnd below is an example of the code format.`
             },
             {
                code: {
@@ -45,7 +45,7 @@ export const run = {
          if (command === 'metamsg2') {
             client.sendMetaMsg(m.chat, [
                {
-                  text: `This is an example of a meta message that does not support *~mentions~* and *~tables~*, but has many variations. Such as citations [](https://api.neoxr.eu) and links [Neoxr API](https://api.neoxr.eu).\n\nCode formatting can still works :`
+                  text: `This is an example of a meta message (rich message) that does not support *~mentions~*, but has many variations. Such as citations [](https://api.neoxr.eu) and links [Neoxr API](https://api.neoxr.eu).\n\nCode formatting and tables are working:`
                },
                {
                   code: {
@@ -54,10 +54,20 @@ export const run = {
                   }
                },
                {
+                  table: {
+                     title: 'Data',
+                     headers: ['Code', 'Artist'],
+                     rows: [
+                        ['SSID-738', 'Yua Mikami'],
+                        ['RTXU-849', 'Momoka Nishina']
+                     ]
+                  }
+               },
+               {
                   muted: 'There is also muted text like this.'
                },
                {
-                  suggestions: ['N', 'E', 'O', 'X', 'R', 'BOT'] // max 6
+                  suggestions: ['N', 'E', 'O', 'X', 'R', 'BOT']
                },
                {
                   sources: [{
@@ -116,14 +126,6 @@ export const run = {
                      post_type: 'PHOTO'
                   }))
                },
-               // {
-               //    medias: Array(3).fill({
-               //       url: 'https://s.neoxr.eu/get/RmEDXP.mp4',
-               //       type: 'video',
-               //       source: 'https://s.neoxr.eu',
-               //       duration: 111
-               //    })
-               // },
                {
                   text: '\n\n---\n\nHere is an example of a non-slide product:\n\n'
                },
