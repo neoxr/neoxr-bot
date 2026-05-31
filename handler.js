@@ -160,6 +160,10 @@ export default async (client, ctx) => {
                quoted: m.quoted ? m.quoted : (isMedia ? m : null),
                timeout: setTimeout(() => {
                   global.typo.delete(m.sender)
+               }, 30000)
+            })
+         }
+      }.sender)
                }, 180000)
             })
 
