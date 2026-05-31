@@ -1,14 +1,15 @@
 import fs from 'fs'
 
 export const run = {
-   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9'],
+   usage: ['button1', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9', 'button10', 'button11'],
    category: 'example',
    async: async (m, {
       client,
       isPrefix,
       command,
       setting,
-      Utils
+      Utils,
+      Config
    }) => {
       try {
          switch (command) {
@@ -135,28 +136,6 @@ export const run = {
                })
                break
 
-            // case 'button6': // Button 6 (Message Modify)
-            //    client.replyButton(m.chat, [{
-            //       text: 'Runtime',
-            //       command: '.runtime'
-            //    }, {
-            //       text: 'Statistic',
-            //       command: '.stat'
-            //    }], m, {
-            //       text: 'Hi @0',
-            //       footer: global.footer,
-            //       docs: {
-            //          name: 'オートメーション',
-            //          pages: 20,
-            //          size: '1GB',
-            //          extension: 'ppt'
-            //       },
-            //       document: true,
-            //       body: 'WhatsApp Automation',
-            //       thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
-            //    })
-            //    break
-
             case 'button6': {
                const buttons = [{
                   name: "quick_reply",
@@ -259,6 +238,79 @@ export const run = {
                })
                break
             }
+
+            case 'button10':
+               client.sendIAMessage(m.chat, [{
+                  name: 'booking_confirmation',
+                  buttonParamsJson: JSON.stringify({
+                     start_datetime: generateDateTimes().start_datetime,
+                     end_datetime: generateDateTimes().end_datetime,
+                     location: 'Indonesia',
+                     booking_url: 'https://api.neoxr.eu/',
+                     phone_number: String(Config.owner),
+                     bookingmanagementurl: 'https://api.neoxr.eu/',
+                     description: '어제 먹은 떡볶이가 사실 내 전생일지도 몰라. 쫄깃한 인생.',
+                     email: 'contact@neoxr.my.id',
+                     display_text: 'Open'
+                  })
+               }], m, {
+                  header: global.header,
+                  content: 'Hi! @0'
+               })
+               break
+
+            case 'button11':
+               client.sendIAMessage(m.chat, [{
+                  name: "payment_key_info",
+                  buttonParamsJson: JSON.stringify({
+                     "currency": "IDR",
+                     "total_amount": {
+                        "value": 0,
+                        "offset": 100
+                     },
+                     "reference_id": "4V9ZSQ2JWGP",
+                     "type": "physical-goods",
+                     "order": {
+                        "status": "pending",
+                        "subtotal": {
+                           "value": 0,
+                           "offset": 100
+                        },
+                        "order_type": "ORDER",
+                        "items": [
+                           {
+                              "name": "",
+                              "amount": {
+                                 "value": 0,
+                                 "offset": 100
+                              },
+                              "quantity": 0,
+                              "sale_amount": {
+                                 "value": 0,
+                                 "offset": 100
+                              }
+                           }
+                        ]
+                     },
+                     "payment_settings": [
+                        {
+                           "type": "payment_key",
+                           "payment_key": {
+                              "type": "IDPAYMENTACCOUNT",
+                              "key": "+62 85887776722",
+                              "name": "DANA",
+                              "institution_name": "DANA",
+                              "full_name_on_account": "Wildan Izzudin",
+                              "account_type": "wallet"
+                           }
+                        }
+                     ],
+                     "share_payment_status": false,
+                     "is_soft_deleted": false,
+                     "referral": "chat_attachment"
+                  })
+               }], m)
+               break
          }
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
@@ -266,3 +318,13 @@ export const run = {
    },
    error: false
 }
+
+function generateDateTimes(durationMinutes = 10) {
+   const start = new Date()
+   const end = new Date(start.getTime() + durationMinutes * 60000)
+ 
+   return {
+     start_datetime: start.toISOString(),
+     end_datetime: end.toISOString()
+   }
+ }
