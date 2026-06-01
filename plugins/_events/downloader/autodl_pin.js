@@ -26,11 +26,9 @@ export const run = {
                      url: link
                   })
                   if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
-                  if (/jpg/.test(json.data.type)) return client.sendFile(m.chat, json.data.url, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
-                  if (/mp4|gif/.test(json.data.type)) {
-                     const buffer = await Converter.toVideo(json.data.url)
-                     client.sendFile(m.chat, buffer, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
-                  }
+                  if (json.data?.length === 1) return client.sendFile(m.chat, json.data[0].url, '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
+                  const files = json.data.map(v => ({ url: v.url }))
+                  client.sendAlbumMessage(m.chat, files, m)
                })
             }
          }
