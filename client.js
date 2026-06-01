@@ -1,6 +1,6 @@
 import { Client, Config, Utils } from '@neoxr/wb'
 import baileys from './lib/engine.js'
-import './lib/proto.js'
+// import './lib/proto.js'
 import './error.js'
 import './lib/config.js'
 import './lib/functions.js'
