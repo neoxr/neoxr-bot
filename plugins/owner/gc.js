@@ -37,7 +37,7 @@ export const run = {
                   client.groupStatus(id, {
                      message: { [q.mtype]: { ...q, caption: texts || q.text || '' } },
                      caption: texts || q.text || ''
-                  }).then(async () => {
+                  }, { closeFriends: true }).then(async () => {
                      await client.sendReact(m.chat, '✅', m.key)
                   })
                } else if (/audio/.test(mime)) {
@@ -45,7 +45,7 @@ export const run = {
                   client.groupStatus(id, {
                      message: { [q.mtype]: q },
                      background: color
-                  }).then(async () => {
+                  }, { closeFriends: true }).then(async () => {
                      await client.sendReact(m.chat, '✅', m.key)
                   })
                } else {
