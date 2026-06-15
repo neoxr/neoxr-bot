@@ -37,7 +37,12 @@ export const run = {
                   client.groupStatus(id, {
                      message: { [q.mtype]: { ...q, caption: texts || q.text || '' } },
                      caption: texts || q.text || ''
-                  }, { closeFriends: true }).then(async () => {
+                  }, {
+                     private: {
+                        name: 'Neoxr Creative',
+                        emoji: '😈'
+                     }
+                  }).then(async () => {
                      await client.sendReact(m.chat, '✅', m.key)
                   })
                } else if (/audio/.test(mime)) {
@@ -45,7 +50,12 @@ export const run = {
                   client.groupStatus(id, {
                      message: { [q.mtype]: q },
                      background: color
-                  }, { closeFriends: true }).then(async () => {
+                  }, {
+                     private: {
+                        name: 'Neoxr Creative',
+                        emoji: '😈'
+                     }
+                  }).then(async () => {
                      await client.sendReact(m.chat, '✅', m.key)
                   })
                } else {
@@ -53,7 +63,13 @@ export const run = {
                   await client.sendReact(m.chat, '🕒', m.key)
                   client.groupStatus(id, {
                      text: texts,
+                     color: color,
                      background: color
+                  }, {
+                     private: {
+                        name: 'Neoxr Creative',
+                        emoji: '😈'
+                     }
                   }).then(async () => {
                      await client.sendReact(m.chat, '✅', m.key)
                   })
