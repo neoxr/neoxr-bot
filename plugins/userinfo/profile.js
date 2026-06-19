@@ -6,6 +6,7 @@ export const run = {
       client,
       text,
       blockList,
+      setting,
       Config,
       Utils
    }) => {
@@ -45,7 +46,8 @@ export const run = {
             type: 'preview-link',
             /* choose: landscape (default), potrait, square */
             ratio: 'square',
-            thumbnail: avatar
+            thumbnail: avatar,
+            icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
       }
    },

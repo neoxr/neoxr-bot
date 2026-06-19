@@ -32,6 +32,7 @@ export const run = {
          /* choose: landscape (default), potrait, square */
          ratio: 'landscape',
          thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
+         icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
       })
    },
    error: false

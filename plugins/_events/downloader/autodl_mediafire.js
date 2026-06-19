@@ -7,6 +7,7 @@ export const run = {
       body,
       users,
       Config,
+      setting,
       Utils
    }) => {
       try {
@@ -43,7 +44,8 @@ export const run = {
                      type: 'preview-link',
                      /* choose: landscape (default), potrait, square */
                      ratio: 'landscape',
-                     thumbnail: 'https://telegra.ph/file/fcf56d646aa059af84126.jpg'
+                     thumbnail: 'https://telegra.ph/file/fcf56d646aa059af84126.jpg',
+                     icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                   }).then(async () => {
                      client.sendFile(m.chat, json.data.url, unescape(decode(json.data.title)), '', m)
                   })

@@ -201,7 +201,8 @@ export default async (client, ctx) => {
                   type: 'preview-link',
                   /* choose: landscape (default), potrait, square */
                   ratio: 'landscape',
-                  url: setting.link
+                  url: setting.link,
+                  icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                }).then(() => chats.lastchat = new Date() * 1)
                continue
             }

@@ -72,7 +72,8 @@ export const run = {
                /* choose: landscape (default), potrait, square */
                ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
-               url: setting.link
+               url: setting.link,
+               icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
             })
          } else if (style === 2) {
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
@@ -128,7 +129,8 @@ export const run = {
                /* choose: landscape (default), potrait, square */
                ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
-               url: setting.link
+               url: setting.link,
+               icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
             })
          } else if (style === 3) {
             let filter = Object.entries(plugins).filter(([_, obj]) => obj.run.usage)
@@ -184,7 +186,8 @@ export const run = {
                /* choose: landscape (default), potrait, square */
                ratio: 'landscape',
                thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
-               url: setting.link
+               url: setting.link,
+               icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
             })
          } else if (style === 4) {
             if (text) {
@@ -249,7 +252,8 @@ export const run = {
                   /* choose: landscape (default), potrait, square */
                   ratio: 'landscape',
                   thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
-                  url: setting.link
+                  url: setting.link,
+                  icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                })
             }
          } else if (style === 5) {

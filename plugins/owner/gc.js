@@ -162,7 +162,8 @@ export const run = {
                   type: 'preview-link',
                   /* choose: landscape (default), potrait, square */
                   ratio: 'landscape',
-                  thumbnail: picture
+                  thumbnail: picture,
+                  icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                })
             }
          }

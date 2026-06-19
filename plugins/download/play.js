@@ -8,6 +8,7 @@ export const run = {
       isPrefix,
       command,
       users,
+      setting,
       Config,
       Utils
    }) => {
@@ -32,7 +33,8 @@ export const run = {
             type: 'preview-link',
             /* choose: landscape (default), potrait, square */
             ratio: 'landscape',
-            thumbnail: json.thumbnail
+            thumbnail: json.thumbnail,
+            icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          }).then(async () => {
             client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
                document: true,

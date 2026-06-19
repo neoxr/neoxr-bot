@@ -35,7 +35,8 @@ export const run = {
             type: 'preview-link',
             /* choose: landscape (default), potrait, square */
             ratio: 'landscape',
-            thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64')
+            thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
+            icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
       } catch (error) {
          client.reply(m.chat, Utils.jsonFormat(error), m)

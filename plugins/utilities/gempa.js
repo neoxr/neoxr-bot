@@ -3,6 +3,7 @@ export const run = {
    category: 'utilities',
    async: async (m, {
       client,
+      setting,
       Utils
    }) => {
       try {
@@ -22,7 +23,8 @@ export const run = {
             type: 'preview-link',
             /* choose: landscape (default), potrait, square */
             ratio: 'square',
-            thumbnail: await Utils.fetchAsBuffer(json.data.map)
+            thumbnail: await Utils.fetchAsBuffer(json.data.map),
+            icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
