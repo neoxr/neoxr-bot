@@ -1,4 +1,4 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
   - name: Have you checked the Baileys issue?
     about: Check the open/closed issues to make sure the bug comes from Baileys or from the script.
