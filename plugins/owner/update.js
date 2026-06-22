@@ -6,7 +6,7 @@ const execPromise = util.promisify(exec)
 export const run = {
    usage: ['update'],
    hidden: ['up'],
-   category: 'operator',
+   category: 'owner',
    async: async (m, {
       client,
       Utils
@@ -38,5 +38,5 @@ export const run = {
          }
       }
    },
-   operator: true
+   owner: true
 }
