@@ -9,38 +9,49 @@ export const run = {
       ctx,
       isOwner,
       Utils,
-      Scraper,
-      waSocket
+      Scraper
    }) => {
-      if (typeof body === 'object' || !isOwner) return
-      let command, text
-      let x = body && body.trim().split`\n`,
-         y = ''
-      command = x[0] ? x[0].split` `[0] : ''
-      y += x[0] ? x[0].split` `.slice`1`.join` ` : '', y += x ? x.slice`1`.join`\n` : ''
-      text = y.trim()
+      if (typeof body !== 'string' || !isOwner) return
+
+      const command = body.trim().split(/\s+/)[0]
+      let text = body.trim().substring(command.length).trim()
+
+      if (!text && m.quoted) {
+         text = m.quoted.text || m.quoted.body || m.quoted.conversation || (typeof m.quoted === 'string' ? m.quoted : '')
+         text = text.trim()
+      }
+
       if (!text) return
+
       if (command === '=>') {
          try {
-            var evL = await eval(`(async () => { return ${text} })()`)
-            client.reply(m.chat, Utils.jsonFormat(evL), m)
+            const evL = await eval(`(async () => { return ${text} })()`)
+            m.reply(util.format(evL))
          } catch (e) {
-            let err = await syntax(text)
-            m.reply(typeof err != 'undefined' ? Utils.texted('monospace', err) + '\n\n' : '' + util.format(e))
+            const err = syntax(text)
+            const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
+            m.reply(errMsg + util.format(e))
          }
       } else if (command === '>') {
          try {
-            var evL = await eval(`(async () => { ${text} })()`)
-            m.reply(Utils.jsonFormat(evL))
+            const evL = await eval(`(async () => { ${text} })()`)
+            const res = evL === undefined ? '✅ Success (No output)' : util.format(evL)
+            m.reply(res)
          } catch (e) {
-            let err = await syntax(text)
-            m.reply(typeof err != 'undefined' ? Utils.texted('monospace', err) + '\n\n' : '' + Utils.jsonFormat(e))
+            const err = syntax(text)
+            const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
+            m.reply(errMsg + util.format(e))
          }
-      } else if (command == '$') {
-         client.sendReact(m.chat, '🕒', m.key)
-         exec(text.trim(), (err, stdout) => {
-            if (err) return m.reply(err.toString())
-            if (stdout) return m.reply(stdout.toString())
+      } else if (command === '$') {
+         if (client.sendReact) client.sendReact(m.chat, '🕒', m.key)
+
+         exec(text, (err, stdout, stderr) => {
+            let res = ''
+            if (err) res += util.format(err) + '\n\n'
+            if (stderr) res += stderr.toString() + '\n\n'
+            if (stdout) res += stdout.toString()
+
+            m.reply(res.trim() || '✅ Success (No output)')
          })
       }
    },
