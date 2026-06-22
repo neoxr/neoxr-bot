@@ -7,10 +7,11 @@
 
 export const run = {
    async: async (m, {
-      client
+      client,
+      groupSet
    }) => {
       try {
-         if (!m.fromMe && m?.msg?.viewOnce) {
+         if (!m.fromMe && m?.msg?.viewOnce && (m.isGroup ? groupSet.viewOnce : true)) {
             const type = Object.keys(m.message)?.[0]
             const message = m.message?.[type]
 
