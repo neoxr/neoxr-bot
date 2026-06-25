@@ -55,11 +55,11 @@ export const run = {
                      thumbnail: await Utils.fetchAsBuffer(json.thumbnail),
                      icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                   }).then(async () => {
-                     await client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m, {
+                     await client.sendFile(m.chat, json.data.url, json.data.filename, caption, m, {
                         document: true
                      })
                   })
-                  client.sendFile(m.chat, json.data.buffer, json.data.filename, caption, m)
+                  client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
                })
             }
          }
