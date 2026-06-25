@@ -10,7 +10,7 @@ export const run = {
       try {
          const q = m.quoted ? m.quoted : m
          const mime = (q.msg || q).mimetype || ''
-         if (/image\/(jpe?g|png)/.test(mime)) {
+         if (/image\/(jpe?g|png|webp)/.test(mime)) {
             const buffer = await q.download()
             if (!buffer) return client.reply(m.chat, global.status.wrong, m)
             await client.sendReact(m.chat, '🕒', m.key)
