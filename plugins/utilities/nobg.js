@@ -23,7 +23,7 @@ export const run = {
                   image: image.data.url
                })
                if (!json.status) return m.reply(Utils.jsonFormat(json))
-               client.sendFile(m.chat, json.data.no_background, '', '', m)
+               client.sendFile(m.chat, json.data.no_background, 'image.png', '', m)
             } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
@@ -37,7 +37,7 @@ export const run = {
                image: image.data.url
             })
             if (!json.status) return m.reply(Utils.jsonFormat(json))
-            client.sendFile(m.chat, json.data.no_background, '', '', m)
+            client.sendFile(m.chat, json.data.no_background, 'image.png', '', m)
          }
       } catch (e) {
          return client.reply(m.chat, Utils.jsonFormat(e), m)
