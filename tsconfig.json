@@ -1,34 +1,38 @@
 {
-   "compilerOptions": {
-      "target": "ES2020",
-      "module": "NodeNext",
-      "moduleResolution": "nodenext",
-      "experimentalDecorators": true,
-      "allowImportingTsExtensions": false,
-      "allowSyntheticDefaultImports": true,
-      "noEmit": false,
-      "allowJs": false,
-      "checkJs": false,
-      "outDir": "lib",
-      "rootDir": "./src",
-      "strict": false,
-      "strictNullChecks": true,
-      "skipLibCheck": true,
-      "noImplicitThis": true,
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "declaration": false,
-      "sourceMap": true,
-      "lib": [
-         "es2020",
-         "esnext.array",
-         "DOM"
-      ]
-   },
-   "include": [
-      "./src/**/*.ts"
-   ],
-   "exclude": [
-      "node_modules"
-   ]
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "experimentalDecorators": true,
+    "allowImportingTsExtensions": false,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "allowJs": false,
+    "checkJs": false,
+    "outDir": "lib",
+    // "outDir": "../bot/node_modules/@neoxr/store/lib",
+    "rootDir": "./src",
+    "strict": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "noImplicitThis": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "sourceMap": true,
+    "lib": [
+      "es2020",
+      "esnext.array",
+      "DOM"
+    ]
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

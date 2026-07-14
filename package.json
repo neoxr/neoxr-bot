@@ -1,6 +1,6 @@
 {
   "name": "@neoxr/store",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Simplicity WhatsApp Bot (Baileys)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@types/bytes": "^3.1.5",
-    "@types/node": "^25.9.2",
+    "@types/node": "^26.1.0",
     "typedoc": "^0.28.5",
     "typescript": "^5.8.2"
   }
