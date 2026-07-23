@@ -113,12 +113,13 @@ class Store {
    }
 
    /**
-    * Converts Buffers and Uint8Arrays to base64 objects early.
-    * This prevents JSON.stringify from calling the native toJSON() method on Buffers,
+    * Converts Buffer and Uint8Array instances directly to base64 objects.
+    * This prevents JSON.stringify from calling the native toJSON() method on Buffers, 
     * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
     */
-   private toPOJO(obj: any, seen = new WeakSet()): any {
+   private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
+      if (depth > 50) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -127,28 +128,44 @@ class Store {
       if (obj instanceof Uint8Array) {
          return { type: 'Buffer', data: Buffer.from(obj).toString('base64') }
       }
+      if (obj instanceof Date) {
+         return obj.toISOString()
+      }
 
       seen.add(obj)
 
       if (Array.isArray(obj)) {
-         return obj.map(v => this.toPOJO(v, seen))
+         return obj.map(v => this.toPOJO(v, seen, depth + 1))
+      }
+
+      const proto = Object.getPrototypeOf(obj)
+      const isPlain = proto === null || proto === Object.prototype
+
+      if (!isPlain) {
+         if (typeof obj.toJSON === 'function') {
+            try {
+               return this.toPOJO(obj.toJSON(), seen, depth + 1)
+            } catch {
+               return null
+            }
+         }
+         return null
       }
 
       const res: any = {}
       const keys = Object.keys(obj)
       for (let i = 0; i < keys.length; i++) {
          const key = keys[i]
-         const val = obj[key]
-         if (typeof val !== 'function') {
-            res[key] = this.toPOJO(val, seen)
-         }
+         try {
+            const val = obj[key]
+            if (typeof val !== 'function') {
+               res[key] = this.toPOJO(val, seen, depth + 1)
+            }
+         } catch { }
       }
       return res
    }
 
-   /**
-    * Initializes the SQLite database and prepares all required SQL statements.
-    */
    private async initDB(): Promise<void> {
       const SQLite = await loadSqlite()
 
@@ -251,9 +268,6 @@ class Store {
       }
    }
 
-   /**
-    * Preloads dynamic chats from database into the active memory cache.
-    */
    private preloadChats(): void {
       if (!this.db || !this.preloadChatsStmt) return
       try {
@@ -264,9 +278,6 @@ class Store {
       } catch { }
    }
 
-   /**
-    * Preloads dynamic contacts from database into the active memory cache.
-    */
    private preloadContacts(): void {
       if (!this.db || !this.preloadContactsStmt) return
       try {
@@ -277,9 +288,6 @@ class Store {
       } catch { }
    }
 
-   /**
-    * Configures directories, capacities, and trigger re-initialization if directory changes.
-    */
    public config({ dir, max }: StoreConfig): this {
       let dbNeedsReinit = false
 
@@ -302,9 +310,6 @@ class Store {
       return this
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing chat records to SQLite.
-    */
    private createChatsProxy(): Record<string, any> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -341,9 +346,6 @@ class Store {
       }) as Record<string, any>
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing contact records to SQLite.
-    */
    private createContactsProxy(): Record<string, Contact> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -388,9 +390,6 @@ class Store {
       return this.contactsProxyInstance
    }
 
-   /**
-    * Binds active client and socket connections to the store module.
-    */
    public bind<T extends Client>(client: T, socket: any): T {
       this.client = client
       this.socket = socket
@@ -423,9 +422,6 @@ class Store {
       return client
    }
 
-   /**
-    * Loads a single message based on JID and message ID.
-    */
    public loadMessage(jid: string, id: string): WAMessage | null {
       if (this.db && this.getOneStmt) {
          try {
@@ -444,9 +440,6 @@ class Store {
       return null
    }
 
-   /**
-    * Loads list of messages associated with a JID up to a specific limit.
-    */
    public loadMessages(jid: string, count?: number): WAMessage[] | null {
       if (this.db) {
          try {
@@ -481,9 +474,6 @@ class Store {
       return null
    }
 
-   /**
-    * Adds a new message record and triggers automatic truncation to maximum capacity.
-    */
    public addMessage(jid: string, msg: WAMessage): void {
       if (this.db && this.insertStmt && this.cleanupStmt) {
          const msgId = msg.key?.id || (msg as any).id
@@ -508,9 +498,6 @@ class Store {
       }
    }
 
-   /**
-    * Fetches all message history associated with a JID using an offset constraint.
-    */
    public getAllMessages(jid: string, offset: number = 0): WAMessage[] & { count(): number; clear(): void } {
       if (this.db && this.getAllWithOffsetStmt && this.countStmt && this.deleteWithOffsetStmt) {
          try {
@@ -568,9 +555,6 @@ class Store {
       return emptyResult
    }
 
-   /**
-    * Handles partial or full updates on active chat structures.
-    */
    public chatUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -580,9 +564,6 @@ class Store {
       }
    }
 
-   /**
-    * Upserts contact arrays and resolves JID targets with the socket instance mapping.
-    */
    public contactsUpsert(newContacts: Contact[]): Set<string> {
       const oldContacts = new Set(Object.keys(this.contacts))
       for (const contact of newContacts) {
@@ -598,9 +579,6 @@ class Store {
       return oldContacts
    }
 
-   /**
-    * Processes structural updates on dynamic contacts and maintains LID-to-PN associations.
-    */
    public contactUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -615,9 +593,6 @@ class Store {
       }
    }
 
-   /**
-    * Fetches a contact structure using exact JID, ID, or phoneNumber identifiers.
-    */
    public getContact(id: string): Contact | null {
       if (!id) return null
       if (this.contacts[id]) return this.contacts[id]
@@ -625,9 +600,6 @@ class Store {
       return found || null
    }
 
-   /**
-    * Resolves lists of contacts alongside contextual cleaning and counting helper methods.
-    */
    public getAllContacts(offset: number = 0) {
       const list = Object.values(this.contacts)
       const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): number; clear(): void }
@@ -652,9 +624,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Updates a message structure by merging incoming status receipts.
-    */
    public updateMessageWithReceipt(msg: any, receipt: any): void {
       if (!msg) return
       msg.userReceipt = msg.userReceipt || []
@@ -671,9 +640,6 @@ class Store {
       }
    }
 
-   /**
-    * Updates a message structure by merging dynamic user reactions.
-    */
    public updateMessageWithReaction(msg: any, reaction: any): void {
       if (!msg) return
       const authorID = getKeyAuthor(reaction.key)
@@ -689,9 +655,6 @@ class Store {
       }
    }
 
-   /**
-    * Loads story data associated with a JID up to a given limit.
-    */
    public async loadStories(jid: string, count?: number): Promise<any[] | null> {
       if (this.db) {
          try {
@@ -717,9 +680,6 @@ class Store {
       return [...slice].reverse()
    }
 
-   /**
-    * Loads a single story entry based on its identifiers.
-    */
    public async loadStory(jid: string, id: string): Promise<any | null> {
       if (this.db && this.getStoryOneStmt) {
          try {
@@ -734,9 +694,6 @@ class Store {
       return list.find((v: any) => v.key?.id === id || v.id === id) || null
    }
 
-   /**
-    * Saves a single story structure and truncates standard memory bounds.
-    */
    public async addStory(jid: string, story: any): Promise<void> {
       const storyId = story.key?.id || story.id
       if (!storyId) return
@@ -758,9 +715,6 @@ class Store {
       }
    }
 
-   /**
-    * Retrieves all stories associated with a JID using offset-based listings.
-    */
    public async getAllStories(jid: string, offset: number = 0) {
       let list: any[] = []
       if (this.db && this.getStoriesAllStmt) {
@@ -808,9 +762,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Tracks message IDs to filter out duplicates.
-    */
    public recordMessageId(sock: any, msg: { [key: string]: any }): boolean {
       if (msg.fromMe) return true
 
@@ -837,9 +788,6 @@ class Store {
       return true
    }
 
-   /**
-    * Cleans up expired message data and deletes historical stories older than 24 hours.
-    */
    private cleanupExpiredMessages(): void {
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {

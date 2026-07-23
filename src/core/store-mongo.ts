@@ -77,8 +77,9 @@ class Store {
     * This prevents JSON.stringify from calling the native toJSON() method on Buffers,
     * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
     */
-   private toPOJO(obj: any, seen = new WeakSet()): any {
+   private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
+      if (depth > 50) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -87,21 +88,40 @@ class Store {
       if (obj instanceof Uint8Array) {
          return { type: 'Buffer', data: Buffer.from(obj).toString('base64') }
       }
+      if (obj instanceof Date) {
+         return obj.toISOString()
+      }
 
       seen.add(obj)
 
       if (Array.isArray(obj)) {
-         return obj.map(v => this.toPOJO(v, seen))
+         return obj.map(v => this.toPOJO(v, seen, depth + 1))
+      }
+
+      const proto = Object.getPrototypeOf(obj)
+      const isPlain = proto === null || proto === Object.prototype
+
+      if (!isPlain) {
+         if (typeof obj.toJSON === 'function') {
+            try {
+               return this.toPOJO(obj.toJSON(), seen, depth + 1)
+            } catch {
+               return null
+            }
+         }
+         return null
       }
 
       const res: any = {}
       const keys = Object.keys(obj)
       for (let i = 0; i < keys.length; i++) {
          const key = keys[i]
-         const val = obj[key]
-         if (typeof val !== 'function') {
-            res[key] = this.toPOJO(val, seen)
-         }
+         try {
+            const val = obj[key]
+            if (typeof val !== 'function') {
+               res[key] = this.toPOJO(val, seen, depth + 1)
+            }
+         } catch { }
       }
       return res
    }
