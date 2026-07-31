@@ -37,7 +37,8 @@
    },
    "devDependencies": {
       "css-select": "5.1.0",
-      "fflate": "^0.8.2"
+      "fflate": "^0.8.2",
+      "pm2": "~7.0.3"
    },
    "overrides": {
       "jimp": "~0.22.12"

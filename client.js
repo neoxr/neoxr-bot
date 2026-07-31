@@ -62,9 +62,18 @@ const connect = async () => {
          if (res && typeof res === 'object' && res.message) Utils.logFile(res.message)
       })
 
-      client.register('error', async error => {
-         console.log(colors.red(error.message))
-         if (error && typeof error === 'object' && error.message) Utils.logFile(error.message)
+      client.on('error', async error => {
+         const errorRegex = /Device logged out|Multi device mismatch|Method not allowed|Bad session file|Session opened on another server|403|516/i
+
+         if (errorRegex.test(error.message)) {
+            try {
+               pm2().catch(console.error)
+            } catch (e) {
+               Utils.printError(e)
+            }
+         }
+
+         console.error(colors.red(error.message))
       })
 
       client.once('ready', async () => {
