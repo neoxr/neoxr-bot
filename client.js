@@ -11,6 +11,7 @@ import cron from 'node-cron'
 import extra from './lib/listeners-extra.js'
 import { models, structure } from './lib/models.js'
 import system from './lib/adapter.js'
+import pm2 from './lib/pm2.js'
 
 const connect = async () => {
    try {
