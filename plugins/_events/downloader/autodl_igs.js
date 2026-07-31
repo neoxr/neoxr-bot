@@ -22,7 +22,7 @@ export const run = {
                let old = new Date()
                Utils.hitstat('igs', m.sender)
                links.map(async link => {
-                  const json = await Api.neoxr('/ig-fetch', {
+                  const json = await Api.neoxr('/ig', {
                   	url: link
                   })
                   if (!json.status) return client.reply(m.chat, `${global.status.fail} : [ @${link.split('/')[4]} ]`, m)
