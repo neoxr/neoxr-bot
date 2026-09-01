@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+   <meta charset="UTF-8">
+   <style>
+      * {
+         -webkit-tap-highlight-color: transparent;
+         -webkit-user-select: none;
+         user-select: none;
+         -webkit-touch-callout: none;
+         box-sizing: border-box;
+      }
+
+      /* Tombol Gerak Sedang */
+      .ctrl-btn {
+         flex: 1;
+         background: #2a2a2a;
+         color: #ffffff;
+         border: 1px solid #3a3a3a;
+         border-radius: 8px;
+         padding: 12px 0;
+         font-size: 20px;
+         font-weight: bold;
+         cursor: pointer;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+         transition: transform .06s, background .1s, border-color .1s;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         touch-action: none;
+      }
+
+      .ctrl-btn:active {
+         transform: scale(0.96);
+         background: #38bdf8;
+         color: #0f172a;
+         border-color: #38bdf8;
+      }
+   </style>
+</head>
+
+<body
+   style="margin:0;background:transparent;font-family:monospace,sans-serif;color:#eee;touch-action:manipulation;cursor:crosshair">
+   <div style="width:100%;max-width:620px;margin:auto;padding:12px">
+
+      <!-- Container Utama (#222222) -->
+      <div
+         style="background:#222222;border:1px solid #333333;border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.6)">
+
+         <!-- Header Minimalis -->
+         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 2px">
+            <div style="font-size:16px;font-weight:900;letter-spacing:1px;color:#ffffff">STRIKER</div>
+            <div style="font-size:13px;color:#888888">
+               <span id="score" style="color:#ffffff;font-weight:900;font-size:16px">00000</span>
+               <span style="margin:0 4px;color:#444">/</span>
+               <span id="best">HI 00000</span>
+            </div>
+         </div>
+
+         <!-- Arena Game Canvas -->
+         <canvas id="game" width="560" height="300"
+            style="width:100%;height:auto;background:#161616;border:1px solid #2d2d2d;border-radius:10px;display:block"></canvas>
+
+         <!-- Tombol Gerak Kiri & Kanan (Sedang) -->
+         <div style="margin-top:10px;display:flex;gap:10px">
+            <button id="btnLeft" class="ctrl-btn">◀</button>
+            <button id="btnRight" class="ctrl-btn">▶</button>
+         </div>
+
+      </div>
+   </div>
+
+   <script>
+const c = document.getElementById('game')
+const x = c.getContext('2d')
+const scoreEl = document.getElementById('score')
+const bestEl = document.getElementById('best')
+const btnLeft = document.getElementById('btnLeft')
+const btnRight = document.getElementById('btnRight')
+
+let p, bullets, enemies, shards, particles, stars, score, best = 0, speed, gameOver, last, shake, flash, runT, spawnTimer, shootTimer
+let moveLeft = false, moveRight = false
+
+// === SISTEM SUARA (WEB AUDIO API) ===
+let actx
+function initAudio() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)()
+  if (actx.state === 'suspended') actx.resume()
+}
+function playTone(freq1, freq2, type, dur, vol = 0.08) {
+  if (!actx) return
+  try {
+    const osc = actx.createOscillator()
+    const gain = actx.createGain()
+    osc.type = type
+    osc.frequency.setValueAtTime(freq1, actx.currentTime)
+    if (freq2) osc.frequency.exponentialRampToValueAtTime(freq2, actx.currentTime + dur)
+    gain.gain.setValueAtTime(vol, actx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur)
+    osc.connect(gain)
+    gain.connect(actx.destination)
+    osc.start()
+    osc.stop(actx.currentTime + dur)
+  } catch (e) {}
+}
+
+const sndShoot = () => playTone(850, 300, 'square', 0.04, 0.04)
+const sndHit = () => playTone(300, 80, 'sawtooth', 0.08, 0.08)
+const sndExplode = () => playTone(140, 40, 'sawtooth', 0.22, 0.15)
+const sndCollect = () => {
+  playTone(650, 900, 'sine', 0.05, 0.1)
+  setTimeout(() => playTone(900, 1350, 'sine', 0.08, 0.1), 35)
+}
+const sndOver = () => playTone(180, 25, 'sawtooth', 0.4, 0.25)
+
+// === PERSISTENSI HIGH SCORE ===
+function loadBest() {
+  let vals = []
+  try { let v = localStorage.getItem('stk_best'); if (v) vals.push(parseInt(v, 10)) } catch(e) {}
+  try { let v = sessionStorage.getItem('stk_best'); if (v) vals.push(parseInt(v, 10)) } catch(e) {}
+  try { let m = document.cookie.match(/(?:^|;\s*)stk_best=(\d+)/); if (m) vals.push(parseInt(m[1], 10)) } catch(e) {}
+  return vals.length ? Math.max(...vals.filter(v => !isNaN(v))) : 0
+}
+
+function saveBest(v) {
+  let val = String(Math.floor(v))
+  try { localStorage.setItem('stk_best', val) } catch(e) {}
+  try { sessionStorage.setItem('stk_best', val) } catch(e) {}
+  try { document.cookie = 'stk_best=' + val + ';max-age=31536000;path=/' } catch(e) {}
+  try {
+    let rq = indexedDB.open('stk_db', 1)
+    rq.onupgradeneeded = () => rq.result.createObjectStore('kv')
+    rq.onsuccess = () => { try { rq.result.transaction('kv', 'readwrite').objectStore('kv').put(val, 'stk_best') } catch(e) {} }
+  } catch(e) {}
+}
+
+best = loadBest()
+
+function reset() {
+  p = { x: c.width / 2, y: 255, w: 22, h: 20, targetX: c.width / 2, triple: 0 }
+  bullets = []
+  enemies = []
+  shards = []
+  particles = []
+  moveLeft = false
+  moveRight = false
+  if (!stars) {
+    stars = []
+    for (let i = 0; i < 35; i++) {
+      stars.push({ x: Math.random() * c.width, y: Math.random() * c.height, r: 1 + Math.random() * 1.5, vy: 0.8 + Math.random() * 1.8 })
+    }
+  }
+  score = 0
+  speed = 1.0
+  gameOver = false
+  last = 0
+  shake = 0
+  flash = 0
+  runT = 0
+  spawnTimer = 40
+  shootTimer = 0
+  bestEl.textContent = 'HI ' + String(Math.floor(best)).padStart(5, '0')
+}
+
+function burst(px, py, n, col, spd) {
+  for (let i = 0; i < n; i++) {
+    particles.push({ x: px, y: py, vx: (Math.random() - .5) * spd, vy: (Math.random() - .5) * spd, life: 1, col, size: 2 + Math.random() * 2 })
+  }
+}
+
+function spawnEnemy() {
+  let isBig = Math.random() < 0.25
+  let ew = isBig ? 24 : 16
+  let eh = isBig ? 24 : 16
+  let hp = isBig ? 3 : 1
+  enemies.push({
+    x: 20 + Math.random() * (c.width - 40 - ew),
+    y: -30,
+    w: ew,
+    h: eh,
+    hp: hp,
+    maxHp: hp,
+    vy: (isBig ? 1.2 : 2.0) + speed * 0.35,
+    isBig: isBig,
+    ph: Math.random() * 10
+  })
+}
+
+function drawPlayer() {
+  x.save()
+  x.translate(p.x, p.y)
+
+  // Api pendorong (thruster)
+  x.fillStyle = Math.random() < 0.5 ? '#38bdf8' : '#ffffff'
+  x.beginPath()
+  x.moveTo(-4, 10)
+  x.lineTo(0, 16 + Math.random() * 6)
+  x.lineTo(4, 10)
+  x.fill()
+
+  // Badan pesawat
+  x.fillStyle = '#ffffff'
+  x.beginPath()
+  x.moveTo(0, -10)
+  x.lineTo(11, 10)
+  x.lineTo(0, 6)
+  x.lineTo(-11, 10)
+  x.closePath()
+  x.fill()
+
+  // Kokpit
+  x.fillStyle = p.triple > 0 ? '#38bdf8' : '#222222'
+  x.beginPath()
+  x.arc(0, 0, 3, 0, 7)
+  x.fill()
+
+  x.restore()
+}
+
+function draw() {
+  x.clearRect(0, 0, c.width, c.height)
+  x.save()
+  if (shake > 0) x.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake)
+
+  // Bintang Latar
+  stars.forEach(s => {
+    x.fillStyle = 'rgba(255,255,255,' + (s.r * 0.25) + ')'
+    x.fillRect(s.x, s.y, s.r, s.r)
+  })
+
+  // Peluru
+  x.fillStyle = '#38bdf8'
+  bullets.forEach(b => {
+    x.fillRect(b.x - 1.5, b.y - 4, 3, 8)
+  })
+
+  // Shards (Kristal Energi)
+  shards.forEach(s => {
+    x.fillStyle = '#38bdf8'
+    let bob = Math.sin(runT * 0.1 + s.x) * 2
+    x.fillRect(s.x - 4, s.y + bob - 4, 8, 8)
+    x.fillStyle = '#ffffff'
+    x.fillRect(s.x - 1.5, s.y + bob - 1.5, 3, 3)
+  })
+
+  // Musuh (Enemies)
+  enemies.forEach(e => {
+    x.fillStyle = e.isBig ? '#e11d48' : '#f43f5e'
+    if (e.isBig) {
+      x.beginPath()
+      x.moveTo(e.x + e.w / 2, e.y)
+      x.lineTo(e.x + e.w, e.y + e.h / 2)
+      x.lineTo(e.x + e.w / 2, e.y + e.h)
+      x.lineTo(e.x, e.y + e.h / 2)
+      x.closePath()
+      x.fill()
+    } else {
+      x.fillRect(e.x, e.y, e.w, e.h)
+    }
+
+    if (e.hp > 1) {
+      x.fillStyle = '#ffffff'
+      x.fillRect(e.x + e.w / 2 - 2, e.y + e.h / 2 - 2, 4, 4)
+    }
+  })
+
+  // Partikel
+  particles.forEach(pt => {
+    x.fillStyle = 'rgba(' + pt.col + ',' + Math.max(pt.life, 0) + ')'
+    x.fillRect(pt.x, pt.y, pt.size, pt.size)
+  })
+
+  if (!gameOver) drawPlayer()
+
+  if (flash > 0) {
+    x.fillStyle = 'rgba(244,63,94,' + (flash * .4) + ')'
+    x.fillRect(0, 0, c.width, c.height)
+  }
+  x.restore()
+
+  // Layar Game Over
+  if (gameOver) {
+    x.fillStyle = 'rgba(22,22,22,.85)'
+    x.fillRect(0, 0, c.width, c.height)
+    x.fillStyle = '#ffffff'
+    x.textAlign = 'center'
+    x.font = '900 24px monospace'
+    x.fillText('OVER', c.width / 2, 135)
+    x.font = '13px monospace'
+    x.fillStyle = '#888888'
+    x.fillText('RETRY', c.width / 2, 165)
+    x.textAlign = 'left'
+  }
+}
+
+function loop(t) {
+  if (!last) last = t
+  let dt = Math.min((t - last) / 16.67, 2)
+  last = t
+  runT += dt
+
+  if (!gameOver) {
+    // Gerak dari Tombol (Continuous Hold)
+    if (moveLeft) p.targetX -= 12 * dt
+    if (moveRight) p.targetX += 12 * dt
+
+    // Pergerakan Halus Pesawat
+    p.targetX = Math.max(16, Math.min(c.width - 16, p.targetX))
+    p.x += (p.targetX - p.x) * 0.35 * dt
+    p.x = Math.max(16, Math.min(c.width - 16, p.x))
+
+    if (p.triple > 0) p.triple -= dt
+
+    // Auto Tembak
+    shootTimer -= dt
+    if (shootTimer <= 0) {
+      shootTimer = p.triple > 0 ? 8 : 11
+      sndShoot()
+      if (p.triple > 0) {
+        bullets.push({ x: p.x - 6, y: p.y - 10, vy: -10 })
+        bullets.push({ x: p.x + 6, y: p.y - 10, vy: -10 })
+        bullets.push({ x: p.x, y: p.y - 12, vy: -10 })
+      } else {
+        bullets.push({ x: p.x, y: p.y - 10, vy: -9.5 })
+      }
+    }
+
+    // Bintang Latar
+    stars.forEach(s => {
+      s.y += s.vy * dt
+      if (s.y > c.height) { s.y = 0; s.x = Math.random() * c.width }
+    })
+
+    // Peluru
+    bullets.forEach(b => { b.y += b.vy * dt })
+    bullets = bullets.filter(b => b.y > -20)
+
+    // Spawn Musuh
+    spawnTimer -= dt
+    if (spawnTimer <= 0) {
+      spawnEnemy()
+      spawnTimer = Math.max(22, 50 - speed * 10) + Math.random() * 20
+    }
+
+    // Update Musuh
+    enemies.forEach(e => {
+      e.y += e.vy * dt
+      if (e.isBig) e.x += Math.sin(runT * 0.08 + e.ph) * 1.2 * dt
+    })
+
+    // Update Shards
+    shards.forEach(s => { s.y += 1.8 * dt })
+    shards.forEach(s => {
+      let dist = Math.hypot(p.x - s.x, p.y - s.y)
+      if (!s.collected && dist < 20) {
+        s.collected = true
+        score += 100
+        p.triple = 280
+        sndCollect()
+        burst(s.x, s.y, 8, '56,189,248', 3)
+      }
+    })
+    shards = shards.filter(s => s.y < c.height + 20 && !s.collected)
+
+    // Deteksi Peluru Menabrak Musuh
+    bullets.forEach((b) => {
+      enemies.forEach((e) => {
+        if (b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) {
+          b.hit = true
+          e.hp--
+          sndHit()
+          burst(b.x, b.y, 3, '255,255,255', 2)
+          if (e.hp <= 0) {
+            e.dead = true
+            score += e.isBig ? 150 : 50
+            sndExplode()
+            shake = 8
+            burst(e.x + e.w / 2, e.y + e.h / 2, e.isBig ? 16 : 10, '244,63,94', 4)
+            if (Math.random() < 0.35) {
+              shards.push({ x: e.x + e.w / 2, y: e.y + e.h / 2, collected: false })
+            }
+          }
+        }
+      })
+    })
+    bullets = bullets.filter(b => !b.hit)
+    enemies = enemies.filter(e => !e.dead && e.y < c.height + 40)
+
+    // Deteksi Musuh Menabrak Pesawat
+    for (const e of enemies) {
+      if (p.x + 8 > e.x && p.x - 8 < e.x + e.w && p.y + 8 > e.y && p.y - 8 < e.y + e.h) {
+        gameOver = true
+        shake = 18
+        flash = 1
+        sndOver()
+        saveBest(best)
+        burst(p.x, p.y, 25, '244,63,94', 6)
+        burst(p.x, p.y, 15, '56,189,248', 4)
+      }
+    }
+
+    // Update Skor
+    speed = Math.min(3.5, speed + 0.0008 * dt)
+    score += dt * 0.4
+    if (score > best) best = score
+
+    scoreEl.textContent = String(Math.floor(score)).padStart(5, '0')
+    bestEl.textContent = 'HI ' + String(Math.floor(best)).padStart(5, '0')
+
+    particles.forEach(pt => { pt.x += pt.vx * dt; pt.y += pt.vy * dt; pt.life -= 0.04 * dt })
+    particles = particles.filter(pt => pt.life > 0)
+  }
+
+  if (shake > 0) shake = Math.max(0, shake - 0.7 * dt)
+  if (flash > 0) flash = Math.max(0, flash - 0.05 * dt)
+
+  draw()
+  requestAnimationFrame(loop)
+}
+
+// === HANDLER TOMBOL GERAK (HOLD & TOUCH FRIENDLY) ===
+function bindBtn(btn, onDown, onUp) {
+  const start = e => {
+    e.preventDefault()
+    initAudio()
+    if (gameOver) { reset(); return }
+    onDown()
+  }
+  const end = e => {
+    e.preventDefault()
+    onUp()
+  }
+  btn.addEventListener('pointerdown', start)
+  btn.addEventListener('pointerup', end)
+  btn.addEventListener('pointerleave', end)
+  btn.addEventListener('pointercancel', end)
+}
+
+bindBtn(btnLeft, () => moveLeft = true, () => moveLeft = false)
+bindBtn(btnRight, () => moveRight = true, () => moveRight = false)
+
+// Kontrol Langsung Canvas (Geser / Sentuh / Klik)
+function setTargetByPos(clientX) {
+  initAudio()
+  const rect = c.getBoundingClientRect()
+  const scale = c.width / rect.width
+  p.targetX = (clientX - rect.left) * scale
+}
+
+c.addEventListener('pointerdown', e => {
+  if (gameOver) { initAudio(); reset(); return }
+  setTargetByPos(e.clientX)
+})
+c.addEventListener('pointermove', e => {
+  if (e.buttons > 0 || e.pointerType === 'touch') {
+    setTargetByPos(e.clientX)
+  }
+})
+
+// Kontrol Keyboard (A / D / Panah Kiri / Panah Kanan)
+window.addEventListener('keydown', e => {
+  initAudio()
+  if (gameOver && (e.code === 'Space' || e.code === 'Enter')) { reset(); return }
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveLeft = true
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') moveRight = true
+})
+window.addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveLeft = false
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') moveRight = false
+})
+
+reset()
+requestAnimationFrame(loop)
+   </script>
+</body>
+
+</html>
