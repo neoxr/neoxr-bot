@@ -56,6 +56,7 @@ class Store {
    private contactsProxyInstance: Record<string, Contact>
 
    public stories: Record<string, any[]> = Object.create(null)
+   public nodes: Record<string, any[]> = Object.create(null)
    public presences: Record<string, { [participant: string]: PresenceData }> = Object.create(null)
    public state: ConnectionState = { connection: 'close' }
    public messageId: Map<string, Map<string, { at: number }>> = new Map()
@@ -63,6 +64,7 @@ class Store {
    private cache = new Map<string, WAMessage[]>()
    private maxCachedJids = 10
    private writeQueues = new Map<string, Promise<any>>()
+   private nodeWriteQueues = new Map<string, Promise<any>>()
 
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
@@ -89,11 +91,6 @@ class Store {
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
-   /**
-    * Converts Buffers and Uint8Arrays to base64 objects early.
-    * This prevents JSON.stringify from calling the native toJSON() method on Buffers,
-    * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
-    */
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
       if (depth > 50) return null
@@ -143,9 +140,39 @@ class Store {
       return res
    }
 
-   /**
-    * Initializes the MySQL connection pool and creates all database schemas if not exist.
-    */
+   private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (depth > 50) return null
+
+      if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
+         return '[buffer]'
+      }
+
+      if (typeof obj !== 'object') return obj
+      if (seen.has(obj)) return null
+      seen.add(obj)
+
+      if (Array.isArray(obj)) {
+         return obj.map(item => this.sanitizeNode(item, seen, depth + 1))
+      }
+
+      const res: any = {}
+      const keys = Object.keys(obj)
+      for (let i = 0; i < keys.length; i++) {
+         const key = keys[i]
+         try {
+            const val = obj[key]
+            if (typeof val === 'function') continue
+            if (Buffer.isBuffer(val) || val instanceof Uint8Array || val?.type === 'Buffer') {
+               res[key] = '[buffer]'
+               continue
+            }
+            res[key] = this.sanitizeNode(val, seen, depth + 1)
+         } catch { }
+      }
+      return res
+   }
+
    private async initDB(): Promise<void> {
       const mysql = await loadMySQL()
 
@@ -223,8 +250,32 @@ class Store {
             `)
          } catch (e) { }
 
+         await this.pool.query(`
+            CREATE TABLE IF NOT EXISTS nodes (
+               jid VARCHAR(255) NOT NULL,
+               id VARCHAR(255) NOT NULL,
+               tag VARCHAR(100) NOT NULL,
+               data LONGTEXT NOT NULL,
+               created_at BIGINT NOT NULL,
+               PRIMARY KEY (jid, id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+         `)
+
+         try {
+            await this.pool.query(`
+               ALTER TABLE nodes ADD INDEX idx_nodes_jid_created_at (jid, created_at DESC);
+            `)
+         } catch (e) { }
+
+         try {
+            await this.pool.query(`
+               ALTER TABLE nodes ADD INDEX idx_nodes_id (id);
+            `)
+         } catch (e) { }
+
          await this.preloadChats()
          await this.preloadContacts()
+         await this.preloadNodes()
 
          this.fallbackStore = null
          this.fallbackChats = null
@@ -235,9 +286,6 @@ class Store {
       }
    }
 
-   /**
-    * Preloads dynamic chats from database into the active memory cache.
-    */
    private async preloadChats(): Promise<void> {
       if (!this.pool) return
       try {
@@ -250,9 +298,6 @@ class Store {
       }
    }
 
-   /**
-    * Preloads dynamic contacts from database into the active memory cache.
-    */
    private async preloadContacts(): Promise<void> {
       if (!this.pool) return
       try {
@@ -265,9 +310,19 @@ class Store {
       }
    }
 
-   /**
-    * Configures directories, capacities, and triggers database re-initialization if URI changes.
-    */
+   private async preloadNodes(): Promise<void> {
+      if (!this.pool) return
+      try {
+         const [rows]: any = await this.pool.query('SELECT jid, data FROM nodes ORDER BY created_at DESC LIMIT 500')
+         for (const row of rows) {
+            if (!this.nodes[row.jid]) this.nodes[row.jid] = []
+            this.nodes[row.jid].push(parse(row.data))
+         }
+      } catch (error) {
+         console.error('[store-mysql] Failed to preload nodes:', error)
+      }
+   }
+
    public config({ dir, max, uri }: StoreConfig): this {
       let needsReinit = false
 
@@ -291,9 +346,6 @@ class Store {
       return this
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing chat records to MySQL.
-    */
    private createChatsProxy(): Record<string, any> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -319,9 +371,6 @@ class Store {
       }) as Record<string, any>
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing contact records to MySQL.
-    */
    private createContactsProxy(): Record<string, Contact> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -355,9 +404,6 @@ class Store {
       return this.contactsProxyInstance
    }
 
-   /**
-    * Binds active client and socket connections to the store module.
-    */
    public bind<T extends Client>(client: T, socket: any): T {
       this.client = client
       this.socket = socket
@@ -380,8 +426,14 @@ class Store {
       client.getAllStories = this.getAllStories.bind(this)
       client.recordMessageId = this.recordMessageId.bind(this)
 
+      client.addNode = this.addNode.bind(this)
+      client.loadNode = this.loadNode.bind(this)
+      client.loadNodes = this.loadNodes.bind(this)
+      client.getAllNodes = this.getAllNodes.bind(this)
+
       client.contacts = this.contacts
       client.stories = this.stories
+      client.nodes = this.nodes
       client.presences = this.presences
       client.state = this.state
       client.messageId = this.messageId
@@ -390,9 +442,6 @@ class Store {
       return client
    }
 
-   /**
-    * Internal helper to load raw messages history of a JID directly from MySQL connection pool.
-    */
    private async getMySQLData(jid: string): Promise<WAMessage[]> {
       if (this.cache.has(jid)) return this.cache.get(jid)!
       if (!this.pool) return []
@@ -411,9 +460,6 @@ class Store {
       }
    }
 
-   /**
-    * Loads a single message based on JID and message ID.
-    */
    public async loadMessage(jid: string, id: string): Promise<WAMessage | null> {
       if (this.pool) {
          try {
@@ -427,9 +473,6 @@ class Store {
       return list.find(v => v.key?.id === id || (v as any).id === id) || null
    }
 
-   /**
-    * Loads list of messages associated with a JID up to a specific limit.
-    */
    public async loadMessages(jid: string, count: number = 25): Promise<WAMessage[] | null> {
       if (this.pool) {
          try {
@@ -448,9 +491,6 @@ class Store {
       return [...list].reverse().slice(0, count)
    }
 
-   /**
-    * Saves a message and schedules background table pruning inside write queues.
-    */
    public async addMessage(jid: string, msg: WAMessage): Promise<void> {
       const msgId = msg.key?.id || (msg as any).id
       if (!msgId) return
@@ -477,7 +517,9 @@ class Store {
                         await this.pool.query('DELETE FROM messages WHERE jid = ? AND id IN (?)', [jid, ids])
                      }
                   }
-               } catch { }
+               } catch (e) {
+                  console.error('[store-mysql] addMessage error:', e)
+               }
             })
             .finally(() => {
                if (this.writeQueues.get(jid) === current) {
@@ -506,9 +548,6 @@ class Store {
       }
    }
 
-   /**
-    * Fetches all message history associated with a JID using an offset constraint.
-    */
    public async getAllMessages(jid: string, offset: number = 0) {
       let list: WAMessage[] = []
 
@@ -561,9 +600,229 @@ class Store {
       })
    }
 
-   /**
-    * Handles partial or full updates on active chat structures.
-    */
+   public async addNode(arg1: any, arg2?: any): Promise<void> {
+      let jid: string
+      let node: any
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         node = arg2
+      } else if (typeof arg2 === 'string') {
+         node = arg1
+         jid = arg2
+      } else {
+         node = arg1
+         jid = node?.attrs?.from || node?.attrs?.to || node?.attrs?.participant || 'unknown'
+      }
+
+      if (!node || typeof node !== 'object') return
+
+      const nodeId = node.attrs?.id || node.id || `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+      const tag = node.tag || 'node'
+
+      const cleanedNode = this.sanitizeNode(node)
+      if (!cleanedNode) return
+
+      if (this.pool) {
+         const previous = this.nodeWriteQueues.get(jid) || Promise.resolve()
+         const current = previous
+            .then(async () => {
+               try {
+                  await this.pool.query(
+                     'INSERT INTO nodes (jid, id, tag, data, created_at) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE tag = VALUES(tag), data = VALUES(data), created_at = VALUES(created_at)',
+                     [jid, nodeId, tag, stringify(cleanedNode), Date.now()]
+                  )
+
+                  const [countResult]: any = await this.pool.query('SELECT COUNT(*) as count FROM nodes WHERE jid = ?', [jid])
+                  const count = countResult[0]?.count || 0
+                  if (count > this.max) {
+                     const [toDelete]: any = await this.pool.query(
+                        'SELECT id FROM nodes WHERE jid = ? ORDER BY created_at ASC LIMIT ?',
+                        [jid, count - this.max]
+                     )
+                     if (toDelete.length > 0) {
+                        const ids = toDelete.map((d: any) => d.id)
+                        await this.pool.query('DELETE FROM nodes WHERE jid = ? AND id IN (?)', [jid, ids])
+                     }
+                  }
+               } catch (e) {
+                  console.error('[store-mysql] addNode error:', e)
+               }
+            })
+            .finally(() => {
+               if (this.nodeWriteQueues.get(jid) === current) {
+                  this.nodeWriteQueues.delete(jid)
+               }
+            })
+         this.nodeWriteQueues.set(jid, current)
+      }
+
+      if (!this.nodes[jid]) {
+         this.nodes[jid] = []
+      }
+      const existingIdx = this.nodes[jid].findIndex((n: any) => (n.attrs?.id || n.id) === nodeId)
+      if (existingIdx !== -1) {
+         this.nodes[jid][existingIdx] = cleanedNode
+      } else {
+         this.nodes[jid].push(cleanedNode)
+         if (this.nodes[jid].length > this.max) {
+            this.nodes[jid].shift()
+         }
+      }
+   }
+
+   public async loadNode(jidOrId: string, id?: string): Promise<any | null> {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid && this.nodes[targetJid]) {
+         const found = this.nodes[targetJid].find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      for (const j in this.nodes) {
+         const found = this.nodes[j]?.find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      if (this.pool) {
+         try {
+            if (targetJid) {
+               const [rows]: any = await this.pool.query('SELECT data FROM nodes WHERE jid = ? AND id = ?', [targetJid, targetId])
+               if (rows.length > 0) return parse(rows[0].data)
+            } else {
+               const [rows]: any = await this.pool.query('SELECT data FROM nodes WHERE id = ? LIMIT 1', [targetId])
+               if (rows.length > 0) return parse(rows[0].data)
+            }
+         } catch {
+            return null
+         }
+      }
+
+      return null
+   }
+
+   public async loadNodes(jid?: string | number, count?: number): Promise<any[] | null> {
+      let targetJid: string | undefined
+      let targetCount: number = 25
+
+      if (typeof jid === 'number') {
+         targetCount = jid
+         targetJid = undefined
+      } else {
+         targetJid = jid
+         if (typeof count === 'number') targetCount = count
+      }
+
+      if (targetJid && this.nodes[targetJid]?.length) {
+         return [...this.nodes[targetJid]].reverse().slice(0, targetCount)
+      } else if (!targetJid) {
+         const allNodes = Object.values(this.nodes).flat()
+         if (allNodes.length) return allNodes.slice(-targetCount).reverse()
+      }
+
+      if (this.pool) {
+         try {
+            let rows: any[] = []
+            if (targetJid) {
+               const [res]: any = await this.pool.query(
+                  'SELECT data FROM nodes WHERE jid = ? ORDER BY created_at DESC LIMIT ?',
+                  [targetJid, targetCount]
+               )
+               rows = res
+            } else {
+               const [res]: any = await this.pool.query(
+                  'SELECT data FROM nodes ORDER BY created_at DESC LIMIT ?',
+                  [targetCount]
+               )
+               rows = res
+            }
+            if (rows.length === 0) return null
+            return rows.map((row: any) => parse(row.data)).reverse()
+         } catch {
+            return null
+         }
+      }
+
+      return null
+   }
+
+   public async getAllNodes(jid?: string, offset: number = 0) {
+      let list: any[] = []
+
+      if (this.pool) {
+         try {
+            if (jid) {
+               const [rows]: any = await this.pool.query(
+                  'SELECT data FROM nodes WHERE jid = ? ORDER BY created_at DESC LIMIT ?',
+                  [jid, this.max]
+               )
+               list = rows.map((row: any) => parse(row.data)).reverse()
+            } else {
+               const [rows]: any = await this.pool.query(
+                  'SELECT data FROM nodes ORDER BY created_at DESC LIMIT ?',
+                  [this.max]
+               )
+               list = rows.map((row: any) => parse(row.data)).reverse()
+            }
+         } catch {
+            list = []
+         }
+      } else {
+         if (jid) {
+            list = this.nodes[jid] || []
+         } else {
+            list = Object.values(this.nodes).flat()
+         }
+      }
+
+      const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & {
+         count(): Promise<number>
+         clear(): Promise<void>
+      }
+
+      sliced.count = async () => {
+         if (this.pool) {
+            try {
+               if (jid) {
+                  const [countResult]: any = await this.pool.query('SELECT COUNT(*) as count FROM nodes WHERE jid = ?', [jid])
+                  const total = countResult[0]?.count || 0
+                  const actualTotal = total > this.max ? this.max : total
+                  return Math.max(0, actualTotal - offset)
+               } else {
+                  const [countResult]: any = await this.pool.query('SELECT COUNT(*) as count FROM nodes')
+                  const total = countResult[0]?.count || 0
+                  const actualTotal = total > this.max ? this.max : total
+                  return Math.max(0, actualTotal - offset)
+               }
+            } catch {
+               return 0
+            }
+         }
+         return Math.max(0, list.length - offset)
+      }
+
+      sliced.clear = async () => {
+         if (jid) {
+            delete this.nodes[jid]
+         } else {
+            this.nodes = Object.create(null)
+         }
+
+         if (this.pool) {
+            try {
+               if (jid) {
+                  await this.pool.query('DELETE FROM nodes WHERE jid = ?', [jid])
+               } else {
+                  await this.pool.query('DELETE FROM nodes')
+               }
+            } catch { }
+         }
+      }
+
+      return sliced
+   }
+
    public chatUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -573,9 +832,6 @@ class Store {
       }
    }
 
-   /**
-    * Upserts contact arrays and resolves JID targets with the socket instance mapping.
-    */
    public contactsUpsert(newContacts: Contact[]): Set<string> {
       const oldContacts = new Set(Object.keys(this.contacts))
       for (const contact of newContacts) {
@@ -591,9 +847,6 @@ class Store {
       return oldContacts
    }
 
-   /**
-    * Processes structural updates on dynamic contacts and maintains LID-to-PN associations.
-    */
    public contactUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -608,9 +861,6 @@ class Store {
       }
    }
 
-   /**
-    * Fetches a contact structure using exact JID, ID, or phoneNumber identifiers.
-    */
    public getContact(id: string): Contact | null {
       if (!id) return null
       if (this.contacts[id]) return this.contacts[id]
@@ -618,9 +868,6 @@ class Store {
       return found || null
    }
 
-   /**
-    * Resolves lists of contacts alongside contextual cleaning and counting helper methods.
-    */
    public getAllContacts(offset: number = 0) {
       const list = Object.values(this.contacts)
       const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): number; clear(): void }
@@ -645,9 +892,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Updates a message structure by merging incoming status receipts and updates active queues.
-    */
    public async updateMessageWithReceipt(msg: any, receipt: any): Promise<void> {
       if (!msg) return
       msg.userReceipt = msg.userReceipt || []
@@ -673,7 +917,9 @@ class Store {
                         'INSERT INTO messages (jid, id, data, created_at) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE data = VALUES(data), created_at = VALUES(created_at)',
                         [jid, id, stringify(this.toPOJO(msg)), Date.now()]
                      )
-                  } catch { }
+                  } catch (e) {
+                     console.error('[store-mysql] updateMessageWithReceipt error:', e)
+                  }
                })
                .finally(() => {
                   if (this.writeQueues.get(jid) === current) {
@@ -685,9 +931,6 @@ class Store {
       }
    }
 
-   /**
-    * Updates a message structure by merging dynamic user reactions and updates active queues.
-    */
    public async updateMessageWithReaction(msg: any, reaction: any): Promise<void> {
       if (!msg) return
       const authorID = getKeyAuthor(reaction.key)
@@ -712,7 +955,9 @@ class Store {
                         'INSERT INTO messages (jid, id, data, created_at) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE data = VALUES(data), created_at = VALUES(created_at)',
                         [jid, id, stringify(this.toPOJO(msg)), Date.now()]
                      )
-                  } catch { }
+                  } catch (e) {
+                     console.error('[store-mysql] updateMessageWithReaction error:', e)
+                  }
                })
                .finally(() => {
                   if (this.writeQueues.get(jid) === current) {
@@ -724,10 +969,12 @@ class Store {
       }
    }
 
-   /**
-    * Loads story data associated with a JID up to a given limit.
-    */
    public async loadStories(jid: string, count?: number): Promise<any[] | null> {
+      if (this.stories[jid]?.length) {
+         const slice = count && count > 0 ? this.stories[jid].slice(-count) : this.stories[jid]
+         if (slice?.length) return [...slice].reverse()
+      }
+
       if (this.pool) {
          try {
             let rows: any[] = []
@@ -756,10 +1003,12 @@ class Store {
       return [...slice].reverse()
    }
 
-   /**
-    * Loads a single story entry based on its identifiers.
-    */
    public async loadStory(jid: string, id: string): Promise<any | null> {
+      if (this.stories[jid]) {
+         const found = this.stories[jid].find((v: any) => (v.key?.id || v.id) === id)
+         if (found) return found
+      }
+
       if (this.pool) {
          try {
             const [rows]: any = await this.pool.query('SELECT data FROM stories WHERE jid = ? AND id = ?', [jid, id])
@@ -768,14 +1017,9 @@ class Store {
             return null
          }
       }
-      const list = this.stories[jid]
-      if (!list || list.length === 0) return null
-      return list.find((v: any) => v.key?.id === id || v.id === id) || null
+      return null
    }
 
-   /**
-    * Saves a single story structure and truncates standard memory bounds.
-    */
    public async addStory(jid: string, story: any): Promise<void> {
       const storyId = story.key?.id || story.id
       if (!storyId) return
@@ -786,8 +1030,22 @@ class Store {
                'INSERT INTO stories (jid, id, data, created_at) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE data = VALUES(data), created_at = VALUES(created_at)',
                [jid, storyId, stringify(this.toPOJO(story)), Date.now()]
             )
-         } catch { }
-         return
+
+            const [countResult]: any = await this.pool.query('SELECT COUNT(*) as count FROM stories WHERE jid = ?', [jid])
+            const count = countResult[0]?.count || 0
+            if (count > this.max) {
+               const [toDelete]: any = await this.pool.query(
+                  'SELECT id FROM stories WHERE jid = ? ORDER BY created_at ASC LIMIT ?',
+                  [jid, count - this.max]
+               )
+               if (toDelete.length > 0) {
+                  const ids = toDelete.map((d: any) => d.id)
+                  await this.pool.query('DELETE FROM stories WHERE jid = ? AND id IN (?)', [jid, ids])
+               }
+            }
+         } catch (e) {
+            console.error('[store-mysql] addStory error:', e)
+         }
       }
 
       if (!this.stories[jid]) {
@@ -800,9 +1058,6 @@ class Store {
       }
    }
 
-   /**
-    * Retrieves all stories associated with a JID using offset-based listings.
-    */
    public async getAllStories(jid: string, offset: number = 0) {
       let list: any[] = []
       if (this.pool) {
@@ -853,9 +1108,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Tracks message IDs to filter out duplicates.
-    */
    public recordMessageId(sock: any, msg: { [key: string]: any }): boolean {
       if (msg.fromMe) return true
 
@@ -882,17 +1134,26 @@ class Store {
       return true
    }
 
-   /**
-    * Cleans up expired message data and deletes historical stories older than 24 hours.
-    */
    private cleanupExpiredMessages(): void {
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
-            if (msgArray && msgArray.length > 100) {
-               msgArray.splice(0, msgArray.length - 100)
+            if (msgArray && msgArray.length > this.max) {
+               msgArray.splice(0, msgArray.length - this.max)
             }
          })
       }
+
+      Object.values(this.stories).forEach((storyArray) => {
+         if (storyArray && storyArray.length > this.max) {
+            storyArray.splice(0, storyArray.length - this.max)
+         }
+      })
+
+      Object.values(this.nodes).forEach((nodeArray) => {
+         if (nodeArray && nodeArray.length > this.max) {
+            nodeArray.splice(0, nodeArray.length - this.max)
+         }
+      })
 
       const now = Date.now()
       this.messageId.forEach((instanceMap, instance) => {
@@ -901,16 +1162,6 @@ class Store {
          })
          if (instanceMap.size === 0) this.messageId.delete(instance)
       })
-
-      if (this.pool) {
-         this.pool.query('DELETE FROM stories WHERE created_at < ?', [now - 86400000]).catch(() => { })
-      } else {
-         Object.values(this.stories).forEach((storyArray) => {
-            if (storyArray && storyArray.length > 30) {
-               storyArray.splice(0, storyArray.length - 30)
-            }
-         })
-      }
    }
 }
 
