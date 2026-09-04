@@ -28,6 +28,7 @@ class Store {
    private contactsProxyInstance: Record<string, Contact>
 
    public stories: Record<string, any[]> = Object.create(null)
+   public nodes: Record<string, any[]> = Object.create(null)
    public presences: Record<string, { [participant: string]: PresenceData }> = Object.create(null)
    public state: ConnectionState = { connection: 'close' }
    public messageId: Map<string, Map<string, { at: number }>> = new Map()
@@ -41,6 +42,9 @@ class Store {
    private storiesFilePath: string
    private storiesPendingWrite = false
 
+   private nodesFilePath: string
+   private nodesPendingWrite = false
+
    constructor(dir: string = 'stores', max: number = 250) {
       this.client = null
       this.socket = null
@@ -50,6 +54,7 @@ class Store {
       this.chatsFilePath = path.join(this.storeDir, 'chats.json')
       this.contactsFilePath = path.join(this.storeDir, 'contacts.json')
       this.storiesFilePath = path.join(this.storeDir, 'stories.json')
+      this.nodesFilePath = path.join(this.storeDir, 'nodes.json')
 
       if (!fs.existsSync(this.storeDir)) {
          fs.mkdirSync(this.storeDir, { recursive: true })
@@ -61,22 +66,17 @@ class Store {
       this.loadChats()
       this.loadContacts()
       this.loadStoriesData()
+      this.loadNodesData()
 
       this.cleanupTimer = setInterval(() => this.cleanupExpiredMessages(), 120000)
       this.cleanupTimer.unref?.()
    }
 
-   /**
-    * Schedules a task to run after a specific delay.
-    */
    private schedule(delay: number, fn: () => void): void {
       const timer = setTimeout(fn, delay)
       timer.unref?.()
    }
 
-   /**
-    * Prunes Map elements based on updated_at timestamps to enforce maximum capacity bounds.
-    */
    private pruneMapByUpdatedAt<T extends Record<string, any>>(map: Map<string, T>, maxSize: number): void {
       if (map.size <= maxSize) return
 
@@ -90,41 +90,21 @@ class Store {
       }
    }
 
-   /**
-    * Truncates story items that have expired or exceed maximum boundaries.
-    */
-   private pruneStoriesCache(now: number = Date.now()): boolean {
+   private pruneStoriesCache(): boolean {
       let updated = false
-      const twentyFourHoursAgo = now - 86400000
 
       for (const [jid, list] of this.storiesCache.entries()) {
-         const filtered = list.filter((story: any) => (story.created_at || story.messageTimestamp || now) > twentyFourHoursAgo)
-         if (filtered.length !== list.length) {
-            if (filtered.length === 0) {
-               this.storiesCache.delete(jid)
-            } else {
-               this.storiesCache.set(jid, filtered)
-            }
+         if (list.length > this.max) {
+            this.storiesCache.set(jid, list.slice(-this.max))
             updated = true
          }
       }
 
       if (this.storiesCache.size > this.maxCachedStoryJids) {
          const overflow = this.storiesCache.size - this.maxCachedStoryJids
-         const candidates = Array.from(this.storiesCache.entries())
-            .map(([jid, list]) => {
-               let newest = 0
-               for (const story of list) {
-                  const timestamp = story.created_at || story.messageTimestamp || 0
-                  if (timestamp > newest) newest = timestamp
-               }
-               return [jid, newest] as const
-            })
-            .sort((a, b) => a[1] - b[1])
-            .slice(0, overflow)
-
-         for (const [jid] of candidates) {
-            this.storiesCache.delete(jid)
+         const keys = Array.from(this.storiesCache.keys()).slice(0, overflow)
+         for (const key of keys) {
+            this.storiesCache.delete(key)
             updated = true
          }
       }
@@ -132,11 +112,6 @@ class Store {
       return updated
    }
 
-   /**
-    * Converts Buffers and Uint8Arrays to base64 objects early.
-    * This prevents JSON.stringify from calling the native toJSON() method on Buffers,
-    * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
-    */
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
       if (depth > 50) return null
@@ -186,9 +161,39 @@ class Store {
       return res
    }
 
-   /**
-    * Loads chat structures from the local JSON storage file.
-    */
+   private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (depth > 50) return null
+
+      if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
+         return '[buffer]'
+      }
+
+      if (typeof obj !== 'object') return obj
+      if (seen.has(obj)) return null
+      seen.add(obj)
+
+      if (Array.isArray(obj)) {
+         return obj.map(item => this.sanitizeNode(item, seen, depth + 1))
+      }
+
+      const res: any = {}
+      const keys = Object.keys(obj)
+      for (let i = 0; i < keys.length; i++) {
+         const key = keys[i]
+         try {
+            const val = obj[key]
+            if (typeof val === 'function') continue
+            if (Buffer.isBuffer(val) || val instanceof Uint8Array || val?.type === 'Buffer') {
+               res[key] = '[buffer]'
+               continue
+            }
+            res[key] = this.sanitizeNode(val, seen, depth + 1)
+         } catch { }
+      }
+      return res
+   }
+
    private loadChats(): void {
       try {
          if (fs.existsSync(this.chatsFilePath)) {
@@ -197,7 +202,7 @@ class Store {
             list.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0))
             const capped = list.slice(0, 500)
             for (const chat of capped) {
-               if (chat.id) this.chatsCache.set(chat.id, chat)
+               if (chat?.id) this.chatsCache.set(chat.id, chat)
             }
          }
       } catch (error: any) {
@@ -207,9 +212,6 @@ class Store {
       }
    }
 
-   /**
-    * Loads contact structures from the local JSON storage file.
-    */
    private loadContacts(): void {
       try {
          if (fs.existsSync(this.contactsFilePath)) {
@@ -218,7 +220,7 @@ class Store {
             list.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0))
             const capped = list.slice(0, 1000)
             for (const contact of capped) {
-               if (contact.jid) this.contactsCache.set(contact.jid, contact)
+               if (contact?.jid) this.contactsCache.set(contact.jid, contact)
             }
          }
       } catch (error: any) {
@@ -228,16 +230,16 @@ class Store {
       }
    }
 
-   /**
-    * Loads stories structure arrays from the local JSON storage file.
-    */
    private loadStoriesData(): void {
       try {
          if (fs.existsSync(this.storiesFilePath)) {
             const content = fs.readFileSync(this.storiesFilePath, 'utf-8')
             const parsed = JSON.parse(content) as Record<string, any[]>
             for (const [jid, list] of Object.entries(parsed)) {
-               this.storiesCache.set(jid, list)
+               if (Array.isArray(list)) {
+                  this.storiesCache.set(jid, list.filter(Boolean).slice(-this.max))
+                  this.stories[jid] = this.storiesCache.get(jid)!
+               }
             }
          }
       } catch (error: any) {
@@ -247,9 +249,24 @@ class Store {
       }
    }
 
-   /**
-    * Enqueues synchronous write pipelines using Promise sequences.
-    */
+   private loadNodesData(): void {
+      try {
+         if (fs.existsSync(this.nodesFilePath)) {
+            const content = fs.readFileSync(this.nodesFilePath, 'utf-8')
+            const parsed = JSON.parse(content) as Record<string, any[]>
+            for (const [jid, list] of Object.entries(parsed)) {
+               if (Array.isArray(list)) {
+                  this.nodes[jid] = list.filter(Boolean).slice(-this.max)
+               }
+            }
+         }
+      } catch (error: any) {
+         if (error.code !== 'ENOENT') {
+            console.error('[store-json] Failed to load nodes:', error)
+         }
+      }
+   }
+
    private enqueueWrite(key: string, writeFn: () => Promise<void>): void {
       const previous = this.writeQueues.get(key) || Promise.resolve()
       const current = previous
@@ -263,9 +280,6 @@ class Store {
       this.writeQueues.set(key, current)
    }
 
-   /**
-    * Schedules and executes debounced chat records writing to JSON.
-    */
    private writeChats(): void {
       if (this.chatsPendingWrite) return
       this.chatsPendingWrite = true
@@ -287,9 +301,6 @@ class Store {
       })
    }
 
-   /**
-    * Schedules and executes debounced contact records writing to JSON.
-    */
    private writeContacts(): void {
       if (this.contactsPendingWrite) return
       this.contactsPendingWrite = true
@@ -311,9 +322,6 @@ class Store {
       })
    }
 
-   /**
-    * Schedules and executes debounced story lists writing to JSON.
-    */
    private writeStoriesData(): void {
       if (this.storiesPendingWrite) return
       this.storiesPendingWrite = true
@@ -339,15 +347,39 @@ class Store {
       })
    }
 
-   /**
-    * Configures directory pathways, capacities, and reloads file systems.
-    */
+   private writeNodesData(): void {
+      if (this.nodesPendingWrite) return
+      this.nodesPendingWrite = true
+
+      this.schedule(2000, () => {
+         this.nodesPendingWrite = false
+         const obj: Record<string, any[]> = {}
+         for (const [jid, list] of Object.entries(this.nodes)) {
+            if (Array.isArray(list) && list.length > 0) {
+               obj[jid] = list.slice(-this.max)
+            }
+         }
+         const cleanData = this.toPOJO(obj)
+
+         this.enqueueWrite('nodes', async () => {
+            const tempPath = `${this.nodesFilePath}.tmp`
+            try {
+               await fs.promises.writeFile(tempPath, JSON.stringify(cleanData), 'utf-8')
+               await fs.promises.rename(tempPath, this.nodesFilePath)
+            } catch (error) {
+               console.error('[store-json] Failed to write nodes to disk:', error)
+            }
+         })
+      })
+   }
+
    public config({ dir, max }: StoreConfig): this {
       if (dir) {
          this.storeDir = path.join(process.cwd(), '.cache', dir)
          this.chatsFilePath = path.join(this.storeDir, 'chats.json')
          this.contactsFilePath = path.join(this.storeDir, 'contacts.json')
          this.storiesFilePath = path.join(this.storeDir, 'stories.json')
+         this.nodesFilePath = path.join(this.storeDir, 'nodes.json')
 
          if (!fs.existsSync(this.storeDir)) {
             fs.mkdirSync(this.storeDir, { recursive: true })
@@ -356,6 +388,7 @@ class Store {
          this.loadChats()
          this.loadContacts()
          this.loadStoriesData()
+         this.loadNodesData()
       }
       if (max !== undefined) {
          this.max = max
@@ -363,9 +396,6 @@ class Store {
       return this
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing chat records to JSON on disk.
-    */
    private createChatsProxy(): Record<string, any> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -389,9 +419,6 @@ class Store {
       }) as Record<string, any>
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing contact records to JSON on disk.
-    */
    private createContactsProxy(): Record<string, Contact> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -423,9 +450,6 @@ class Store {
       return this.contactsProxyInstance
    }
 
-   /**
-    * Binds active client and socket connections to the store module.
-    */
    public bind<T extends Client>(client: T, socket: any): T {
       this.client = client
       this.socket = socket
@@ -448,8 +472,14 @@ class Store {
       client.getAllStories = this.getAllStories.bind(this)
       client.recordMessageId = this.recordMessageId.bind(this)
 
+      client.addNode = this.addNode.bind(this)
+      client.loadNode = this.loadNode.bind(this)
+      client.loadNodes = this.loadNodes.bind(this)
+      client.getAllNodes = this.getAllNodes.bind(this)
+
       client.contacts = this.contacts
       client.stories = this.stories
+      client.nodes = this.nodes
       client.presences = this.presences
       client.state = this.state
       client.messageId = this.messageId
@@ -458,17 +488,11 @@ class Store {
       return client
    }
 
-   /**
-    * Resolves a sanitized file path string based on a unique JID.
-    */
    private getFilePath(jid: string): string {
       const safeJid = jid.replace(/[^a-zA-Z0-9.-]/g, '_')
       return path.join(this.storeDir, `${safeJid}.json`)
    }
 
-   /**
-    * Updates insertion order sequence of a cached JID message array.
-    */
    private touchJid(jid: string): void {
       const data = this.cache.get(jid)
       if (data) {
@@ -477,9 +501,6 @@ class Store {
       }
    }
 
-   /**
-    * Evicts the oldest cached JID from memory when cached capacity limits are exceeded.
-    */
    private evictOldestCache(): void {
       if (this.cache.size > this.maxCachedJids) {
          for (const [key] of this.cache) {
@@ -491,10 +512,8 @@ class Store {
       }
    }
 
-   /**
-    * Reads raw message records from a single JID's JSON storage file.
-    */
    private readJidData(jid: string): WAMessage[] {
+      if (!jid) return []
       if (this.cache.has(jid)) {
          this.touchJid(jid)
          return this.cache.get(jid)!
@@ -503,8 +522,9 @@ class Store {
       const filePath = this.getFilePath(jid)
       try {
          const fileContent = fs.readFileSync(filePath, 'utf-8')
-         const list = JSON.parse(fileContent) as WAMessage[]
-         const data = list.slice(-100)
+         const list = JSON.parse(fileContent)
+         if (!Array.isArray(list)) return []
+         const data = list.filter(Boolean).slice(-this.max)
 
          this.cache.set(jid, data)
          this.evictOldestCache()
@@ -519,10 +539,8 @@ class Store {
       }
    }
 
-   /**
-    * Schedules a debounced sync operation to write a JID's message array to JSON.
-    */
    private writeJidData(jid: string, data: WAMessage[]): void {
+      if (!jid) return
       this.cache.set(jid, data)
       this.touchJid(jid)
       this.evictOldestCache()
@@ -551,18 +569,14 @@ class Store {
       })
    }
 
-   /**
-    * Loads a single message based on JID and message ID.
-    */
    public loadMessage(jid: string, id: string): WAMessage | null {
+      if (!jid || !id) return null
       const list = this.readJidData(jid)
-      return list.find(v => v.key?.id === id || (v as any).id === id) || null
+      return list.find(v => v?.key?.id === id || (v as any)?.id === id) || null
    }
 
-   /**
-    * Loads list of messages associated with a JID up to a specific limit.
-    */
    public loadMessages(jid: string, count: number = 25): WAMessage[] | null {
+      if (!jid) return null
       const list = this.readJidData(jid)
       if (list.length === 0) return null
 
@@ -570,10 +584,8 @@ class Store {
       return [...slice].reverse()
    }
 
-   /**
-    * Saves a message and schedules a local JID JSON file sync.
-    */
    public addMessage(jid: string, msg: WAMessage): void {
+      if (!jid || !msg) return
       const list = this.readJidData(jid)
       list.push(msg)
 
@@ -584,9 +596,6 @@ class Store {
       this.writeJidData(jid, list)
    }
 
-   /**
-    * Fetches all message history associated with a JID and yields an array structure.
-    */
    public getAllMessages(jid: string, offset: number = 0): WAMessage[] & { count(): number; clear(): void } {
       const list = this.readJidData(jid)
       const sliced = (offset > 0 ? list.slice(offset) : list) as WAMessage[] & { count(): number; clear(): void }
@@ -623,21 +632,130 @@ class Store {
       return sliced
    }
 
-   /**
-    * Handles partial or full updates on active chat structures.
-    */
+   public addNode(arg1: any, arg2?: any): void {
+      let jid: string
+      let node: any
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         node = arg2
+      } else if (typeof arg2 === 'string') {
+         node = arg1
+         jid = arg2
+      } else {
+         node = arg1
+         jid = node?.attrs?.from || node?.attrs?.to || node?.attrs?.participant || 'unknown'
+      }
+
+      if (!node || typeof node !== 'object') return
+
+      const nodeId = node?.attrs?.id || node?.id || `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+
+      const cleanedNode = this.sanitizeNode(node)
+      if (!cleanedNode) return
+
+      if (!this.nodes[jid]) {
+         this.nodes[jid] = []
+      }
+
+      const existingIdx = this.nodes[jid].findIndex((n: any) => (n?.attrs?.id || n?.id) === nodeId)
+      if (existingIdx !== -1) {
+         this.nodes[jid][existingIdx] = cleanedNode
+      } else {
+         this.nodes[jid].push(cleanedNode)
+         if (this.nodes[jid].length > this.max) {
+            this.nodes[jid].shift()
+         }
+      }
+
+      this.writeNodesData()
+   }
+
+   public loadNode(jidOrId: string, id?: string): any | null {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid && this.nodes[targetJid]) {
+         const found = this.nodes[targetJid].find((v: any) => (v?.attrs?.id || v?.id) === targetId)
+         if (found) return found
+      }
+
+      for (const j in this.nodes) {
+         const found = this.nodes[j]?.find((v: any) => (v?.attrs?.id || v?.id) === targetId)
+         if (found) return found
+      }
+
+      return null
+   }
+
+   public loadNodes(jid?: string | number, count?: number): any[] | null {
+      let targetJid: string | undefined
+      let targetCount: number = 25
+
+      if (typeof jid === 'number') {
+         targetCount = jid
+         targetJid = undefined
+      } else {
+         targetJid = jid
+         if (typeof count === 'number') targetCount = count
+      }
+
+      if (targetJid) {
+         const list = this.nodes[targetJid]
+         if (!list || list.length === 0) return null
+         const slice = targetCount ? list.slice(-targetCount) : list
+         return [...slice].reverse()
+      }
+
+      const allNodes = Object.values(this.nodes).flat()
+      if (allNodes.length === 0) return null
+      return allNodes.slice(-targetCount).reverse()
+   }
+
+   public getAllNodes(jid?: string, offset: number = 0) {
+      let list: any[] = []
+      if (jid) {
+         list = this.nodes[jid] || []
+      } else {
+         list = Object.values(this.nodes).flat()
+      }
+
+      const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & {
+         count(): number
+         clear(): void
+      }
+
+      sliced.count = () => {
+         let currentList: any[] = []
+         if (jid) {
+            currentList = this.nodes[jid] || []
+         } else {
+            currentList = Object.values(this.nodes).flat()
+         }
+         return Math.max(0, currentList.length - offset)
+      }
+
+      sliced.clear = () => {
+         if (jid) {
+            delete this.nodes[jid]
+         } else {
+            this.nodes = Object.create(null)
+         }
+         this.writeNodesData()
+      }
+
+      return sliced
+   }
+
    public chatUpdate(updates: any[]): void {
       for (const update of updates) {
-         if (update.id) {
+         if (update?.id) {
             const id = update.id
             this.chats[id] = Object.assign(this.chats[id] || { id }, update)
          }
       }
    }
 
-   /**
-    * Upserts contact arrays and resolves JID targets with the socket instance mapping.
-    */
    public contactsUpsert(newContacts: Contact[]): Set<string> {
       const oldContacts = new Set(Object.keys(this.contacts))
       for (const contact of newContacts) {
@@ -653,12 +771,9 @@ class Store {
       return oldContacts
    }
 
-   /**
-    * Processes structural updates on dynamic contacts and maintains LID-to-PN associations.
-    */
    public contactUpdate(updates: any[]): void {
       for (const update of updates) {
-         if (update.id) {
+         if (update?.id) {
             const id = noSuffix(update.id)
             let jid = id
             if (this.socket && jid?.endsWith('lid')) {
@@ -670,15 +785,12 @@ class Store {
       }
    }
 
-   /**
-    * Fetches a contact structure using exact JID, ID, or phoneNumber identifiers.
-    */
    public getContact(id: string): Contact | null {
       if (!id) return null
       if (this.contacts[id]) return this.contacts[id]
       let found: Contact | undefined
       for (const c of this.contactsCache.values()) {
-         if ((c as any).id === id || (c as any).jid === id || (c as any).sender_pn === id) {
+         if ((c as any)?.id === id || (c as any)?.jid === id || (c as any)?.sender_pn === id) {
             found = c
             break
          }
@@ -686,9 +798,6 @@ class Store {
       return found || null
    }
 
-   /**
-    * Resolves lists of contacts alongside contextual cleaning and counting helper methods.
-    */
    public getAllContacts(offset: number = 0) {
       const list = Object.values(this.contacts)
       const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): number; clear(): void }
@@ -715,21 +824,18 @@ class Store {
       return sliced
    }
 
-   /**
-    * Updates a message structure by merging incoming status receipts.
-    */
    public updateMessageWithReceipt(msg: any, receipt: any): void {
-      if (!msg) return
+      if (!msg || !receipt) return
       msg.userReceipt = msg.userReceipt || []
-      const recp = msg.userReceipt.find((m: any) => m.userJid === receipt.userJid)
+      const recp = msg.userReceipt.find((m: any) => m?.userJid === receipt?.userJid)
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg?.key?.remoteJid || msg?.jid
       if (jid) {
          const list = this.readJidData(jid)
-         const id = msg.key?.id || msg.id
-         const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
+         const id = msg?.key?.id || msg?.id
+         const idx = list.findIndex(v => v?.key?.id === id || (v as any)?.id === id)
          if (idx !== -1) {
             list[idx] = msg
             this.writeJidData(jid, list)
@@ -737,20 +843,34 @@ class Store {
       }
    }
 
-   /**
-    * Updates a message structure by merging dynamic user reactions.
-    */
    public updateMessageWithReaction(msg: any, reaction: any): void {
-      if (!msg) return
-      const authorID = getKeyAuthor(reaction.key)
-      msg.reactions = (msg.reactions || []).filter((r: any) => getKeyAuthor(r.key) !== authorID)
+      if (!msg || !reaction) return
+      const reactionKey = reaction?.key || reaction
+      if (!reactionKey) return
+
+      let authorID: string = ''
+      try {
+         authorID = getKeyAuthor(reactionKey)
+      } catch {
+         authorID = reactionKey?.participant || reactionKey?.remoteJid || ''
+      }
+
+      msg.reactions = (msg.reactions || []).filter((r: any) => {
+         if (!r) return false
+         try {
+            return getKeyAuthor(r?.key || r) !== authorID
+         } catch {
+            return true
+         }
+      })
+
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg?.key?.remoteJid || msg?.jid
       if (jid) {
          const list = this.readJidData(jid)
-         const id = msg.key?.id || msg.id
-         const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
+         const id = msg?.key?.id || msg?.id
+         const idx = list.findIndex(v => v?.key?.id === id || (v as any)?.id === id)
          if (idx !== -1) {
             list[idx] = msg
             this.writeJidData(jid, list)
@@ -758,39 +878,34 @@ class Store {
       }
    }
 
-   /**
-    * Loads story lists associated with a JID up to a given limit.
-    */
    public async loadStories(jid: string, count?: number): Promise<any[] | null> {
+      if (!jid) return null
       const list = this.storiesCache.get(jid)
       if (!list || list.length === 0) return null
       const slice = count && count > 0 ? list.slice(-count) : list
       return [...slice].reverse()
    }
 
-   /**
-    * Loads a single story entry based on its identifiers.
-    */
    public async loadStory(jid: string, id: string): Promise<any | null> {
+      if (!jid || !id) return null
       const list = this.storiesCache.get(jid)
       if (!list || list.length === 0) return null
-      return list.find((v: any) => v.key?.id === id || v.id === id) || null
+      return list.find((v: any) => v?.key?.id === id || v?.id === id) || null
    }
 
-   /**
-    * Saves a single story structure in active story caches and triggers file updates.
-    */
    public async addStory(jid: string, story: any): Promise<void> {
-      const storyId = story.key?.id || story.id
+      if (!jid || !story) return
+      const storyId = story?.key?.id || story?.id
       if (!storyId) return
 
       let list = this.storiesCache.get(jid)
       if (!list) {
          list = []
          this.storiesCache.set(jid, list)
+         this.stories[jid] = list
       }
 
-      const idx = list.findIndex((s: any) => (s.key?.id || s.id) === storyId)
+      const idx = list.findIndex((s: any) => (s?.key?.id || s?.id) === storyId)
       if (idx !== -1) {
          list[idx] = story
       } else {
@@ -804,9 +919,6 @@ class Store {
       this.writeStoriesData()
    }
 
-   /**
-    * Retrieves all stories associated with a JID using offset-based listing structures.
-    */
    public async getAllStories(jid: string, offset: number = 0) {
       const list = this.storiesCache.get(jid) || []
       const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): Promise<number>; clear(): Promise<void> }
@@ -818,22 +930,21 @@ class Store {
 
       sliced.clear = async () => {
          this.storiesCache.delete(jid)
+         delete this.stories[jid]
          this.writeStoriesData()
       }
 
       return sliced
    }
 
-   /**
-    * Tracks message IDs to filter out duplicates.
-    */
    public recordMessageId(sock: any, msg: { [key: string]: any }): boolean {
-      if (msg.fromMe) return true
+      if (!msg) return true
+      if (msg.fromMe || msg?.key?.fromMe) return true
 
-      const id = msg.key?.id || msg.id
+      const id = msg?.key?.id || msg?.id
       if (!id) return true
 
-      const instance = noSuffix(sock.user.id)
+      const instance = noSuffix(sock?.user?.id || 'default')
 
       let instanceMap = this.messageId.get(instance)
 
@@ -853,9 +964,6 @@ class Store {
       return true
    }
 
-   /**
-    * Cleans up expired message data and schedules dynamic background pruning.
-    */
    private cleanupExpiredMessages(): void {
       const now = Date.now()
       this.messageId.forEach((instanceMap, instance) => {
@@ -865,7 +973,14 @@ class Store {
          if (instanceMap.size === 0) this.messageId.delete(instance)
       })
 
-      if (this.pruneStoriesCache(now)) {
+      for (const [jid, list] of Object.entries(this.nodes)) {
+         if (list.length > this.max) {
+            this.nodes[jid] = list.slice(-this.max)
+            this.writeNodesData()
+         }
+      }
+
+      if (this.pruneStoriesCache()) {
          this.writeStoriesData()
       }
    }
