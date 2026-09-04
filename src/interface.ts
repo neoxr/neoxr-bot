@@ -1,3 +1,12 @@
+export interface BinaryNode {
+   tag: string
+   attrs?: Record<string, any>
+   content?: BinaryNode[] | string | Uint8Array | Buffer | any
+   [key: string]: any
+}
+
+export type WANode = BinaryNode
+
 export interface WAMessage {
    id?: string
    key?: {
@@ -54,9 +63,15 @@ export interface Client {
    addMessage?: (jid: string, msg: WAMessage) => void | Promise<void>
    getAllMessages?: (jid: string, offset?: number) => any
 
+   loadNode?: (jid: string, id: string) => BinaryNode | Promise<BinaryNode | null> | null | any
+   loadNodes?: (jid: string, count?: number) => BinaryNode[] | Promise<BinaryNode[] | null> | null | any
+   addNode?: (node: BinaryNode | any, customJid?: string) => void | Promise<void>
+   getAllNodes?: (jid: string, offset?: number) => any
+
    chats?: Record<string, any>
    contacts?: Record<string, any>
    stories?: Record<string, any[]>
+   nodes?: Record<string, any[]>
    presences?: Record<string, any>
    state?: any
    messageId?: Map<string, Map<string, { at: number }>>

@@ -56,6 +56,7 @@ class Store {
    private contactsProxyInstance: Record<string, Contact>
 
    public stories: Record<string, any[]> = Object.create(null)
+   public nodes: Record<string, any[]> = Object.create(null)
    public presences: Record<string, { [participant: string]: PresenceData }> = Object.create(null)
    public state: ConnectionState = { connection: 'close' }
    public messageId: Map<string, Map<string, { at: number }>> = new Map()
@@ -69,6 +70,17 @@ class Store {
    private countStmt: any = null
    private deleteWithOffsetStmt: any = null
 
+   private insertNodeStmt: any = null
+   private cleanupNodeStmt: any = null
+   private getNodeOneStmt: any = null
+   private getNodeByIdStmt: any = null
+   private getNodesLimitStmt: any = null
+   private getNodesAllStmt: any = null
+   private getAllNodesGlobalStmt: any = null
+   private countNodesStmt: any = null
+   private deleteNodesWithOffsetStmt: any = null
+   private preloadNodesStmt: any = null
+
    private getChatStmt: any = null
    private insertChatStmt: any = null
    private getAllChatIdsStmt: any = null
@@ -81,12 +93,12 @@ class Store {
    private deleteContactsStmt: any = null
 
    private insertStoryStmt: any = null
+   private cleanupStoriesStmt: any = null
    private getStoriesLimitStmt: any = null
    private getStoriesAllStmt: any = null
    private getStoryOneStmt: any = null
    private countStoriesStmt: any = null
    private deleteStoriesWithOffsetStmt: any = null
-   private cleanupStoriesStmt: any = null
 
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
@@ -112,11 +124,6 @@ class Store {
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
-   /**
-    * Converts Buffer and Uint8Array instances directly to base64 objects.
-    * This prevents JSON.stringify from calling the native toJSON() method on Buffers, 
-    * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
-    */
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
       if (depth > 50) return null
@@ -161,6 +168,39 @@ class Store {
             if (typeof val !== 'function') {
                res[key] = this.toPOJO(val, seen, depth + 1)
             }
+         } catch { }
+      }
+      return res
+   }
+
+   private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (depth > 50) return null
+
+      if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
+         return '[buffer]'
+      }
+
+      if (typeof obj !== 'object') return obj
+      if (seen.has(obj)) return null
+      seen.add(obj)
+
+      if (Array.isArray(obj)) {
+         return obj.map(item => this.sanitizeNode(item, seen, depth + 1))
+      }
+
+      const res: any = {}
+      const keys = Object.keys(obj)
+      for (let i = 0; i < keys.length; i++) {
+         const key = keys[i]
+         try {
+            const val = obj[key]
+            if (typeof val === 'function') continue
+            if (Buffer.isBuffer(val) || val instanceof Uint8Array || val?.type === 'Buffer') {
+               res[key] = '[buffer]'
+               continue
+            }
+            res[key] = this.sanitizeNode(val, seen, depth + 1)
          } catch { }
       }
       return res
@@ -221,6 +261,17 @@ class Store {
                PRIMARY KEY (jid, id)
             );
             CREATE INDEX IF NOT EXISTS idx_stories_jid_created_at ON stories (jid, created_at DESC);
+
+            CREATE TABLE IF NOT EXISTS nodes (
+               jid TEXT,
+               id TEXT,
+               tag TEXT,
+               data TEXT,
+               created_at INTEGER,
+               PRIMARY KEY (jid, id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_nodes_jid_created_at ON nodes (jid, created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_nodes_id ON nodes (id);
          `)
 
          try {
@@ -236,6 +287,17 @@ class Store {
          this.countStmt = this.db.prepare('SELECT COUNT(*) as count FROM messages WHERE jid = ?')
          this.deleteWithOffsetStmt = this.db.prepare('DELETE FROM messages WHERE jid = ? AND id IN (SELECT id FROM messages WHERE jid = ? ORDER BY created_at ASC LIMIT -1 OFFSET ?)')
 
+         this.insertNodeStmt = this.db.prepare('INSERT OR REPLACE INTO nodes (jid, id, tag, data, created_at) VALUES (?, ?, ?, ?, ?)')
+         this.cleanupNodeStmt = this.db.prepare('DELETE FROM nodes WHERE jid = ? AND id NOT IN (SELECT id FROM nodes WHERE jid = ? ORDER BY created_at DESC LIMIT ?)')
+         this.getNodeOneStmt = this.db.prepare('SELECT data FROM nodes WHERE jid = ? AND id = ?')
+         this.getNodeByIdStmt = this.db.prepare('SELECT data FROM nodes WHERE id = ?')
+         this.getNodesLimitStmt = this.db.prepare('SELECT data FROM nodes WHERE jid = ? ORDER BY created_at DESC LIMIT ?')
+         this.getNodesAllStmt = this.db.prepare('SELECT data FROM nodes WHERE jid = ? ORDER BY created_at DESC')
+         this.getAllNodesGlobalStmt = this.db.prepare('SELECT data FROM nodes ORDER BY created_at DESC')
+         this.countNodesStmt = this.db.prepare('SELECT COUNT(*) as count FROM nodes WHERE jid = ?')
+         this.deleteNodesWithOffsetStmt = this.db.prepare('DELETE FROM nodes WHERE jid = ? AND id IN (SELECT id FROM nodes WHERE jid = ? ORDER BY created_at ASC LIMIT -1 OFFSET ?)')
+         this.preloadNodesStmt = this.db.prepare('SELECT jid, data FROM nodes ORDER BY created_at DESC LIMIT 500')
+
          this.getChatStmt = this.db.prepare('SELECT data FROM chats WHERE id = ?')
          this.insertChatStmt = this.db.prepare('INSERT OR REPLACE INTO chats (id, data, updated_at) VALUES (?, ?, ?)')
          this.getAllChatIdsStmt = this.db.prepare('SELECT id FROM chats')
@@ -248,15 +310,16 @@ class Store {
          this.deleteContactsStmt = this.db.prepare('DELETE FROM contacts')
 
          this.insertStoryStmt = this.db.prepare('INSERT OR REPLACE INTO stories (jid, id, data, created_at) VALUES (?, ?, ?, ?)')
+         this.cleanupStoriesStmt = this.db.prepare('DELETE FROM stories WHERE jid = ? AND id NOT IN (SELECT id FROM stories WHERE jid = ? ORDER BY created_at DESC LIMIT ?)')
          this.getStoriesLimitStmt = this.db.prepare('SELECT data FROM stories WHERE jid = ? ORDER BY created_at DESC LIMIT ?')
          this.getStoriesAllStmt = this.db.prepare('SELECT data FROM stories WHERE jid = ? ORDER BY created_at DESC')
          this.getStoryOneStmt = this.db.prepare('SELECT data FROM stories WHERE jid = ? AND id = ?')
          this.countStoriesStmt = this.db.prepare('SELECT COUNT(*) as count FROM stories WHERE jid = ?')
          this.deleteStoriesWithOffsetStmt = this.db.prepare('DELETE FROM stories WHERE jid = ? AND id IN (SELECT id FROM stories WHERE jid = ? ORDER BY created_at ASC LIMIT -1 OFFSET ?)')
-         this.cleanupStoriesStmt = this.db.prepare('DELETE FROM stories WHERE created_at < ?')
 
          this.preloadChats()
          this.preloadContacts()
+         this.preloadNodes()
 
          this.fallbackStore = null
          this.fallbackChats = null
@@ -284,6 +347,17 @@ class Store {
          const rows = this.preloadContactsStmt.all() as { jid: string, data: string }[]
          for (const row of rows) {
             this.contactsCache.set(row.jid, parse(row.data))
+         }
+      } catch { }
+   }
+
+   private preloadNodes(): void {
+      if (!this.db || !this.preloadNodesStmt) return
+      try {
+         const rows = this.preloadNodesStmt.all() as { jid: string, data: string }[]
+         for (const row of rows) {
+            if (!this.nodes[row.jid]) this.nodes[row.jid] = []
+            this.nodes[row.jid].push(parse(row.data))
          }
       } catch { }
    }
@@ -412,8 +486,14 @@ class Store {
       client.getAllStories = this.getAllStories.bind(this)
       client.recordMessageId = this.recordMessageId.bind(this)
 
+      client.addNode = this.addNode.bind(this)
+      client.loadNode = this.loadNode.bind(this)
+      client.loadNodes = this.loadNodes.bind(this)
+      client.getAllNodes = this.getAllNodes.bind(this)
+
       client.contacts = this.contacts
       client.stories = this.stories
+      client.nodes = this.nodes
       client.presences = this.presences
       client.state = this.state
       client.messageId = this.messageId
@@ -481,7 +561,9 @@ class Store {
             try {
                this.insertStmt.run(jid, msgId, stringify(this.toPOJO(msg)), Date.now())
                this.cleanupStmt.run(jid, jid, this.max)
-            } catch { }
+            } catch (e) {
+               console.error('[store-sqlite] addMessage error:', e)
+            }
          }
          return
       }
@@ -553,6 +635,189 @@ class Store {
       emptyResult.count = () => 0
       emptyResult.clear = () => { }
       return emptyResult
+   }
+
+   public addNode(arg1: any, arg2?: any): void {
+      let jid: string
+      let node: any
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         node = arg2
+      } else if (typeof arg2 === 'string') {
+         node = arg1
+         jid = arg2
+      } else {
+         node = arg1
+         jid = node?.attrs?.from || node?.attrs?.to || node?.attrs?.participant || 'unknown'
+      }
+
+      if (!node || typeof node !== 'object') return
+
+      const nodeId = node.attrs?.id || node.id || `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+      const tag = node.tag || 'node'
+
+      const cleanedNode = this.sanitizeNode(node)
+      if (!cleanedNode) return
+
+      if (this.db && this.insertNodeStmt) {
+         try {
+            this.insertNodeStmt.run(jid, nodeId, tag, stringify(cleanedNode), Date.now())
+            if (this.cleanupNodeStmt) {
+               this.cleanupNodeStmt.run(jid, jid, this.max)
+            }
+         } catch (e) {
+            console.error('[store-sqlite] addNode error:', e)
+         }
+      }
+
+      if (!this.nodes[jid]) {
+         this.nodes[jid] = []
+      }
+      const existingIdx = this.nodes[jid].findIndex((n: any) => (n.attrs?.id || n.id) === nodeId)
+      if (existingIdx !== -1) {
+         this.nodes[jid][existingIdx] = cleanedNode
+      } else {
+         this.nodes[jid].push(cleanedNode)
+         if (this.nodes[jid].length > this.max) {
+            this.nodes[jid].shift()
+         }
+      }
+   }
+
+   public loadNode(jidOrId: string, id?: string): any | null {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (this.db) {
+         try {
+            if (targetJid && this.getNodeOneStmt) {
+               const row = this.getNodeOneStmt.get(targetJid, targetId) as { data: string } | undefined
+               if (row) return parse(row.data)
+            }
+            if (this.getNodeByIdStmt) {
+               const row = this.getNodeByIdStmt.get(targetId) as { data: string } | undefined
+               if (row) return parse(row.data)
+            }
+         } catch { }
+      }
+
+      if (targetJid && this.nodes[targetJid]) {
+         const found = this.nodes[targetJid].find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      for (const j in this.nodes) {
+         const found = this.nodes[j]?.find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      return null
+   }
+
+   public loadNodes(jid?: string | number, count?: number): any[] | null {
+      let targetJid: string | undefined
+      let targetCount: number = 25
+
+      if (typeof jid === 'number') {
+         targetCount = jid
+         targetJid = undefined
+      } else {
+         targetJid = jid
+         if (typeof count === 'number') targetCount = count
+      }
+
+      if (this.db) {
+         try {
+            let rows: { data: string }[] = []
+            if (targetJid) {
+               if (this.getNodesLimitStmt) {
+                  rows = this.getNodesLimitStmt.all(targetJid, targetCount) as { data: string }[]
+               }
+            } else if (this.getAllNodesGlobalStmt) {
+               rows = this.getAllNodesGlobalStmt.all() as { data: string }[]
+               if (targetCount > 0) rows = rows.slice(0, targetCount)
+            }
+            if (rows.length === 0) return null
+            return rows.map(row => parse(row.data))
+         } catch {
+            return null
+         }
+      }
+
+      if (targetJid) {
+         const list = this.nodes[targetJid]
+         if (!list || list.length === 0) return null
+         const slice = targetCount ? list.slice(-targetCount) : list
+         return [...slice].reverse()
+      }
+
+      const allNodes = Object.values(this.nodes).flat()
+      if (allNodes.length === 0) return null
+      return allNodes.slice(-targetCount).reverse()
+   }
+
+   public getAllNodes(jid?: string, offset: number = 0) {
+      let list: any[] = []
+      if (this.db) {
+         try {
+            if (jid && this.getNodesAllStmt) {
+               const rows = this.getNodesAllStmt.all(jid) as { data: string }[]
+               list = rows.map(row => parse(row.data))
+            } else if (!jid && this.getAllNodesGlobalStmt) {
+               const rows = this.getAllNodesGlobalStmt.all() as { data: string }[]
+               list = rows.map(row => parse(row.data))
+            }
+         } catch { }
+      } else {
+         if (jid) {
+            list = this.nodes[jid] || []
+         } else {
+            list = Object.values(this.nodes).flat()
+         }
+      }
+
+      const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): Promise<number>; clear(): Promise<void> }
+
+      sliced.count = async () => {
+         if (this.db && jid && this.countNodesStmt) {
+            try {
+               const result = this.countNodesStmt.get(jid) as { count: number } | undefined
+               const total = result ? result.count : 0
+               return Math.max(0, total - offset)
+            } catch {
+               return 0
+            }
+         }
+         return Math.max(0, list.length - offset)
+      }
+
+      sliced.clear = async () => {
+         if (this.db && jid && this.deleteNodesWithOffsetStmt) {
+            try {
+               this.deleteNodesWithOffsetStmt.run(jid, jid, offset)
+            } catch { }
+         } else if (!jid && this.db) {
+            try {
+               this.db.exec('DELETE FROM nodes')
+            } catch { }
+         }
+
+         if (jid) {
+            if (offset === 0) {
+               delete this.nodes[jid]
+            } else {
+               const currentList = this.nodes[jid] || []
+               if (offset < currentList.length) {
+                  this.nodes[jid] = currentList.slice(0, offset)
+               }
+            }
+         } else {
+            this.nodes = Object.create(null)
+         }
+      }
+
+      return sliced
    }
 
    public chatUpdate(updates: any[]): void {
@@ -698,10 +963,13 @@ class Store {
       const storyId = story.key?.id || story.id
       if (!storyId) return
 
-      if (this.db && this.insertStoryStmt) {
+      if (this.db && this.insertStoryStmt && this.cleanupStoriesStmt) {
          try {
             this.insertStoryStmt.run(jid, storyId, stringify(this.toPOJO(story)), Date.now())
-         } catch { }
+            this.cleanupStoriesStmt.run(jid, jid, this.max)
+         } catch (e) {
+            console.error('[store-sqlite] addStory error:', e)
+         }
          return
       }
 
@@ -791,11 +1059,23 @@ class Store {
    private cleanupExpiredMessages(): void {
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
-            if (msgArray && msgArray.length > 100) {
-               msgArray.splice(0, msgArray.length - 100)
+            if (msgArray && msgArray.length > this.max) {
+               msgArray.splice(0, msgArray.length - this.max)
             }
          })
       }
+
+      Object.values(this.stories).forEach((storyArray) => {
+         if (storyArray && storyArray.length > this.max) {
+            storyArray.splice(0, storyArray.length - this.max)
+         }
+      })
+
+      Object.values(this.nodes).forEach((nodeArray) => {
+         if (nodeArray && nodeArray.length > this.max) {
+            nodeArray.splice(0, nodeArray.length - this.max)
+         }
+      })
 
       const now = Date.now()
       this.messageId.forEach((instanceMap, instance) => {
@@ -804,18 +1084,6 @@ class Store {
          })
          if (instanceMap.size === 0) this.messageId.delete(instance)
       })
-
-      if (this.db && this.cleanupStoriesStmt) {
-         try {
-            this.cleanupStoriesStmt.run(now - 86400000)
-         } catch { }
-      } else {
-         Object.values(this.stories).forEach((storyArray) => {
-            if (storyArray && storyArray.length > 30) {
-               storyArray.splice(0, storyArray.length - 30)
-            }
-         })
-      }
    }
 }
 
