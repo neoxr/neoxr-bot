@@ -32,6 +32,7 @@ class Store {
    private contactsProxyInstance: Record<string, Contact>
 
    public stories: Record<string, any[]> = Object.create(null)
+   public nodes: Record<string, any[]> = Object.create(null)
    public presences: Record<string, { [participant: string]: PresenceData }> = Object.create(null)
    public state: ConnectionState = { connection: 'close' }
    public messageId: Map<string, Map<string, { at: number }>> = new Map()
@@ -40,6 +41,7 @@ class Store {
    private maxCachedJids = 10
    private pendingJidWrites = new Set<string>()
    private writeQueues = new Map<string, Promise<any>>()
+   private nodeWriteQueues = new Map<string, Promise<any>>()
 
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
@@ -66,11 +68,6 @@ class Store {
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
-   /**
-    * Converts Buffers and Uint8Arrays to base64 objects early.
-    * This prevents JSON.stringify from calling the native toJSON() method on Buffers,
-    * which expands binary data into massive numeric arrays in memory, causing RSS spikes.
-    */
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj !== 'object') return obj
       if (depth > 50) return null
@@ -119,10 +116,40 @@ class Store {
       }
       return res
    }
-   
-   /**
-    * Initializes the Redis connection client and triggers initial scans for preloading cache.
-    */
+
+   private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (depth > 50) return null
+
+      if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
+         return '[buffer]'
+      }
+
+      if (typeof obj !== 'object') return obj
+      if (seen.has(obj)) return null
+      seen.add(obj)
+
+      if (Array.isArray(obj)) {
+         return obj.map(item => this.sanitizeNode(item, seen, depth + 1))
+      }
+
+      const res: any = {}
+      const keys = Object.keys(obj)
+      for (let i = 0; i < keys.length; i++) {
+         const key = keys[i]
+         try {
+            const val = obj[key]
+            if (typeof val === 'function') continue
+            if (Buffer.isBuffer(val) || val instanceof Uint8Array || val?.type === 'Buffer') {
+               res[key] = '[buffer]'
+               continue
+            }
+            res[key] = this.sanitizeNode(val, seen, depth + 1)
+         } catch { }
+      }
+      return res
+   }
+
    private async initDB(): Promise<void> {
       const RedisModule = await loadRedis()
 
@@ -153,6 +180,7 @@ class Store {
          await this.redis.connect()
          await this.preloadChats()
          await this.preloadContacts()
+         await this.preloadNodes()
 
          this.fallbackStore = null
          this.fallbackChats = null
@@ -163,9 +191,6 @@ class Store {
       }
    }
 
-   /**
-    * Preloads dynamic chats from Redis keyspace into the active memory cache.
-    */
    private async preloadChats(): Promise<void> {
       if (!this.redis) return
       try {
@@ -186,9 +211,6 @@ class Store {
       }
    }
 
-   /**
-    * Preloads dynamic contacts from Redis keyspace into the active memory cache.
-    */
    private async preloadContacts(): Promise<void> {
       if (!this.redis) return
       try {
@@ -209,9 +231,26 @@ class Store {
       }
    }
 
-   /**
-    * Configures directory pathways, capacities, and re-initializes client if URI changes.
-    */
+   private async preloadNodes(): Promise<void> {
+      if (!this.redis) return
+      try {
+         let cursor = '0'
+         const reply = await this.redis.scan(cursor, { MATCH: 'node_store:*', COUNT: 500 })
+         const keys = reply.keys
+         if (keys && keys.length > 0) {
+            for (const key of keys) {
+               const raw = await this.redis.get(key)
+               if (raw) {
+                  const jid = key.replace('node_store:', '')
+                  this.nodes[jid] = JSON.parse(raw)
+               }
+            }
+         }
+      } catch (error) {
+         console.error('[store-redis] Failed to preload nodes:', error)
+      }
+   }
+
    public config({ dir, max, uri }: StoreConfig): this {
       let needsReinit = false
 
@@ -235,9 +274,6 @@ class Store {
       return this
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing chat records to Redis keyspace.
-    */
    private createChatsProxy(): Record<string, any> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -263,9 +299,6 @@ class Store {
       }) as Record<string, any>
    }
 
-   /**
-    * Creates a proxy handler to manage cache updates and auto-syncing contact records to Redis keyspace.
-    */
    private createContactsProxy(): Record<string, Contact> {
       const self = this
       return new Proxy(Object.create(null), {
@@ -299,9 +332,6 @@ class Store {
       return this.contactsProxyInstance
    }
 
-   /**
-    * Binds active client and socket connections to the store module.
-    */
    public bind<T extends Client>(client: T, socket: any): T {
       this.client = client
       this.socket = socket
@@ -324,8 +354,14 @@ class Store {
       client.getAllStories = this.getAllStories.bind(this)
       client.recordMessageId = this.recordMessageId.bind(this)
 
+      client.addNode = this.addNode.bind(this)
+      client.loadNode = this.loadNode.bind(this)
+      client.loadNodes = this.loadNodes.bind(this)
+      client.getAllNodes = this.getAllNodes.bind(this)
+
       client.contacts = this.contacts
       client.stories = this.stories
+      client.nodes = this.nodes
       client.presences = this.presences
       client.state = this.state
       client.messageId = this.messageId
@@ -334,9 +370,6 @@ class Store {
       return client
    }
 
-   /**
-    * Updates insertion order sequence of a cached JID message array.
-    */
    private touchJid(jid: string): void {
       const data = this.cache.get(jid)
       if (data) {
@@ -345,9 +378,6 @@ class Store {
       }
    }
 
-   /**
-    * Evicts the oldest cached JID from memory when cached capacity limits are exceeded.
-    */
    private evictOldestCache(): void {
       if (this.cache.size > this.maxCachedJids) {
          for (const [key] of this.cache) {
@@ -359,9 +389,6 @@ class Store {
       }
    }
 
-   /**
-    * Internal helper to load JID message arrays from memory cache or Redis keyspace.
-    */
    private async getRedisData(jid: string): Promise<WAMessage[]> {
       if (this.cache.has(jid)) {
          this.touchJid(jid)
@@ -381,9 +408,6 @@ class Store {
       }
    }
 
-   /**
-    * Internal helper to save JID message arrays into memory cache and schedules Redis writes.
-    */
    private async setRedisData(jid: string, data: WAMessage[]): Promise<void> {
       this.cache.set(jid, data)
       this.touchJid(jid)
@@ -416,17 +440,11 @@ class Store {
       }, 1500)
    }
 
-   /**
-    * Loads a single message based on JID and message ID.
-    */
    public async loadMessage(jid: string, id: string): Promise<WAMessage | null> {
       const list = await this.getRedisData(jid)
       return list.find(v => v.key?.id === id || (v as any).id === id) || null
    }
 
-   /**
-    * Loads list of messages associated with a JID up to a specific limit.
-    */
    public async loadMessages(jid: string, count?: number): Promise<WAMessage[] | null> {
       const list = await this.getRedisData(jid)
       if (list.length === 0) return null
@@ -435,9 +453,6 @@ class Store {
       return [...slice].reverse()
    }
 
-   /**
-    * Appends a message record, prunes lists, and triggers scheduled Redis syncs.
-    */
    public async addMessage(jid: string, msg: WAMessage): Promise<void> {
       const list = await this.getRedisData(jid)
       list.push(msg)
@@ -449,9 +464,6 @@ class Store {
       await this.setRedisData(jid, list)
    }
 
-   /**
-    * Fetches all message history associated with a JID using offset-based structures.
-    */
    public getAllMessages(jid: string, offset: number = 0): Promise<WAMessage[] & { count(): Promise<number>; clear(): Promise<void> }> & { count(): Promise<number>; clear(): Promise<void> } {
       const self = this
 
@@ -564,9 +576,220 @@ class Store {
       return promiseWithMethods
    }
 
-   /**
-    * Handles partial or full updates on active chat structures.
-    */
+   public async addNode(arg1: any, arg2?: any): Promise<void> {
+      let jid: string
+      let node: any
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         node = arg2
+      } else if (typeof arg2 === 'string') {
+         node = arg1
+         jid = arg2
+      } else {
+         node = arg1
+         jid = node?.attrs?.from || node?.attrs?.to || node?.attrs?.participant || 'unknown'
+      }
+
+      if (!node || typeof node !== 'object') return
+
+      const nodeId = node.attrs?.id || node.id || `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+      const tag = node.tag || 'node'
+
+      const cleanedNode = this.sanitizeNode(node)
+      if (!cleanedNode) return
+
+      if (!this.nodes[jid]) {
+         this.nodes[jid] = []
+      }
+      const existingIdx = this.nodes[jid].findIndex((n: any) => (n.attrs?.id || n.id) === nodeId)
+      if (existingIdx !== -1) {
+         this.nodes[jid][existingIdx] = cleanedNode
+      } else {
+         this.nodes[jid].push(cleanedNode)
+         if (this.nodes[jid].length > this.max) {
+            this.nodes[jid].shift()
+         }
+      }
+
+      if (this.redis) {
+         const previous = this.nodeWriteQueues.get(jid) || Promise.resolve()
+         const current = previous
+            .then(async () => {
+               try {
+                  await this.redis.set(`node_store:${jid}`, JSON.stringify(this.nodes[jid]))
+               } catch (e) {
+                  console.error('[store-redis] addNode error:', e)
+               }
+            })
+            .finally(() => {
+               if (this.nodeWriteQueues.get(jid) === current) {
+                  this.nodeWriteQueues.delete(jid)
+               }
+            })
+         this.nodeWriteQueues.set(jid, current)
+      }
+   }
+
+   public async loadNode(jidOrId: string, id?: string): Promise<any | null> {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid && this.nodes[targetJid]) {
+         const found = this.nodes[targetJid].find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      for (const j in this.nodes) {
+         const found = this.nodes[j]?.find((v: any) => (v.attrs?.id || v.id) === targetId)
+         if (found) return found
+      }
+
+      if (this.redis && targetJid) {
+         try {
+            const raw = await this.redis.get(`node_store:${targetJid}`)
+            if (raw) {
+               const list = JSON.parse(raw)
+               this.nodes[targetJid] = list
+               return list.find((v: any) => (v.attrs?.id || v.id) === targetId) || null
+            }
+         } catch { }
+      }
+
+      return null
+   }
+
+   public async loadNodes(jid?: string | number, count?: number): Promise<any[] | null> {
+      let targetJid: string | undefined
+      let targetCount: number = 25
+
+      if (typeof jid === 'number') {
+         targetCount = jid
+         targetJid = undefined
+      } else {
+         targetJid = jid
+         if (typeof count === 'number') targetCount = count
+      }
+
+      if (targetJid) {
+         let list = this.nodes[targetJid]
+         if ((!list || list.length === 0) && this.redis) {
+            try {
+               const raw = await this.redis.get(`node_store:${targetJid}`)
+               if (raw) {
+                  list = JSON.parse(raw)
+                  this.nodes[targetJid] = list
+               }
+            } catch { }
+         }
+         if (!list || list.length === 0) return null
+         const slice = targetCount ? list.slice(-targetCount) : list
+         return [...slice].reverse()
+      }
+
+      const allNodes = Object.values(this.nodes).flat()
+      if (allNodes.length === 0) return null
+      return allNodes.slice(-targetCount).reverse()
+   }
+
+   public getAllNodes(jid?: string, offset: number = 0) {
+      const self = this
+
+      const promise = (async () => {
+         let list: any[] = []
+
+         if (jid) {
+            list = self.nodes[jid] || []
+            if (list.length === 0 && self.redis) {
+               try {
+                  const raw = await self.redis.get(`node_store:${jid}`)
+                  if (raw) {
+                     list = JSON.parse(raw)
+                     self.nodes[jid] = list
+                  }
+               } catch { }
+            }
+         } else {
+            list = Object.values(self.nodes).flat()
+         }
+
+         const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & {
+            count(): Promise<number>
+            clear(): Promise<void>
+         }
+
+         sliced.count = async () => {
+            let currentList: any[] = []
+            if (jid) {
+               currentList = self.nodes[jid] || []
+            } else {
+               currentList = Object.values(self.nodes).flat()
+            }
+            return Math.max(0, currentList.length - offset)
+         }
+
+         sliced.clear = async () => {
+            if (jid) {
+               delete self.nodes[jid]
+               if (self.redis) {
+                  try {
+                     await self.redis.del(`node_store:${jid}`)
+                  } catch { }
+               }
+            } else {
+               self.nodes = Object.create(null)
+               if (self.redis) {
+                  try {
+                     let cursor = '0'
+                     const reply = await self.redis.scan(cursor, { MATCH: 'node_store:*', COUNT: 1000 })
+                     if (reply.keys?.length) {
+                        await Promise.all(reply.keys.map((k: string) => self.redis.del(k)))
+                     }
+                  } catch { }
+               }
+            }
+         }
+
+         return sliced
+      })()
+
+      const promiseWithMethods = promise as any
+
+      promiseWithMethods.count = async () => {
+         let currentList: any[] = []
+         if (jid) {
+            currentList = self.nodes[jid] || []
+         } else {
+            currentList = Object.values(self.nodes).flat()
+         }
+         return Math.max(0, currentList.length - offset)
+      }
+
+      promiseWithMethods.clear = async () => {
+         if (jid) {
+            delete self.nodes[jid]
+            if (self.redis) {
+               try {
+                  await self.redis.del(`node_store:${jid}`)
+               } catch { }
+            }
+         } else {
+            self.nodes = Object.create(null)
+            if (self.redis) {
+               try {
+                  let cursor = '0'
+                  const reply = await self.redis.scan(cursor, { MATCH: 'node_store:*', COUNT: 1000 })
+                  if (reply.keys?.length) {
+                     await Promise.all(reply.keys.map((k: string) => self.redis.del(k)))
+                  }
+               } catch { }
+            }
+         }
+      }
+
+      return promiseWithMethods
+   }
+
    public chatUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -576,9 +799,6 @@ class Store {
       }
    }
 
-   /**
-    * Upserts contact arrays and resolves JID targets with the socket instance mapping.
-    */
    public contactsUpsert(newContacts: Contact[]): Set<string> {
       const oldContacts = new Set(Object.keys(this.contacts))
       for (const contact of newContacts) {
@@ -594,9 +814,6 @@ class Store {
       return oldContacts
    }
 
-   /**
-    * Processes structural updates on dynamic contacts and maintains LID-to-PN associations.
-    */
    public contactUpdate(updates: any[]): void {
       for (const update of updates) {
          if (update.id) {
@@ -611,9 +828,6 @@ class Store {
       }
    }
 
-   /**
-    * Fetches a contact structure using exact JID, ID, or phoneNumber identifiers.
-    */
    public getContact(id: string): Contact | null {
       if (!id) return null
       if (this.contacts[id]) return this.contacts[id]
@@ -621,9 +835,6 @@ class Store {
       return found || null
    }
 
-   /**
-    * Resolves lists of contacts alongside contextual cleaning and counting helper methods.
-    */
    public getAllContacts(offset: number = 0) {
       const list = Object.values(this.contacts)
       const sliced = (offset > 0 ? list.slice(offset) : list) as any[] & { count(): number; clear(): void }
@@ -653,9 +864,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Updates a message structure by merging incoming status receipts and schedules Redis syncs.
-    */
    public async updateMessageWithReceipt(msg: any, receipt: any): Promise<void> {
       if (!msg) return
       msg.userReceipt = msg.userReceipt || []
@@ -675,9 +883,6 @@ class Store {
       }
    }
 
-   /**
-    * Updates a message structure by merging dynamic user reactions and schedules Redis syncs.
-    */
    public async updateMessageWithReaction(msg: any, reaction: any): Promise<void> {
       if (!msg) return
       const authorID = getKeyAuthor(reaction.key)
@@ -696,10 +901,12 @@ class Store {
       }
    }
 
-   /**
-    * Loads story data associated with a JID up to a given limit.
-    */
    public async loadStories(jid: string, count?: number): Promise<any[] | null> {
+      if (this.stories[jid]?.length) {
+         const slice = count && count > 0 ? this.stories[jid].slice(-count) : this.stories[jid]
+         if (slice?.length) return [...slice].reverse()
+      }
+
       if (this.redis) {
          try {
             const reply = await this.redis.scan('0', { MATCH: `story_store:${jid}:*`, COUNT: 100 })
@@ -714,16 +921,19 @@ class Store {
             return null
          }
       }
+
       const list = this.stories[jid]
       if (!list || list.length === 0) return null
       const slice = count && count > 0 ? list.slice(-count) : list
       return [...slice].reverse()
    }
 
-   /**
-    * Loads a single story entry based on its identifiers.
-    */
    public async loadStory(jid: string, id: string): Promise<any | null> {
+      if (this.stories[jid]) {
+         const found = this.stories[jid].find((v: any) => v.key?.id === id || v.id === id)
+         if (found) return found
+      }
+
       if (this.redis) {
          try {
             const raw = await this.redis.get(`story_store:${jid}:${id}`)
@@ -732,24 +942,13 @@ class Store {
             return null
          }
       }
-      const list = this.stories[jid]
-      if (!list || list.length === 0) return null
-      return list.find((v: any) => v.key?.id === id || v.id === id) || null
+
+      return null
    }
 
-   /**
-    * Saves a single story structure with 24-hour expiration inside Redis.
-    */
    public async addStory(jid: string, story: any): Promise<void> {
       const storyId = story.key?.id || story.id
       if (!storyId) return
-
-      if (this.redis) {
-         try {
-            await this.redis.set(`story_store:${jid}:${storyId}`, JSON.stringify(this.toPOJO(story)), { EX: 86400 })
-         } catch { }
-         return
-      }
 
       if (!this.stories[jid]) {
          this.stories[jid] = []
@@ -759,11 +958,26 @@ class Store {
       if (this.stories[jid].length > this.max) {
          this.stories[jid].splice(0, this.stories[jid].length - this.max)
       }
+
+      if (this.redis) {
+         try {
+            await this.redis.set(`story_store:${jid}:${storyId}`, JSON.stringify(this.toPOJO(story)))
+            const reply = await this.redis.scan('0', { MATCH: `story_store:${jid}:*`, COUNT: 500 })
+            const keys = reply.keys || []
+            if (keys.length > this.max) {
+               const raws = await Promise.all(keys.map((k: string) => this.redis.get(k).then((data: any) => ({ key: k, data: data ? JSON.parse(data) : null }))))
+               raws.sort((a: any, b: any) => (b.data?.created_at || 0) - (a.data?.created_at || 0))
+               const toDelete = raws.slice(this.max).map((r: any) => r.key)
+               if (toDelete.length > 0) {
+                  await Promise.all(toDelete.map((k: string) => this.redis.del(k)))
+               }
+            }
+         } catch (e) {
+            console.error('[store-redis] addStory error:', e)
+         }
+      }
    }
 
-   /**
-    * Retrieves all stories associated with a JID using offset-based listings.
-    */
    public async getAllStories(jid: string, offset: number = 0) {
       let list: any[] = []
       if (this.redis) {
@@ -820,9 +1034,6 @@ class Store {
       return sliced
    }
 
-   /**
-    * Tracks message IDs to filter out duplicates.
-    */
    public recordMessageId(sock: any, msg: { [key: string]: any }): boolean {
       if (msg.fromMe) return true
 
@@ -849,17 +1060,26 @@ class Store {
       return true
    }
 
-   /**
-    * Cleans up expired message records from active Map instances.
-    */
    private cleanupExpiredMessages(): void {
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
-            if (msgArray && msgArray.length > 100) {
-               msgArray.splice(0, msgArray.length - 100)
+            if (msgArray && msgArray.length > this.max) {
+               msgArray.splice(0, msgArray.length - this.max)
             }
          })
       }
+
+      Object.values(this.stories).forEach((storyArray) => {
+         if (storyArray && storyArray.length > this.max) {
+            storyArray.splice(0, storyArray.length - this.max)
+         }
+      })
+
+      Object.values(this.nodes).forEach((nodeArray) => {
+         if (nodeArray && nodeArray.length > this.max) {
+            nodeArray.splice(0, nodeArray.length - this.max)
+         }
+      })
 
       const now = Date.now()
       this.messageId.forEach((instanceMap, instance) => {
@@ -868,14 +1088,6 @@ class Store {
          })
          if (instanceMap.size === 0) this.messageId.delete(instance)
       })
-
-      if (!this.redis) {
-         Object.values(this.stories).forEach((storyArray) => {
-            if (storyArray && storyArray.length > 30) {
-               storyArray.splice(0, storyArray.length - 30)
-            }
-         })
-      }
    }
 }
 
