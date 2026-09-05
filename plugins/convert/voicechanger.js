@@ -1,7 +1,7 @@
 
 import { Converter } from '@neoxr/wb'
 import fs from 'node:fs'
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
 
 export const run = {
    usage: ['bass', 'blown', 'chipmunk', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth'],
@@ -33,7 +33,8 @@ export const run = {
             const buffer = await Converter.toAudio(await m.quoted.download(), 'mp3')
             const parse = await Utils.getFile(buffer)
             let ran = Utils.filename('mp3')
-            exec(`ffmpeg -i ${parse.file} ${set} ${ran}`, async (err, stderr, stdout) => {
+            const setArgs = set.trim().split(/\s+/).map(a => a.replace(/^"(.*)"$/, '$1'))
+            execFile('ffmpeg', ['-i', parse.file, ...setArgs, ran], async (err, stderr, stdout) => {
                fs.unlinkSync(parse.file)
                if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
                let buff = fs.readFileSync(ran)
