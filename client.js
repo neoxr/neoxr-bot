@@ -9,7 +9,7 @@ import fsPromise from 'fs/promises'
 import colors from 'colors'
 import cron from 'node-cron'
 import extra from './lib/listeners-extra.js'
-import { models, structure } from './lib/models.js'
+import { models } from './lib/models.js'
 import system from './lib/adapter.js'
 import pm2 from './lib/pm2.js'
 
@@ -43,7 +43,7 @@ const connect = async () => {
 
       client.once('connect', async res => {
          try {
-            await system.proxy.init(models, structure, Config.database)
+            await system.proxy.init(models, models.structure, Config.database)
 
             const isEmpty = global.db.users.length === 0 && global.db.chats.length === 0
 
@@ -52,7 +52,7 @@ const connect = async () => {
 
                if (previous && Object.keys(previous).length > 0) {
                   console.dim('[Proxy DB] Old data found, starting migration...')
-                  await system.proxy.migrate(previous, structure)
+                  await system.proxy.migrate(previous, models.structure)
                   console.dim('[Proxy DB] Migration successful!')
                }
             }
@@ -88,7 +88,7 @@ const connect = async () => {
 
          cron.schedule('0 12 * * *', async () => {
             if (global?.db?.setting?.autobackup) {
-               const data = await system.proxy.backup(structure, Config.database)
+               const data = await system.proxy.backup(models.structure, Config.database)
                const now = new Intl.DateTimeFormat('en-CA', { timeZone: process.env.TZ, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(', ', '_').replace(/:/g, '-')
                const filename = `${Config.database}-${now}.json`
                await fsPromise.writeFile(filename, data, 'utf-8')
