@@ -1,5 +1,5 @@
 import fsPromise from 'fs/promises'
-import { structure } from '../../lib/models.js'
+import { models } from '../../lib/models.js'
 
 export const run = {
    usage: ['restore'],
@@ -16,7 +16,7 @@ export const run = {
             const fn = await Utils.getFile(await m.quoted.download())
             if (!fn.status) return m.reply(Utils.texted('bold', '🚩 File cannot be downloaded.'))
             const data = await fsPromise.readFile(fn.file, 'utf-8')
-            await system.proxy.restore(structure, data, Config.database)
+            await system.proxy.restore(models.structure, data, Config.database)
             m.reply('✅ Database was successfully restored.')
          } else m.reply(Utils.texted('bold', '🚩 Reply to the backup file first then reply with this feature.'))
       } catch (e) {
