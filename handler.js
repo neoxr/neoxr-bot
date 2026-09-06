@@ -35,13 +35,13 @@ export default async (client, ctx) => {
 
       schema(m, Config)
 
-      let groupSet = global.db.groups.get(m.chat)
-      let chats = global.db.chats.get(m.chat)
-      let users = global.db.users.get(m.sender)
-      let setting = global.db.setting
-      let isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), Config.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
-      let isPrem = users && users.premium || isOwner
-      let participants = m.isGroup ? groupMetadata ? client.lidParser(groupMetadata.participants) : [] : [] || []
+      const groupSet = global.db.groups.get(m.chat)
+      const chats = global.db.chats.get(m.chat)
+      const users = global.db.users.get(m.sender)
+      const setting = global.db.setting
+      const isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), Config.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      const isPrem = users && users.premium || isOwner
+      const participants = m.isGroup ? groupMetadata ? client.lidParser(groupMetadata.participants) : [] : [] || []
       const admins = m.isGroup ? client.getAdmin(participants) : []
       const isAdmin = m.isGroup ? admins.includes(m.sender) : false
       const isBotAdmin = m.isGroup ? admins.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
@@ -99,6 +99,7 @@ export default async (client, ctx) => {
       if (!setting.multiprefix) setting.noprefix = false
       if (setting.debug && !m.fromMe && isOwner) client.reply(m.chat, Utils.jsonFormat(m), m)
       if (m.isGroup) groupSet.activity = new Date() * 1
+      if (!users) return
       if (users) {
          if (!users.lid) {
             const { lid } = await client.getUserId(m.sender)
