@@ -44,7 +44,8 @@ export const run = {
          const result = await (await axios.post('https://s.neoxr.eu/api/generate', json, {
             headers: {
                'Content-Type': 'application/json'
-            }
+            },
+            timeout: 15000
          })).data
          const buffer = Buffer.from(result.data.image, 'base64')
          client.sendSticker(m.chat, buffer, m, {
