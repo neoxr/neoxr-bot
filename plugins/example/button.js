@@ -8,6 +8,7 @@ export const run = {
       isPrefix,
       command,
       setting,
+      store,
       Utils,
       Config
    }) => {
@@ -95,7 +96,7 @@ export const run = {
             case 'button5': // Button 5 (Carousel)
                const cards = [{
                   header: {
-                     imageMessage: global.db.setting.cover,
+                     imageMessage: 'https://i.pinimg.com/736x/c7/2c/b0/c72cb05eb27c7d52e9cfa0cea059b1c8.jpg',
                      hasMediaAttachment: true,
                   },
                   body: {
@@ -113,7 +114,7 @@ export const run = {
                   }
                }, {
                   header: {
-                     imageMessage: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
+                     imageMessage: 'https://i.pinimg.com/736x/c7/2c/b0/c72cb05eb27c7d52e9cfa0cea059b1c8.jpg',
                      hasMediaAttachment: true,
                   },
                   body: {
@@ -132,7 +133,8 @@ export const run = {
                }]
 
                client.sendCarousel(m.chat, cards, m, {
-                  content: 'Hi!'
+                  content: 'Hi!',
+                  store
                })
                break
 
@@ -275,57 +277,70 @@ export const run = {
                })
                break
 
-            case 'button11':
-               client.sendIAMessage(m.chat, [{
-                  name: "payment_key_info",
+            case 'button11': {
+               const buttons = [{
+                  name: 'quick_reply',
                   buttonParamsJson: JSON.stringify({
-                     "currency": "IDR",
-                     "total_amount": {
-                        "value": 0,
-                        "offset": 100
-                     },
-                     "reference_id": "4V9ZSQ2JWGP",
-                     "type": "physical-goods",
-                     "order": {
-                        "status": "pending",
-                        "subtotal": {
-                           "value": 0,
-                           "offset": 100
-                        },
-                        "order_type": "ORDER",
-                        "items": [
-                           {
-                              "name": "",
-                              "amount": {
-                                 "value": 0,
-                                 "offset": 100
-                              },
-                              "quantity": 0,
-                              "sale_amount": {
-                                 "value": 0,
-                                 "offset": 100
-                              }
-                           }
-                        ]
-                     },
-                     "payment_settings": [
-                        {
-                           "type": "payment_key",
-                           "payment_key": {
-                              "type": "IDPAYMENTACCOUNT",
-                              "key": "+62 85887776722",
-                              "name": "DANA",
-                              "institution_name": "DANA",
-                              "full_name_on_account": "Wildan Izzudin",
-                              "account_type": "wallet"
-                           }
-                        }
-                     ],
-                     "share_payment_status": false,
-                     "is_soft_deleted": false,
-                     "referral": "chat_attachment"
+                     display_text: 'Runtime',
+                     id: `${isPrefix}run`,
+                     icon: 'REVIEW'
+                  }),
+               }, {
+                  name: 'single_select',
+                  buttonParamsJson: JSON.stringify({
+                     title: 'Tap Here!',
+                     sections: [{
+                        rows: [{
+                           title: 'Dummy 1',
+                           // description: `X`,
+                           id: `${isPrefix}run`
+                        }, {
+                           title: 'Dummy 2',
+                           // description: `Y`,
+                           id: `${isPrefix}run`
+                        }]
+                     }],
+                     icon: 'DEFAULT'
                   })
-               }], m)
+               }]
+
+               const uuid = Utils.uuid()
+               client.sendIAMessage(m.chat, buttons, m, {
+                  header: '',
+                  content: '',
+                  widget: {
+                     uuid: Utils.uuid(),
+                     data: JSON.stringify({
+                        version: 'v0.9',
+                        createSurface: {
+                           surfaceId: `starcore-widget=${uuid}`,
+                           catalogId: 'https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json',
+                           components: [{
+                              id: 'root',
+                              component: 'Column',
+                              children: [
+                                 'cover',
+                                 'description'
+                              ]
+                           }, {
+                              id: 'cover',
+                              component: 'Image',
+                              url: 'https://i.pinimg.com/736x/c7/2c/b0/c72cb05eb27c7d52e9cfa0cea059b1c8.jpg',
+                              variant: 'header',
+                              fit: 'none'
+                           }, {
+                              id: 'description',
+                              component: 'Text',
+                              text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+                              variant: 'body'
+                           }]
+                        }
+                     }),
+                     type: 'im_a2ui'
+                  },
+                  footer: global.footer
+               })
+            }
                break
          }
       } catch (e) {
