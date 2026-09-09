@@ -45,7 +45,13 @@ export const run = {
          if (command === 'metamsg2') {
             client.sendMetaMsg(m.chat, [
                {
-                  text: `This is an example of a meta message (rich message) that does not support *~mentions~*, but has many variations. Such as citations [](https://api.neoxr.eu) and links [Neoxr API](https://api.neoxr.eu).\n\nCode formatting and tables are working:`
+                  text: `This is an example of a meta message (rich message) that does not support *~mentions~*, but has many variations. Such as citations [](https://api.neoxr.eu) and links [Neoxr API](https://api.neoxr.eu).`
+               },
+               {
+                  preview: 'https://i.pinimg.com/736x/c7/2c/b0/c72cb05eb27c7d52e9cfa0cea059b1c8.jpg'
+               },
+               {
+                  text: '\n\nCode formatting and tables are working:'
                },
                {
                   code: {
