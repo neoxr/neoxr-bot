@@ -24,7 +24,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: 5.1-ESM
+          ref: 5.0-ESM
           token: ${{ steps.generate-token.outputs.token }}
           fetch-depth: 0
 
@@ -75,6 +75,6 @@ jobs:
             --title "chore(deps): bump @neoxr/wb to v${VERSION}" \
             --body "Automated dependency update for \`@neoxr/wb\` to version \`${VERSION}\`." \
             --head "$BRANCH_NAME" \
-            --base 5.1-ESM)
+            --base 5.0-ESM)
 
           gh pr merge "$PR_URL" --squash --delete-branch --admin
