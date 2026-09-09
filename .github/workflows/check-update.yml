@@ -1,0 +1,80 @@
+name: Check and Update @neoxr/wb
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1.11.0
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: 5.1-ESM
+          token: ${{ steps.generate-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Check for @neoxr/wb Updates
+        id: check-update
+        run: |
+          LATEST_VER=$(npm view @neoxr/wb version)
+          echo "Latest version on NPM: $LATEST_VER"
+
+          yarn add @neoxr/wb@latest
+
+          if git diff --quiet package.json; then
+            echo "has_update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_update=true" >> "$GITHUB_OUTPUT"
+            echo "latest_version=$LATEST_VER" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Branch, PR and Merge
+        if: steps.check-update.outputs.has_update == 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          VERSION: ${{ steps.check-update.outputs.latest_version }}
+        run: |
+          BRANCH_NAME="bump-wb-v${VERSION}"
+
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            exit 0
+          fi
+
+          git config user.name "neoxr-triage[bot]"
+          git config user.email "neoxr-triage[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH_NAME"
+          git add -f package.json yarn.lock
+          git commit -m "chore(deps): update @neoxr/wb to v${VERSION}"
+          git push origin "$BRANCH_NAME"
+
+          PR_URL=$(gh pr create \
+            --title "chore(deps): bump @neoxr/wb to v${VERSION}" \
+            --body "Automated dependency update for \`@neoxr/wb\` to version \`${VERSION}\`." \
+            --head "$BRANCH_NAME" \
+            --base 5.1-ESM)
+
+          gh pr merge "$PR_URL" --squash --delete-branch --admin

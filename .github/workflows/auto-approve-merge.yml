@@ -12,7 +12,7 @@ permissions:
 jobs:
   approve-and-merge:
     runs-on: ubuntu-latest
-    if: github.actor == 'neoxr' || github.actor == 'zlyvo'
+    if: github.actor == 'neoxr' || github.actor == 'neoxr-triage[bot]'
     
     steps:
       - name: Generate GitHub App Token
