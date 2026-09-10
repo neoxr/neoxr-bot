@@ -93,7 +93,7 @@ export const run = {
                   if (/image\/(jpe?g|png)/.test(mime)) {
                      client.sendReact(m.chat, '🕒', m.key)
                      buffer = await q.download()
-                  } else if (/ video /.test(mime)) {
+                  } else if (/video/.test(mime)) {
                      client.sendReact(m.chat, '🕒', m.key)
                      if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
                      buffer = await q.download()
