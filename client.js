@@ -13,6 +13,11 @@ import { models } from './lib/models.js'
 import system from './lib/adapter.js'
 import pm2 from './lib/pm2.js'
 
+import stores from '@neoxr/store'
+const store = stores.default || stores
+
+store.config({ max: Number(process.env.MAX_STORE || 100) })
+
 const connect = async () => {
    try {
       const client = new Client({
@@ -30,7 +35,7 @@ const connect = async () => {
             session: 'session',
             config: process.env.DATABASE_URL || ''
          },
-         engines: [baileys], // Init baileys as main engine
+         engines: [baileys, store], // Init baileys as main engine
          debug: false // Set to 'true' if you want to see how this module works :v
       }, {
          // This is the Baileys connection options section
