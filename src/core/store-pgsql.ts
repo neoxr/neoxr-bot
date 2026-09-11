@@ -89,7 +89,7 @@ class Store {
       this.chatsProxyInstance = this.createChatsProxy()
       this.contactsProxyInstance = this.createContactsProxy()
 
-      if (process.env?.USE_STORE?.includes('pg')) {
+      if (process.env?.USE_STORE?.includes('postgres')) {
          this.initDB()
       }
 
