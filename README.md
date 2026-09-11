@@ -16,7 +16,7 @@
 Install the core package:
 
 ```bash
-yarn add @neoxr/store@github:neoxr/neoxr-bot#utils/store
+yarn add @neoxr/store@github:neoxr/neoxr-bot#feat/store
 ```
 
 Depending on the storage engine you plan to use, install the corresponding optional peer dependency:
@@ -146,6 +146,50 @@ Exposes direct access to chat sessions: `Record<string, any>`. Reads and writes 
 - `client.messageId`: `Map<string, Map<string, { at: number }>>`
 
 ---
+
+#### 🧩 NODE METHODS
+
+Manages raw WhatsApp XML/binary stanza nodes received from the WebSocket (e.g. `<message>`, `<call>`, `<notification>`).
+
+> **Buffer Safeguard:** Any binary `Buffer` or `Uint8Array` inside the node payload (such as encrypted message ciphertext) is automatically sanitized and replaced with `'[buffer]'` before persistence to prevent memory leaks and database serialization errors.
+
+```typescript
+// Example Node Payload Structure
+{
+  tag: 'message',
+  attrs: {
+    from: '120363403664875148@g.us',
+    type: 'text',
+    id: 'AC3691F18130145FF445F111B2AF5B8A',
+    participant: '260597593682096@lid',
+    t: '1788530802'
+  },
+  content: [
+    { tag: 'reporting', attrs: {}, content: [] },
+    { tag: 'enc', attrs: { type: 'pkmsg' }, content: '[buffer]' }
+  ]
+}
+```
+
+#### `client.addNode(node: any, customJid?: string): Promise<void> | void`
+#### `client.addNode(jid: string, node: any): Promise<void> | void`
+Saves a sanitized node to persistent storage and updates the RAM cache (`client.nodes`).
+- **Flexible Calling:** Accepts `client.addNode(node)` (JID is automatically extracted from `attrs.from` / `attrs.participant`) or `client.addNode(jid, node)`.
+- **FIFO Auto-Pruning:** Once stored nodes under a specific JID reach `max`, the oldest nodes are pruned. Data is **never** deleted by arbitrary timers.
+
+#### `client.loadNode(jid: string, id?: string): Promise<any | null> | any | null`
+Retrieves a specific node by its ID.
+- **Single Argument:** `client.loadNode(id)` looks up the node across all stored chats.
+- **Two Arguments:** `client.loadNode(jid, id)` retrieves the node scoped strictly to that JID.
+
+#### `client.loadNodes(jid?: string | number, count?: number): Promise<any[] | null> | any[] | null`
+Loads latest stored nodes in reverse chronological order.
+- Can be called as `client.loadNodes(jid, 25)` or `client.loadNodes(25)` to query globally.
+
+#### `client.getAllNodes(jid?: string, offset?: number): Promise<any[] & { count(): Promise<number>; clear(): Promise<void> }>`
+Retrieves all stored nodes starting from the specified offset.
+- `.count()`: Returns total node count minus offset.
+- `.clear()`: Deletes stored nodes for the given JID (or clears all nodes if no JID is passed).
 
 #### 💬 MESSAGE METHODS
 
