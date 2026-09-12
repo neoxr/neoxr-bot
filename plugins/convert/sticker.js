@@ -1,3 +1,5 @@
+import { downloadContentFromMessage, downloadMediaMessage } from 'baileys'
+
 export const run = {
    usage: ['sticker'],
    hidden: ['s', 'sk', 'stiker', 'sgif'],
@@ -24,8 +26,9 @@ export const run = {
             client.sendSticker(m.chat, buffer, m, {
                packname: exif.sk_pack,
                author: exif.sk_author,
-               meta: true
-            })
+               meta: true,
+               store
+            }).then(() => m.react('✅'))
          } else {
             const q = m.quoted ? m.quoted : m
             const mime = (q.msg || q).mimetype || ''
@@ -37,7 +40,7 @@ export const run = {
 
                if (!result?.items?.length) return client.reply(m.chat, Utils.texted('bold', `❌ Album message doesn't exist in the store. Reupload or forward it to generate the sticker pack.`), m)
 
-               const results = await Promise.all(result.items.map(c => c.download()))
+               const results = await Promise.all(result.items.map(c => getMedia(c)))
 
                const stickers = results.map(buffer => ({ data: buffer }))
 
@@ -103,9 +106,11 @@ export const run = {
 
                   client.sendSticker(m.chat, buffer, m, {
                      packname: exif.sk_pack,
-                     author: exif.sk_author
+                     author: exif.sk_author,
+                     store
                   }).then(async () => {
                      buffer = null
+                     m.react('✅')
                   })
                }
             }
@@ -117,6 +122,46 @@ export const run = {
    },
    error: false,
    limit: true
+}
+
+async function getMedia(message) {
+   const msg = message?.msg || message
+
+   try {
+      const mime = msg?.mimetype || ''
+      const messageType = message?.mtype
+         ? message.mtype.replace(/Message|WithCaption/gi, '')
+         : mime?.split('/')?.[0]
+
+      const stream = await downloadContentFromMessage(
+         msg,
+         messageType
+      )
+
+      let buffer = Buffer.from([])
+
+      for await (const chunk of stream) {
+         buffer = Buffer.concat([buffer, chunk])
+      }
+
+      return buffer
+   } catch (streamError) {
+      const key = msg?.key || message?.key
+
+      if (!key) return null
+
+      try {
+         return await downloadMediaMessage(
+            {
+               key,
+               message: msg.message
+            },
+            'buffer'
+         )
+      } catch {
+         return null
+      }
+   }
 }
 
 async function retryUntil(fn, { retries = 5, delayMs = 800, factor = 1 } = {}) {
