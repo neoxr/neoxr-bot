@@ -26,8 +26,7 @@ export const run = {
             client.sendSticker(m.chat, buffer, m, {
                packname: exif.sk_pack,
                author: exif.sk_author,
-               meta: true,
-               store
+               meta: true
             }).then(() => m.react('✅'))
          } else {
             const q = m.quoted ? m.quoted : m
@@ -106,8 +105,7 @@ export const run = {
 
                   client.sendSticker(m.chat, buffer, m, {
                      packname: exif.sk_pack,
-                     author: exif.sk_author,
-                     store
+                     author: exif.sk_author
                   }).then(async () => {
                      buffer = null
                      m.react('✅')
