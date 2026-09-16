@@ -3,12 +3,54 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { noSuffix, getKeyAuthor } from '../utils.js'
 
+const colors = {
+   reset: '\x1b[0m',
+   bold: '\x1b[1m',
+   dim: '\x1b[2m',
+   red: '\x1b[31m',
+   green: '\x1b[32m',
+   yellow: '\x1b[33m',
+   blue: '\x1b[34m',
+   magenta: '\x1b[35m',
+   cyan: '\x1b[36m',
+   gray: '\x1b[90m',
+   white: '\x1b[37m'
+}
+
+const BufferJSON = {
+   replacer: (k: any, value: any) => {
+      if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
+         return {
+            type: 'Buffer',
+            data: Buffer.from(value).toString('base64')
+         }
+      }
+      if (value && value.type === 'Buffer' && typeof value.data === 'string') {
+         return value
+      }
+      return value
+   },
+   reviver: (_: any, value: any) => {
+      if (typeof value === 'object' && value !== null && (value.buffer === true || value.type === 'Buffer')) {
+         const val = value.data ?? value.value
+         return typeof val === 'string'
+            ? Buffer.from(val, 'base64')
+            : Buffer.from(val || [])
+      }
+      return value
+   }
+}
+
+const stringify = (obj: any) => JSON.stringify(obj, BufferJSON.replacer)
+const parse = (str: string) => JSON.parse(str, BufferJSON.reviver)
+
 class Store {
    public client: Client | null
    public socket: any | null
    public storeDir: string
    public max: number
    public database: string
+   public debug: boolean
 
    private cache = new Map<string, WAMessage[]>()
    private readonly maxCachedJids = 10
@@ -45,12 +87,13 @@ class Store {
    private nodesFilePath: string
    private nodesPendingWrite = false
 
-   constructor(dir: string = 'stores', max: number = 250) {
+   constructor(dir: string = 'stores', max: number = 250, debug: boolean = false) {
       this.client = null
       this.socket = null
       this.storeDir = path.join(process.cwd(), '.cache', dir)
       this.max = max
       this.database = 'json'
+      this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
       this.chatsFilePath = path.join(this.storeDir, 'chats.json')
       this.contactsFilePath = path.join(this.storeDir, 'contacts.json')
       this.storiesFilePath = path.join(this.storeDir, 'stories.json')
@@ -70,6 +113,32 @@ class Store {
 
       this.cleanupTimer = setInterval(() => this.cleanupExpiredMessages(), 120000)
       this.cleanupTimer.unref?.()
+   }
+
+   private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
+      if (!this.debug && (type === 'debug' || type === 'info')) return
+
+      const prefix = `${colors.cyan}${colors.bold}[store-json]${colors.reset}`
+      let badge = ''
+
+      switch (type) {
+         case 'info':
+            badge = `${colors.green}${colors.bold}[INFO]${colors.reset}`
+            break
+         case 'warn':
+            badge = `${colors.yellow}${colors.bold}[WARN]${colors.reset}`
+            break
+         case 'error':
+            badge = `${colors.red}${colors.bold}[ERROR]${colors.reset}`
+            break
+         case 'debug':
+            badge = `${colors.magenta}${colors.bold}[DEBUG]${colors.reset}`
+            break
+      }
+
+      const formattedMessage = `${colors.white}${message}${colors.reset}`
+      const out = type === 'error' ? console.error : type === 'warn' ? console.warn : console.log
+      out(`${prefix} ${badge} ${formattedMessage}`, ...args)
    }
 
    private schedule(delay: number, fn: () => void): void {
@@ -113,8 +182,12 @@ class Store {
    }
 
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
-      if (obj === null || typeof obj !== 'object') return obj
-      if (depth > 50) return null
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (typeof obj === 'bigint') return obj.toString()
+      if (typeof obj !== 'object') {
+         return typeof obj === 'function' ? undefined : obj
+      }
+      if (depth > 35) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -133,18 +206,13 @@ class Store {
          return obj.map(v => this.toPOJO(v, seen, depth + 1))
       }
 
-      const proto = Object.getPrototypeOf(obj)
-      const isPlain = proto === null || proto === Object.prototype
-
-      if (!isPlain) {
-         if (typeof obj.toJSON === 'function') {
-            try {
-               return this.toPOJO(obj.toJSON(), seen, depth + 1)
-            } catch {
-               return null
+      if (typeof obj.toJSON === 'function') {
+         try {
+            const json = obj.toJSON()
+            if (json && typeof json === 'object') {
+               return this.toPOJO(json, seen, depth + 1)
             }
-         }
-         return null
+         } catch { }
       }
 
       const res: any = {}
@@ -153,23 +221,51 @@ class Store {
          const key = keys[i]
          try {
             const val = obj[key]
-            if (typeof val !== 'function') {
-               res[key] = this.toPOJO(val, seen, depth + 1)
+            if (typeof val === 'function') continue
+            const pojoVal = this.toPOJO(val, seen, depth + 1)
+            if (pojoVal !== undefined) {
+               res[key] = pojoVal
             }
          } catch { }
       }
       return res
    }
 
+   private cleanMessage(msg: any): any {
+      if (!msg || typeof msg !== 'object') return null
+
+      const base: any = {
+         key: this.toPOJO(msg.key),
+         message: this.toPOJO(msg.message),
+         messageTimestamp: msg.messageTimestamp || msg.timestampSeconds || Math.floor(Date.now() / 1000),
+         pushName: msg.pushName || ''
+      }
+
+      if (msg.broadcast !== undefined) base.broadcast = msg.broadcast
+      if (msg.status !== undefined) base.status = msg.status
+      if (msg.reactions) base.reactions = this.toPOJO(msg.reactions)
+      if (msg.userReceipt) base.userReceipt = this.toPOJO(msg.userReceipt)
+      if (msg.pollUpdates) base.pollUpdates = this.toPOJO(msg.pollUpdates)
+
+      if (msg.id) base.id = msg.id
+      if (msg.chat) base.chat = msg.chat
+      if (msg.sender) base.sender = msg.sender
+      if (msg.isGroup !== undefined) base.isGroup = msg.isGroup
+      if (msg.mtype) base.mtype = msg.mtype
+      if (msg.text) base.text = msg.text
+
+      return base
+   }
+
    private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj === 'undefined') return obj
-      if (depth > 50) return null
+      if (depth > 35) return null
 
       if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
          return '[buffer]'
       }
 
-      if (typeof obj !== 'object') return obj
+      if (typeof obj !== 'object') return typeof obj === 'function' ? undefined : obj
       if (seen.has(obj)) return null
       seen.add(obj)
 
@@ -198,16 +294,17 @@ class Store {
       try {
          if (fs.existsSync(this.chatsFilePath)) {
             const content = fs.readFileSync(this.chatsFilePath, 'utf-8')
-            const list = JSON.parse(content) as any[]
+            const list = parse(content) as any[]
             list.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0))
             const capped = list.slice(0, 500)
             for (const chat of capped) {
                if (chat?.id) this.chatsCache.set(chat.id, chat)
             }
+            this.log('debug', `Loaded ${colors.green}${this.chatsCache.size}${colors.reset} chats from disk.`)
          }
       } catch (error: any) {
          if (error.code !== 'ENOENT') {
-            console.error('[store-json] Failed to load chats:', error)
+            this.log('error', 'Failed to load chats:', error)
          }
       }
    }
@@ -216,16 +313,17 @@ class Store {
       try {
          if (fs.existsSync(this.contactsFilePath)) {
             const content = fs.readFileSync(this.contactsFilePath, 'utf-8')
-            const list = JSON.parse(content) as any[]
+            const list = parse(content) as any[]
             list.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0))
             const capped = list.slice(0, 1000)
             for (const contact of capped) {
                if (contact?.jid) this.contactsCache.set(contact.jid, contact)
             }
+            this.log('debug', `Loaded ${colors.green}${this.contactsCache.size}${colors.reset} contacts from disk.`)
          }
       } catch (error: any) {
          if (error.code !== 'ENOENT') {
-            console.error('[store-json] Failed to load contacts:', error)
+            this.log('error', 'Failed to load contacts:', error)
          }
       }
    }
@@ -234,17 +332,18 @@ class Store {
       try {
          if (fs.existsSync(this.storiesFilePath)) {
             const content = fs.readFileSync(this.storiesFilePath, 'utf-8')
-            const parsed = JSON.parse(content) as Record<string, any[]>
+            const parsed = parse(content) as Record<string, any[]>
             for (const [jid, list] of Object.entries(parsed)) {
                if (Array.isArray(list)) {
                   this.storiesCache.set(jid, list.filter(Boolean).slice(-this.max))
                   this.stories[jid] = this.storiesCache.get(jid)!
                }
             }
+            this.log('debug', `Loaded stories for ${colors.green}${this.storiesCache.size}${colors.reset} JIDs from disk.`)
          }
       } catch (error: any) {
          if (error.code !== 'ENOENT') {
-            console.error('[store-json] Failed to load stories:', error)
+            this.log('error', 'Failed to load stories:', error)
          }
       }
    }
@@ -253,25 +352,26 @@ class Store {
       try {
          if (fs.existsSync(this.nodesFilePath)) {
             const content = fs.readFileSync(this.nodesFilePath, 'utf-8')
-            const parsed = JSON.parse(content) as Record<string, any[]>
+            const parsed = parse(content) as Record<string, any[]>
             for (const [jid, list] of Object.entries(parsed)) {
                if (Array.isArray(list)) {
                   this.nodes[jid] = list.filter(Boolean).slice(-this.max)
                }
             }
+            this.log('debug', `Loaded nodes for ${colors.green}${Object.keys(this.nodes).length}${colors.reset} JIDs from disk.`)
          }
       } catch (error: any) {
          if (error.code !== 'ENOENT') {
-            console.error('[store-json] Failed to load nodes:', error)
+            this.log('error', 'Failed to load nodes:', error)
          }
       }
    }
 
    private enqueueWrite(key: string, writeFn: () => Promise<void>): void {
-      const previous = this.writeQueues.get(key) || Promise.resolve()
+      const previous = (this.writeQueues.get(key) || Promise.resolve()).catch(() => { })
       const current = previous
          .then(writeFn)
-         .catch((err) => console.error(`[store] Write error on ${key}:`, err))
+         .catch((err) => this.log('error', `Write error on ${key}:`, err))
          .finally(() => {
             if (this.writeQueues.get(key) === current) {
                this.writeQueues.delete(key)
@@ -292,10 +392,11 @@ class Store {
          this.enqueueWrite('chats', async () => {
             const tempPath = `${this.chatsFilePath}.tmp`
             try {
-               await fs.promises.writeFile(tempPath, JSON.stringify(list), 'utf-8')
+               await fs.promises.writeFile(tempPath, stringify(list), 'utf-8')
                await fs.promises.rename(tempPath, this.chatsFilePath)
+               this.log('debug', `Saved ${colors.green}${list.length}${colors.reset} chats to disk.`)
             } catch (error) {
-               console.error('[store-json] Failed to write chats to disk:', error)
+               this.log('error', 'Failed to write chats to disk:', error)
             }
          })
       })
@@ -313,10 +414,11 @@ class Store {
          this.enqueueWrite('contacts', async () => {
             const tempPath = `${this.contactsFilePath}.tmp`
             try {
-               await fs.promises.writeFile(tempPath, JSON.stringify(list), 'utf-8')
+               await fs.promises.writeFile(tempPath, stringify(list), 'utf-8')
                await fs.promises.rename(tempPath, this.contactsFilePath)
+               this.log('debug', `Saved ${colors.green}${list.length}${colors.reset} contacts to disk.`)
             } catch (error) {
-               console.error('[store-json] Failed to write contacts to disk:', error)
+               this.log('error', 'Failed to write contacts to disk:', error)
             }
          })
       })
@@ -338,10 +440,11 @@ class Store {
          this.enqueueWrite('stories', async () => {
             const tempPath = `${this.storiesFilePath}.tmp`
             try {
-               await fs.promises.writeFile(tempPath, JSON.stringify(cleanData), 'utf-8')
+               await fs.promises.writeFile(tempPath, stringify(cleanData), 'utf-8')
                await fs.promises.rename(tempPath, this.storiesFilePath)
+               this.log('debug', `Saved stories to disk.`)
             } catch (error) {
-               console.error('[store-json] Failed to write stories to disk:', error)
+               this.log('error', 'Failed to write stories to disk:', error)
             }
          })
       })
@@ -364,16 +467,17 @@ class Store {
          this.enqueueWrite('nodes', async () => {
             const tempPath = `${this.nodesFilePath}.tmp`
             try {
-               await fs.promises.writeFile(tempPath, JSON.stringify(cleanData), 'utf-8')
+               await fs.promises.writeFile(tempPath, stringify(cleanData), 'utf-8')
                await fs.promises.rename(tempPath, this.nodesFilePath)
+               this.log('debug', `Saved nodes to disk.`)
             } catch (error) {
-               console.error('[store-json] Failed to write nodes to disk:', error)
+               this.log('error', 'Failed to write nodes to disk:', error)
             }
          })
       })
    }
 
-   public config({ dir, max }: StoreConfig): this {
+   public config({ dir, max, debug }: StoreConfig & { debug?: boolean }): this {
       if (dir) {
          this.storeDir = path.join(process.cwd(), '.cache', dir)
          this.chatsFilePath = path.join(this.storeDir, 'chats.json')
@@ -390,9 +494,16 @@ class Store {
          this.loadStoriesData()
          this.loadNodesData()
       }
+
       if (max !== undefined) {
          this.max = max
       }
+
+      if (debug !== undefined) {
+         this.debug = debug
+         this.log('debug', `Debug mode set to: ${colors.yellow}${this.debug}${colors.reset}`)
+      }
+
       return this
    }
 
@@ -485,6 +596,7 @@ class Store {
       client.messageId = this.messageId
       client.chats = this.chats
 
+      this.log('debug', 'Store successfully bound to client and socket.')
       return client
    }
 
@@ -505,7 +617,6 @@ class Store {
       if (this.cache.size > this.maxCachedJids) {
          for (const [key] of this.cache) {
             if (this.pendingJidWrites.has(key)) continue
-
             this.cache.delete(key)
             if (this.cache.size <= this.maxCachedJids) break
          }
@@ -522,7 +633,7 @@ class Store {
       const filePath = this.getFilePath(jid)
       try {
          const fileContent = fs.readFileSync(filePath, 'utf-8')
-         const list = JSON.parse(fileContent)
+         const list = parse(fileContent)
          if (!Array.isArray(list)) return []
          const data = list.filter(Boolean).slice(-this.max)
 
@@ -534,7 +645,7 @@ class Store {
          if (error.code === 'ENOENT') {
             return []
          }
-         console.error(`[store-json] Failed to read JID ${jid} from JSON:`, error)
+         this.log('error', `Failed to read JID ${jid} from JSON:`, error)
          return []
       }
    }
@@ -557,22 +668,40 @@ class Store {
             const filePath = this.getFilePath(jid)
             const tempFilePath = `${filePath}.tmp`
             try {
-               const cleanData = this.toPOJO(currentData)
-               const jsonStr = JSON.stringify(cleanData)
-
-               await fs.promises.writeFile(tempFilePath, jsonStr, 'utf-8')
+               const cleanData = currentData.map(v => this.toPOJO(v))
+               await fs.promises.writeFile(tempFilePath, stringify(cleanData), 'utf-8')
                await fs.promises.rename(tempFilePath, filePath)
+               this.log('debug', `[writeJidData] Saved ${colors.green}${cleanData.length}${colors.reset} messages for ${colors.yellow}${jid}${colors.reset}`)
             } catch (error) {
-               console.error(`[store-json] Failed to write JID ${jid} to JSON:`, error)
+               this.log('error', `Failed to write JID ${jid} to JSON:`, error)
             }
          })
       })
    }
 
-   public loadMessage(jid: string, id: string): WAMessage | null {
-      if (!jid || !id) return null
-      const list = this.readJidData(jid)
-      return list.find(v => v?.key?.id === id || (v as any)?.id === id) || null
+   public loadMessage(jidOrId: string, id?: string): WAMessage | null {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid) {
+         const list = this.readJidData(targetJid)
+         const found = list.find(v => v?.key?.id === targetId || (v as any)?.id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in ${colors.yellow}${targetJid}${colors.reset}`)
+            return found
+         }
+         return null
+      }
+
+      for (const [, list] of this.cache) {
+         const found = list.find(v => v?.key?.id === targetId || (v as any)?.id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in cache.`)
+            return found
+         }
+      }
+
+      return null
    }
 
    public loadMessages(jid: string, count: number = 25): WAMessage[] | null {
@@ -580,14 +709,43 @@ class Store {
       const list = this.readJidData(jid)
       if (list.length === 0) return null
 
-      const slice = count ? list.slice(-count) : list
+      this.log('debug', `[loadMessages] Loaded ${colors.green}${Math.min(list.length, count)}${colors.reset} messages for ${colors.yellow}${jid}${colors.reset}`)
+      const slice = list.slice(-count)
       return [...slice].reverse()
    }
 
-   public addMessage(jid: string, msg: WAMessage): void {
-      if (!jid || !msg) return
+   public addMessage(arg1: any, arg2?: any): void {
+      let jid: string = ''
+      let msg: any = null
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         msg = arg2
+      } else if (typeof arg2 === 'string') {
+         msg = arg1
+         jid = arg2
+      } else if (arg1 && typeof arg1 === 'object') {
+         msg = arg1
+         jid = arg1.key?.remoteJid || arg1.chat || arg1.jid || ''
+      }
+
+      if (!msg || typeof msg !== 'object') return
+
+      const msgId = msg.key?.id || msg.id
+      if (!msgId) return
+
+      if (!jid || jid.endsWith('@lid')) {
+         jid = msg.key?.remoteJid || msg.chat || msg.jid || jid
+      }
+      if (!jid) return
+
+      const cleanedMsg = this.cleanMessage(msg)
+      if (!cleanedMsg) return
+
+      this.log('debug', `[addMessage] Incoming message ${colors.cyan}${msgId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       const list = this.readJidData(jid)
-      list.push(msg)
+      list.push(cleanedMsg)
 
       if (list.length > this.max) {
          list.splice(0, list.length - this.max)
@@ -617,7 +775,7 @@ class Store {
                fs.unlinkSync(filePath)
             } catch (error: any) {
                if (error.code !== 'ENOENT') {
-                  console.error(`[store-json] Failed to delete JSON file for JID ${jid}:`, error)
+                  self.log('error', `Failed to delete JSON file for JID ${jid}:`, error)
                }
             }
          } else {
@@ -650,9 +808,12 @@ class Store {
       if (!node || typeof node !== 'object') return
 
       const nodeId = node?.attrs?.id || node?.id || `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+      const tag = node?.tag || 'node'
 
       const cleanedNode = this.sanitizeNode(node)
       if (!cleanedNode) return
+
+      this.log('debug', `[addNode] Storing node tag: ${colors.magenta}${tag}${colors.reset} id: ${colors.cyan}${nodeId}${colors.reset}`)
 
       if (!this.nodes[jid]) {
          this.nodes[jid] = []
@@ -754,6 +915,7 @@ class Store {
             this.chats[id] = Object.assign(this.chats[id] || { id }, update)
          }
       }
+      this.log('debug', `[chatUpdate] Processed ${colors.green}${updates.length}${colors.reset} chat updates.`)
    }
 
    public contactsUpsert(newContacts: Contact[]): Set<string> {
@@ -768,6 +930,7 @@ class Store {
          oldContacts.delete(jid)
          this.contacts[jid] = Object.assign(this.contacts[jid] || { jid }, contact)
       }
+      this.log('debug', `[contactsUpsert] Processed ${colors.green}${newContacts.length}${colors.reset} contacts.`)
       return oldContacts
    }
 
@@ -783,6 +946,7 @@ class Store {
             this.contacts[jid] = Object.assign(this.contacts[jid] || { jid, id: jid }, update)
          }
       }
+      this.log('debug', `[contactUpdate] Processed ${colors.green}${updates.length}${colors.reset} contact updates.`)
    }
 
    public getContact(id: string): Contact | null {
@@ -831,14 +995,17 @@ class Store {
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg?.key?.remoteJid || msg?.jid
-      if (jid) {
+      const jid = msg?.key?.remoteJid || msg?.chat || msg?.jid
+      const id = msg?.key?.id || msg?.id
+
+      if (jid && id) {
+         const cleaned = this.cleanMessage(msg)
          const list = this.readJidData(jid)
-         const id = msg?.key?.id || msg?.id
          const idx = list.findIndex(v => v?.key?.id === id || (v as any)?.id === id)
          if (idx !== -1) {
-            list[idx] = msg
+            list[idx] = cleaned
             this.writeJidData(jid, list)
+            this.log('debug', `[updateReceipt] Updated receipt for message ${colors.cyan}${id}${colors.reset}`)
          }
       }
    }
@@ -866,14 +1033,17 @@ class Store {
 
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg?.key?.remoteJid || msg?.jid
-      if (jid) {
+      const jid = msg?.key?.remoteJid || msg?.chat || msg?.jid
+      const id = msg?.key?.id || msg?.id
+
+      if (jid && id) {
+         const cleaned = this.cleanMessage(msg)
          const list = this.readJidData(jid)
-         const id = msg?.key?.id || msg?.id
          const idx = list.findIndex(v => v?.key?.id === id || (v as any)?.id === id)
          if (idx !== -1) {
-            list[idx] = msg
+            list[idx] = cleaned
             this.writeJidData(jid, list)
+            this.log('debug', `[updateReaction] Updated reaction for message ${colors.cyan}${id}${colors.reset}`)
          }
       }
    }
@@ -898,6 +1068,9 @@ class Store {
       const storyId = story?.key?.id || story?.id
       if (!storyId) return
 
+      const cleanedStory = this.toPOJO(story)
+      this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       let list = this.storiesCache.get(jid)
       if (!list) {
          list = []
@@ -907,9 +1080,9 @@ class Store {
 
       const idx = list.findIndex((s: any) => (s?.key?.id || s?.id) === storyId)
       if (idx !== -1) {
-         list[idx] = story
+         list[idx] = cleanedStory
       } else {
-         list.push(story)
+         list.push(cleanedStory)
       }
 
       if (list.length > this.max) {
@@ -965,6 +1138,8 @@ class Store {
    }
 
    private cleanupExpiredMessages(): void {
+      this.log('debug', 'Running periodic memory cache cleanup routine.')
+
       const now = Date.now()
       this.messageId.forEach((instanceMap, instance) => {
          instanceMap.forEach((value, msgId) => {

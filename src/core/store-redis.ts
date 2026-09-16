@@ -10,10 +10,51 @@ const loadRedis = async () => {
       const module = await import(moduleName)
       RedisConstructor = module.createClient ? module : (module.default || module)
       return RedisConstructor
-   } catch (e) {
+   } catch {
       return null
    }
 }
+
+const colors = {
+   reset: '\x1b[0m',
+   bold: '\x1b[1m',
+   dim: '\x1b[2m',
+   red: '\x1b[31m',
+   green: '\x1b[32m',
+   yellow: '\x1b[33m',
+   blue: '\x1b[34m',
+   magenta: '\x1b[35m',
+   cyan: '\x1b[36m',
+   gray: '\x1b[90m',
+   white: '\x1b[37m'
+}
+
+const BufferJSON = {
+   replacer: (k: any, value: any) => {
+      if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
+         return {
+            type: 'Buffer',
+            data: Buffer.from(value).toString('base64')
+         }
+      }
+      if (value && value.type === 'Buffer' && typeof value.data === 'string') {
+         return value
+      }
+      return value
+   },
+   reviver: (_: any, value: any) => {
+      if (typeof value === 'object' && value !== null && (value.buffer === true || value.type === 'Buffer')) {
+         const val = value.data ?? value.value
+         return typeof val === 'string'
+            ? Buffer.from(val, 'base64')
+            : Buffer.from(val || [])
+      }
+      return value
+   }
+}
+
+const stringify = (obj: any) => JSON.stringify(obj, BufferJSON.replacer)
+const parse = (str: string) => JSON.parse(str, BufferJSON.reviver)
 
 class Store {
    public client: Client | null
@@ -22,6 +63,7 @@ class Store {
    public max: number
    public uri: string | undefined
    public database: string
+   public debug: boolean
 
    private redis: any = null
    private fallbackStore: Record<string, WAMessage[]> | null = null
@@ -46,13 +88,14 @@ class Store {
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
 
-   constructor(dir: string = 'stores', max: number = 250, uri?: string) {
+   constructor(dir: string = 'stores', max: number = 250, uri?: string, debug: boolean = false) {
       this.client = null
       this.socket = null
       this.storeDir = path.join(process.cwd(), '.cache', dir)
       this.max = max
       this.uri = uri || process.env.USE_STORE
       this.database = 'redis'
+      this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
 
       this.fallbackStore = Object.create(null)
       this.fallbackChats = Object.create(null)
@@ -61,16 +104,48 @@ class Store {
       this.chatsProxyInstance = this.createChatsProxy()
       this.contactsProxyInstance = this.createContactsProxy()
 
-      if (process.env?.USE_STORE?.includes('redis')) {
+      const targetUri = this.uri || process.env?.USE_STORE
+      if (targetUri && targetUri.includes('redis')) {
+         this.uri = targetUri
          this.initDB()
       }
 
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
+   private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
+      if (!this.debug && (type === 'debug' || type === 'info')) return
+
+      const prefix = `${colors.cyan}${colors.bold}[store-redis]${colors.reset}`
+      let badge = ''
+
+      switch (type) {
+         case 'info':
+            badge = `${colors.green}${colors.bold}[INFO]${colors.reset}`
+            break
+         case 'warn':
+            badge = `${colors.yellow}${colors.bold}[WARN]${colors.reset}`
+            break
+         case 'error':
+            badge = `${colors.red}${colors.bold}[ERROR]${colors.reset}`
+            break
+         case 'debug':
+            badge = `${colors.magenta}${colors.bold}[DEBUG]${colors.reset}`
+            break
+      }
+
+      const formattedMessage = `${colors.white}${message}${colors.reset}`
+      const out = type === 'error' ? console.error : type === 'warn' ? console.warn : console.log
+      out(`${prefix} ${badge} ${formattedMessage}`, ...args)
+   }
+
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
-      if (obj === null || typeof obj !== 'object') return obj
-      if (depth > 50) return null
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (typeof obj === 'bigint') return obj.toString()
+      if (typeof obj !== 'object') {
+         return typeof obj === 'function' ? undefined : obj
+      }
+      if (depth > 35) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -89,18 +164,13 @@ class Store {
          return obj.map(v => this.toPOJO(v, seen, depth + 1))
       }
 
-      const proto = Object.getPrototypeOf(obj)
-      const isPlain = proto === null || proto === Object.prototype
-
-      if (!isPlain) {
-         if (typeof obj.toJSON === 'function') {
-            try {
-               return this.toPOJO(obj.toJSON(), seen, depth + 1)
-            } catch {
-               return null
+      if (typeof obj.toJSON === 'function') {
+         try {
+            const json = obj.toJSON()
+            if (json && typeof json === 'object') {
+               return this.toPOJO(json, seen, depth + 1)
             }
-         }
-         return null
+         } catch { }
       }
 
       const res: any = {}
@@ -109,23 +179,51 @@ class Store {
          const key = keys[i]
          try {
             const val = obj[key]
-            if (typeof val !== 'function') {
-               res[key] = this.toPOJO(val, seen, depth + 1)
+            if (typeof val === 'function') continue
+            const pojoVal = this.toPOJO(val, seen, depth + 1)
+            if (pojoVal !== undefined) {
+               res[key] = pojoVal
             }
          } catch { }
       }
       return res
    }
 
+   private cleanMessage(msg: any): any {
+      if (!msg || typeof msg !== 'object') return null
+
+      const base: any = {
+         key: this.toPOJO(msg.key),
+         message: this.toPOJO(msg.message),
+         messageTimestamp: msg.messageTimestamp || msg.timestampSeconds || Math.floor(Date.now() / 1000),
+         pushName: msg.pushName || ''
+      }
+
+      if (msg.broadcast !== undefined) base.broadcast = msg.broadcast
+      if (msg.status !== undefined) base.status = msg.status
+      if (msg.reactions) base.reactions = this.toPOJO(msg.reactions)
+      if (msg.userReceipt) base.userReceipt = this.toPOJO(msg.userReceipt)
+      if (msg.pollUpdates) base.pollUpdates = this.toPOJO(msg.pollUpdates)
+
+      if (msg.id) base.id = msg.id
+      if (msg.chat) base.chat = msg.chat
+      if (msg.sender) base.sender = msg.sender
+      if (msg.isGroup !== undefined) base.isGroup = msg.isGroup
+      if (msg.mtype) base.mtype = msg.mtype
+      if (msg.text) base.text = msg.text
+
+      return base
+   }
+
    private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj === 'undefined') return obj
-      if (depth > 50) return null
+      if (depth > 35) return null
 
       if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
          return '[buffer]'
       }
 
-      if (typeof obj !== 'object') return obj
+      if (typeof obj !== 'object') return typeof obj === 'function' ? undefined : obj
       if (seen.has(obj)) return null
       seen.add(obj)
 
@@ -154,27 +252,29 @@ class Store {
       const RedisModule = await loadRedis()
 
       if (!RedisModule || (!RedisModule.createClient && !RedisModule.default?.createClient)) {
-         console.warn('[store-redis] Redis module not installed! Running in RAM-only mode.')
+         this.log('warn', 'Missing "redis" library. Operating in RAM storage mode.')
          return
       }
 
       if (!this.uri) {
-         console.warn('[store-redis] Redis URI not provided! Running in RAM-only mode.')
+         this.log('warn', 'Redis URI undefined. Operating in RAM storage mode.')
          return
       }
 
       if (this.redis) {
          try {
             await this.redis.disconnect()
-         } catch (e) { }
+         } catch { }
       }
 
       try {
+         this.log('debug', `Initiating Redis connection to: ${colors.gray}${this.uri}${colors.reset}`)
+
          const createClient = RedisModule.createClient || RedisModule.default?.createClient
          this.redis = createClient({ url: this.uri })
 
          this.redis.on('error', (err: any) => {
-            console.error('[store-redis] Redis Client Error:', err)
+            this.log('error', 'Redis Client Error:', err?.message || err)
          })
 
          await this.redis.connect()
@@ -185,8 +285,9 @@ class Store {
          this.fallbackStore = null
          this.fallbackChats = null
          this.fallbackContacts = null
-      } catch (error) {
-         console.error('[store-redis] Failed to initialize Redis. Falling back to RAM-only mode:', error)
+         this.log('info', 'Redis database connection established successfully.')
+      } catch (error: any) {
+         this.log('error', `Failed to connect to Redis (${error?.message || error}). Falling back to RAM storage mode.`)
          this.redis = null
       }
    }
@@ -194,64 +295,64 @@ class Store {
    private async preloadChats(): Promise<void> {
       if (!this.redis) return
       try {
-         let cursor = '0'
-         const reply = await this.redis.scan(cursor, { MATCH: 'chat_store:*', COUNT: 500 })
+         const reply = await this.redis.scan('0', { MATCH: 'chat_store:*', COUNT: 500 })
          const keys = reply.keys
          if (keys && keys.length > 0) {
             for (const key of keys) {
                const raw = await this.redis.get(key)
                if (raw) {
                   const id = key.replace('chat_store:', '')
-                  this.chatsCache.set(id, JSON.parse(raw))
+                  this.chatsCache.set(id, parse(raw))
                }
             }
          }
-      } catch (error) {
-         console.error('[store-redis] Failed to preload chats:', error)
+         this.log('debug', `Preloaded ${colors.green}${keys?.length || 0}${colors.reset} chats into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload chats from Redis:', error?.message || error)
       }
    }
 
    private async preloadContacts(): Promise<void> {
       if (!this.redis) return
       try {
-         let cursor = '0'
-         const reply = await this.redis.scan(cursor, { MATCH: 'contact_store:*', COUNT: 1000 })
+         const reply = await this.redis.scan('0', { MATCH: 'contact_store:*', COUNT: 1000 })
          const keys = reply.keys
          if (keys && keys.length > 0) {
             for (const key of keys) {
                const raw = await this.redis.get(key)
                if (raw) {
                   const jid = key.replace('contact_store:', '')
-                  this.contactsCache.set(jid, JSON.parse(raw))
+                  this.contactsCache.set(jid, parse(raw))
                }
             }
          }
-      } catch (error) {
-         console.error('[store-redis] Failed to preload contacts:', error)
+         this.log('debug', `Preloaded ${colors.green}${keys?.length || 0}${colors.reset} contacts into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload contacts from Redis:', error?.message || error)
       }
    }
 
    private async preloadNodes(): Promise<void> {
       if (!this.redis) return
       try {
-         let cursor = '0'
-         const reply = await this.redis.scan(cursor, { MATCH: 'node_store:*', COUNT: 500 })
+         const reply = await this.redis.scan('0', { MATCH: 'node_store:*', COUNT: 500 })
          const keys = reply.keys
          if (keys && keys.length > 0) {
             for (const key of keys) {
                const raw = await this.redis.get(key)
                if (raw) {
                   const jid = key.replace('node_store:', '')
-                  this.nodes[jid] = JSON.parse(raw)
+                  this.nodes[jid] = parse(raw)
                }
             }
          }
-      } catch (error) {
-         console.error('[store-redis] Failed to preload nodes:', error)
+         this.log('debug', `Preloaded ${colors.green}${keys?.length || 0}${colors.reset} nodes into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload nodes from Redis:', error?.message || error)
       }
    }
 
-   public config({ dir, max, uri }: StoreConfig): this {
+   public config({ dir, max, uri, debug }: StoreConfig & { debug?: boolean }): this {
       let needsReinit = false
 
       if (dir) {
@@ -260,6 +361,11 @@ class Store {
 
       if (max !== undefined) {
          this.max = max
+      }
+
+      if (debug !== undefined) {
+         this.debug = debug
+         this.log('debug', `Debug mode set to: ${colors.yellow}${this.debug}${colors.reset}`)
       }
 
       if (uri && uri !== this.uri) {
@@ -286,7 +392,9 @@ class Store {
             const cleanedValue = self.toPOJO(value)
             self.chatsCache.set(prop, cleanedValue)
             if (self.redis) {
-               self.redis.set(`chat_store:${prop}`, JSON.stringify(cleanedValue)).catch(() => { })
+               self.redis.set(`chat_store:${prop}`, stringify(cleanedValue)).catch((err: any) => {
+                  self.log('error', 'Failed to save chat:', err?.message || err)
+               })
             } else if (self.fallbackChats) {
                self.fallbackChats[prop] = cleanedValue
             }
@@ -311,7 +419,9 @@ class Store {
             const cleanedValue = self.toPOJO(value)
             self.contactsCache.set(prop, cleanedValue)
             if (self.redis) {
-               self.redis.set(`contact_store:${prop}`, JSON.stringify(cleanedValue)).catch(() => { })
+               self.redis.set(`contact_store:${prop}`, stringify(cleanedValue)).catch((err: any) => {
+                  self.log('error', 'Failed to save contact:', err?.message || err)
+               })
             } else if (self.fallbackContacts) {
                self.fallbackContacts[prop] = cleanedValue
             }
@@ -367,6 +477,7 @@ class Store {
       client.messageId = this.messageId
       client.chats = this.chats
 
+      this.log('debug', 'Store successfully bound to client and socket.')
       return client
    }
 
@@ -382,7 +493,6 @@ class Store {
       if (this.cache.size > this.maxCachedJids) {
          for (const [key] of this.cache) {
             if (this.pendingJidWrites.has(key)) continue
-
             this.cache.delete(key)
             if (this.cache.size <= this.maxCachedJids) break
          }
@@ -398,12 +508,12 @@ class Store {
       if (!this.redis) return []
       try {
          const raw = await this.redis.get(`msg_store:${jid}`)
-         const data = raw ? (JSON.parse(raw) as WAMessage[]) : []
+         const data = raw ? (parse(raw) as WAMessage[]) : []
          this.cache.set(jid, data)
          this.evictOldestCache()
          return data
-      } catch (error) {
-         console.error(`[store-redis] Failed to load JID ${jid} from Redis:`, error)
+      } catch (error: any) {
+         this.log('error', `Failed to load JID ${jid} from Redis:`, error?.message || error)
          return []
       }
    }
@@ -421,14 +531,15 @@ class Store {
          const currentData = this.cache.get(jid)
          if (!currentData || !this.redis) return
 
-         const previous = this.writeQueues.get(jid) || Promise.resolve()
+         const previous = (this.writeQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous
             .then(async () => {
                try {
-                  const cleanData = this.toPOJO(currentData)
-                  await this.redis.set(`msg_store:${jid}`, JSON.stringify(cleanData))
-               } catch (error) {
-                  console.error(`[store-redis] Failed to save JID ${jid} to Redis:`, error)
+                  const cleanData = currentData.map(v => this.toPOJO(v))
+                  await this.redis.set(`msg_store:${jid}`, stringify(cleanData))
+                  this.log('debug', `[setRedisData] Persisted ${colors.green}${cleanData.length}${colors.reset} messages for ${colors.yellow}${jid}${colors.reset}`)
+               } catch (error: any) {
+                  this.log('error', `Failed to save JID ${jid} to Redis:`, error?.message || error)
                }
             })
             .finally(() => {
@@ -440,28 +551,91 @@ class Store {
       }, 1500)
    }
 
-   public async loadMessage(jid: string, id: string): Promise<WAMessage | null> {
-      const list = await this.getRedisData(jid)
-      return list.find(v => v.key?.id === id || (v as any).id === id) || null
+   public async loadMessage(jidOrId: string, id?: string): Promise<WAMessage | null> {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid) {
+         const list = await this.getRedisData(targetJid)
+         const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in Redis list for ${colors.yellow}${targetJid}${colors.reset}`)
+            return found
+         }
+         return null
+      }
+
+      for (const [, list] of this.cache) {
+         const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in global memory cache.`)
+            return found
+         }
+      }
+
+      return null
    }
 
    public async loadMessages(jid: string, count?: number): Promise<WAMessage[] | null> {
+      const targetCount = count && count > 0 ? count : 25
       const list = await this.getRedisData(jid)
       if (list.length === 0) return null
 
-      const slice = count ? list.slice(-count) : list
+      this.log('debug', `[loadMessages] Loaded ${colors.green}${Math.min(list.length, targetCount)}${colors.reset} messages for ${colors.yellow}${jid}${colors.reset}`)
+      const slice = list.slice(-targetCount)
       return [...slice].reverse()
    }
 
-   public async addMessage(jid: string, msg: WAMessage): Promise<void> {
-      const list = await this.getRedisData(jid)
-      list.push(msg)
+   public async addMessage(arg1: any, arg2?: any): Promise<void> {
+      let jid: string = ''
+      let msg: any = null
 
-      if (list.length > this.max) {
-         list.splice(0, list.length - this.max)
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         msg = arg2
+      } else if (typeof arg2 === 'string') {
+         msg = arg1
+         jid = arg2
+      } else if (arg1 && typeof arg1 === 'object') {
+         msg = arg1
+         jid = arg1.key?.remoteJid || arg1.chat || arg1.jid || ''
       }
 
-      await this.setRedisData(jid, list)
+      if (!msg || typeof msg !== 'object') return
+
+      const msgId = msg.key?.id || msg.id
+      if (!msgId) return
+
+      if (!jid || jid.endsWith('@lid')) {
+         jid = msg.key?.remoteJid || msg.chat || msg.jid || jid
+      }
+      if (!jid) return
+
+      const cleanedMsg = this.cleanMessage(msg)
+      if (!cleanedMsg) return
+
+      this.log('debug', `[addMessage] Incoming message ${colors.cyan}${msgId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
+      if (this.redis) {
+         const list = await this.getRedisData(jid)
+         list.push(cleanedMsg)
+
+         if (list.length > this.max) {
+            list.splice(0, list.length - this.max)
+         }
+
+         await this.setRedisData(jid, list)
+         return
+      }
+
+      if (this.fallbackStore) {
+         if (!this.fallbackStore[jid]) this.fallbackStore[jid] = []
+         this.fallbackStore[jid].push(cleanedMsg)
+         if (this.fallbackStore[jid].length > this.max) {
+            this.fallbackStore[jid].splice(0, this.fallbackStore[jid].length - this.max)
+         }
+         this.log('debug', `[addMessage] Stored message ${colors.cyan}${msgId}${colors.reset} in RAM fallback.`)
+      }
    }
 
    public getAllMessages(jid: string, offset: number = 0): Promise<WAMessage[] & { count(): Promise<number>; clear(): Promise<void> }> & { count(): Promise<number>; clear(): Promise<void> } {
@@ -498,8 +672,8 @@ class Store {
                if (offset === 0) {
                   try {
                      await self.redis.del(`msg_store:${jid}`)
-                  } catch (error) {
-                     console.error(`[store-redis] Failed to clear JID ${jid} from Redis:`, error)
+                  } catch (error: any) {
+                     self.log('error', `Failed to clear JID ${jid} from Redis:`, error?.message || error)
                   }
                } else {
                   const currentList = await self.getRedisData(jid)
@@ -548,8 +722,8 @@ class Store {
             if (offset === 0) {
                try {
                   await self.redis.del(`msg_store:${jid}`)
-               } catch (error) {
-                  console.error(`[store-redis] Failed to clear JID ${jid} from Redis:`, error)
+               } catch (error: any) {
+                  self.log('error', `Failed to clear JID ${jid} from Redis:`, error?.message || error)
                }
             } else {
                const currentList = await self.getRedisData(jid)
@@ -599,6 +773,8 @@ class Store {
       const cleanedNode = this.sanitizeNode(node)
       if (!cleanedNode) return
 
+      this.log('debug', `[addNode] Storing node tag: ${colors.magenta}${tag}${colors.reset} id: ${colors.cyan}${nodeId}${colors.reset}`)
+
       if (!this.nodes[jid]) {
          this.nodes[jid] = []
       }
@@ -613,13 +789,13 @@ class Store {
       }
 
       if (this.redis) {
-         const previous = this.nodeWriteQueues.get(jid) || Promise.resolve()
+         const previous = (this.nodeWriteQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous
             .then(async () => {
                try {
-                  await this.redis.set(`node_store:${jid}`, JSON.stringify(this.nodes[jid]))
-               } catch (e) {
-                  console.error('[store-redis] addNode error:', e)
+                  await this.redis.set(`node_store:${jid}`, stringify(this.nodes[jid]))
+               } catch (e: any) {
+                  this.log('error', `Failed to save node ${nodeId}:`, e?.message || e)
                }
             })
             .finally(() => {
@@ -649,7 +825,7 @@ class Store {
          try {
             const raw = await this.redis.get(`node_store:${targetJid}`)
             if (raw) {
-               const list = JSON.parse(raw)
+               const list = parse(raw)
                this.nodes[targetJid] = list
                return list.find((v: any) => (v.attrs?.id || v.id) === targetId) || null
             }
@@ -677,7 +853,7 @@ class Store {
             try {
                const raw = await this.redis.get(`node_store:${targetJid}`)
                if (raw) {
-                  list = JSON.parse(raw)
+                  list = parse(raw)
                   this.nodes[targetJid] = list
                }
             } catch { }
@@ -704,7 +880,7 @@ class Store {
                try {
                   const raw = await self.redis.get(`node_store:${jid}`)
                   if (raw) {
-                     list = JSON.parse(raw)
+                     list = parse(raw)
                      self.nodes[jid] = list
                   }
                } catch { }
@@ -740,8 +916,7 @@ class Store {
                self.nodes = Object.create(null)
                if (self.redis) {
                   try {
-                     let cursor = '0'
-                     const reply = await self.redis.scan(cursor, { MATCH: 'node_store:*', COUNT: 1000 })
+                     const reply = await self.redis.scan('0', { MATCH: 'node_store:*', COUNT: 1000 })
                      if (reply.keys?.length) {
                         await Promise.all(reply.keys.map((k: string) => self.redis.del(k)))
                      }
@@ -797,6 +972,7 @@ class Store {
             this.chats[id] = Object.assign(this.chats[id] || { id }, update)
          }
       }
+      this.log('debug', `[chatUpdate] Processed ${colors.green}${updates.length}${colors.reset} chat updates.`)
    }
 
    public contactsUpsert(newContacts: Contact[]): Set<string> {
@@ -806,11 +982,12 @@ class Store {
          let jid = id
          if (this.socket && jid?.endsWith('lid')) {
             // @ts-ignore
-            jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+            jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
          }
          oldContacts.delete(jid)
          this.contacts[jid] = Object.assign(this.contacts[jid] || { jid }, contact)
       }
+      this.log('debug', `[contactsUpsert] Processed ${colors.green}${newContacts.length}${colors.reset} contacts.`)
       return oldContacts
    }
 
@@ -821,11 +998,12 @@ class Store {
             let jid = id
             if (this.socket && jid?.endsWith('lid')) {
                // @ts-ignore
-               jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+               jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
             }
             this.contacts[jid] = Object.assign(this.contacts[jid] || { jid, id: jid }, update)
          }
       }
+      this.log('debug', `[contactUpdate] Processed ${colors.green}${updates.length}${colors.reset} contact updates.`)
    }
 
    public getContact(id: string): Contact | null {
@@ -871,14 +1049,17 @@ class Store {
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg.key?.remoteJid
-      if (jid) {
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
+      const id = msg.key?.id || msg.id
+
+      if (jid && id) {
+         const cleanedMsg = this.cleanMessage(msg)
          const list = await this.getRedisData(jid)
-         const id = msg.key?.id || msg.id
          const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
          if (idx !== -1) {
-            list[idx] = msg
+            list[idx] = cleanedMsg
             await this.setRedisData(jid, list)
+            this.log('debug', `[updateReceipt] Updated receipt for message ${colors.cyan}${id}${colors.reset}`)
          }
       }
    }
@@ -889,14 +1070,17 @@ class Store {
       msg.reactions = (msg.reactions || []).filter((r: any) => getKeyAuthor(r.key) !== authorID)
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg.key?.remoteJid
-      if (jid) {
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
+      const id = msg.key?.id || msg.id
+
+      if (jid && id) {
+         const cleanedMsg = this.cleanMessage(msg)
          const list = await this.getRedisData(jid)
-         const id = msg.key?.id || msg.id
          const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
          if (idx !== -1) {
-            list[idx] = msg
+            list[idx] = cleanedMsg
             await this.setRedisData(jid, list)
+            this.log('debug', `[updateReaction] Updated reaction for message ${colors.cyan}${id}${colors.reset}`)
          }
       }
    }
@@ -914,10 +1098,11 @@ class Store {
             if (!keys || keys.length === 0) return null
             const loadPromises = keys.map((k: string) => this.redis.get(k))
             const raws = await Promise.all(loadPromises)
-            const stories = raws.filter(Boolean).map(r => JSON.parse(r))
+            const stories = raws.filter(Boolean).map((r: string) => parse(r))
             stories.sort((a: any, b: any) => (b.created_at || 0) - (a.created_at || 0))
             return count ? stories.slice(0, count).reverse() : stories.reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load stories for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -937,8 +1122,9 @@ class Store {
       if (this.redis) {
          try {
             const raw = await this.redis.get(`story_store:${jid}:${id}`)
-            return raw ? JSON.parse(raw) : null
-         } catch {
+            return raw ? parse(raw) : null
+         } catch (error: any) {
+            this.log('error', `Failed to load story ${id}:`, error?.message || error)
             return null
          }
       }
@@ -950,10 +1136,13 @@ class Store {
       const storyId = story.key?.id || story.id
       if (!storyId) return
 
+      const cleanedStory = this.toPOJO(story)
+      this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (!this.stories[jid]) {
          this.stories[jid] = []
       }
-      this.stories[jid].push(story)
+      this.stories[jid].push(cleanedStory)
 
       if (this.stories[jid].length > this.max) {
          this.stories[jid].splice(0, this.stories[jid].length - this.max)
@@ -961,19 +1150,19 @@ class Store {
 
       if (this.redis) {
          try {
-            await this.redis.set(`story_store:${jid}:${storyId}`, JSON.stringify(this.toPOJO(story)))
+            await this.redis.set(`story_store:${jid}:${storyId}`, stringify(cleanedStory))
             const reply = await this.redis.scan('0', { MATCH: `story_store:${jid}:*`, COUNT: 500 })
             const keys = reply.keys || []
             if (keys.length > this.max) {
-               const raws = await Promise.all(keys.map((k: string) => this.redis.get(k).then((data: any) => ({ key: k, data: data ? JSON.parse(data) : null }))))
+               const raws = await Promise.all(keys.map((k: string) => this.redis.get(k).then((data: any) => ({ key: k, data: data ? parse(data) : null }))))
                raws.sort((a: any, b: any) => (b.data?.created_at || 0) - (a.data?.created_at || 0))
                const toDelete = raws.slice(this.max).map((r: any) => r.key)
                if (toDelete.length > 0) {
                   await Promise.all(toDelete.map((k: string) => this.redis.del(k)))
                }
             }
-         } catch (e) {
-            console.error('[store-redis] addStory error:', e)
+         } catch (e: any) {
+            this.log('error', `Failed to save story ${storyId}:`, e?.message || e)
          }
       }
    }
@@ -986,7 +1175,7 @@ class Store {
             const keys = reply.keys
             if (keys && keys.length > 0) {
                const raws = await Promise.all(keys.map((k: string) => this.redis.get(k)))
-               list = raws.filter(Boolean).map(r => JSON.parse(r))
+               list = raws.filter(Boolean).map((r: string) => parse(r))
                list.sort((a: any, b: any) => (b.created_at || 0) - (a.created_at || 0)).reverse()
             }
          } catch { }
@@ -1061,6 +1250,8 @@ class Store {
    }
 
    private cleanupExpiredMessages(): void {
+      this.log('debug', 'Running periodic memory cache cleanup routine.')
+
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
             if (msgArray && msgArray.length > this.max) {

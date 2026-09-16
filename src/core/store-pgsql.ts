@@ -10,24 +10,41 @@ const loadPG = async () => {
       const module = await import(moduleName)
       PGConstructor = module.default?.Pool || module.Pool || module
       return PGConstructor
-   } catch (e) {
+   } catch {
       return null
    }
 }
 
+const colors = {
+   reset: '\x1b[0m',
+   bold: '\x1b[1m',
+   dim: '\x1b[2m',
+   red: '\x1b[31m',
+   green: '\x1b[32m',
+   yellow: '\x1b[33m',
+   blue: '\x1b[34m',
+   magenta: '\x1b[35m',
+   cyan: '\x1b[36m',
+   gray: '\x1b[90m',
+   white: '\x1b[37m'
+}
+
 const BufferJSON = {
    replacer: (k: any, value: any) => {
-      if (Buffer.isBuffer(value) || value instanceof Uint8Array || value?.type === 'Buffer') {
+      if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
          return {
             type: 'Buffer',
-            data: Buffer.from(value?.data || value).toString('base64')
+            data: Buffer.from(value).toString('base64')
          }
+      }
+      if (value && value.type === 'Buffer' && typeof value.data === 'string') {
+         return value
       }
       return value
    },
    reviver: (_: any, value: any) => {
       if (typeof value === 'object' && value !== null && (value.buffer === true || value.type === 'Buffer')) {
-         const val = value.data || value.value
+         const val = value.data ?? value.value
          return typeof val === 'string'
             ? Buffer.from(val, 'base64')
             : Buffer.from(val || [])
@@ -47,6 +64,7 @@ class Store {
    public max: number
    public uri: string | undefined
    public database: string
+   public debug: boolean
 
    private pool: any = null
    private fallbackStore: Record<string, WAMessage[]> | null = null
@@ -73,7 +91,7 @@ class Store {
    private maxCachedContacts = 5000
    private maxCachedChats = 1000
 
-   constructor(dir: string = 'stores', max: number = 250, uri?: string) {
+   constructor(dir: string = 'stores', max: number = 250, uri?: string, debug: boolean = false) {
       this.client = null
       this.socket = null
 
@@ -81,6 +99,7 @@ class Store {
       this.max = max
       this.uri = uri || process.env.USE_STORE
       this.database = 'pgsql'
+      this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
 
       this.fallbackStore = Object.create(null)
       this.fallbackChats = Object.create(null)
@@ -89,16 +108,50 @@ class Store {
       this.chatsProxyInstance = this.createChatsProxy()
       this.contactsProxyInstance = this.createContactsProxy()
 
-      if (process.env?.USE_STORE?.includes('postgres')) {
+      const targetUri = this.uri || process.env?.USE_STORE
+      if (targetUri && (targetUri.includes('postgres') || targetUri.includes('pgsql'))) {
+         this.uri = targetUri
          this.initDB()
+      } else {
+         this.log('warn', 'PostgreSQL URI not specified or protocol invalid. Operating in RAM storage mode.')
       }
 
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
+   private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
+      if (!this.debug && (type === 'debug' || type === 'info')) return
+
+      const prefix = `${colors.cyan}${colors.bold}[store-postgres]${colors.reset}`
+      let badge = ''
+
+      switch (type) {
+         case 'info':
+            badge = `${colors.green}${colors.bold}[INFO]${colors.reset}`
+            break
+         case 'warn':
+            badge = `${colors.yellow}${colors.bold}[WARN]${colors.reset}`
+            break
+         case 'error':
+            badge = `${colors.red}${colors.bold}[ERROR]${colors.reset}`
+            break
+         case 'debug':
+            badge = `${colors.magenta}${colors.bold}[DEBUG]${colors.reset}`
+            break
+      }
+
+      const formattedMessage = `${colors.white}${message}${colors.reset}`
+      const out = type === 'error' ? console.error : type === 'warn' ? console.warn : console.log
+      out(`${prefix} ${badge} ${formattedMessage}`, ...args)
+   }
+
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
-      if (obj === null || typeof obj !== 'object') return obj
-      if (depth > 50) return null
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (typeof obj === 'bigint') return obj.toString()
+      if (typeof obj !== 'object') {
+         return typeof obj === 'function' ? undefined : obj
+      }
+      if (depth > 35) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -117,18 +170,13 @@ class Store {
          return obj.map(v => this.toPOJO(v, seen, depth + 1))
       }
 
-      const proto = Object.getPrototypeOf(obj)
-      const isPlain = proto === null || proto === Object.prototype
-
-      if (!isPlain) {
-         if (typeof obj.toJSON === 'function') {
-            try {
-               return this.toPOJO(obj.toJSON(), seen, depth + 1)
-            } catch {
-               return null
+      if (typeof obj.toJSON === 'function') {
+         try {
+            const json = obj.toJSON()
+            if (json && typeof json === 'object') {
+               return this.toPOJO(json, seen, depth + 1)
             }
-         }
-         return null
+         } catch { }
       }
 
       const res: any = {}
@@ -137,23 +185,51 @@ class Store {
          const key = keys[i]
          try {
             const val = obj[key]
-            if (typeof val !== 'function') {
-               res[key] = this.toPOJO(val, seen, depth + 1)
+            if (typeof val === 'function') continue
+            const pojoVal = this.toPOJO(val, seen, depth + 1)
+            if (pojoVal !== undefined) {
+               res[key] = pojoVal
             }
          } catch { }
       }
       return res
    }
 
+   private cleanMessage(msg: any): any {
+      if (!msg || typeof msg !== 'object') return null
+
+      const base: any = {
+         key: this.toPOJO(msg.key),
+         message: this.toPOJO(msg.message),
+         messageTimestamp: msg.messageTimestamp || msg.timestampSeconds || Math.floor(Date.now() / 1000),
+         pushName: msg.pushName || ''
+      }
+
+      if (msg.broadcast !== undefined) base.broadcast = msg.broadcast
+      if (msg.status !== undefined) base.status = msg.status
+      if (msg.reactions) base.reactions = this.toPOJO(msg.reactions)
+      if (msg.userReceipt) base.userReceipt = this.toPOJO(msg.userReceipt)
+      if (msg.pollUpdates) base.pollUpdates = this.toPOJO(msg.pollUpdates)
+
+      if (msg.id) base.id = msg.id
+      if (msg.chat) base.chat = msg.chat
+      if (msg.sender) base.sender = msg.sender
+      if (msg.isGroup !== undefined) base.isGroup = msg.isGroup
+      if (msg.mtype) base.mtype = msg.mtype
+      if (msg.text) base.text = msg.text
+
+      return base
+   }
+
    private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj === 'undefined') return obj
-      if (depth > 50) return null
+      if (depth > 35) return null
 
       if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
          return '[buffer]'
       }
 
-      if (typeof obj !== 'object') return obj
+      if (typeof obj !== 'object') return typeof obj === 'function' ? undefined : obj
       if (seen.has(obj)) return null
       seen.add(obj)
 
@@ -182,23 +258,30 @@ class Store {
       const Pool = await loadPG()
 
       if (!Pool) {
-         console.warn('[store-pg] pg module not installed! Running in RAM-only mode.')
+         this.log('warn', 'Missing "pg" library. Operating in RAM storage mode.')
          return
       }
 
       if (!this.uri) {
-         console.warn('[store-pg] PostgreSQL URI not provided! Running in RAM-only mode.')
+         this.log('warn', 'PostgreSQL URI undefined. Operating in RAM storage mode.')
          return
       }
 
       if (this.pool) {
          try {
             await this.pool.end()
-         } catch (e) { }
+         } catch { }
       }
 
       try {
-         this.pool = new Pool({ connectionString: this.uri })
+         this.log('debug', `Initiating PostgreSQL pool connection to: ${colors.gray}${this.uri}${colors.reset}`)
+
+         this.pool = new Pool({
+            connectionString: this.uri,
+            max: 15,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 5000
+         })
 
          await this.pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
@@ -248,7 +331,7 @@ class Store {
             await this.pool.query(`
                ALTER TABLE chats ADD COLUMN IF NOT EXISTS updated_at BIGINT NOT NULL DEFAULT 0;
             `)
-         } catch (e) { }
+         } catch { }
 
          await this.preloadChats()
          await this.preloadContacts()
@@ -257,8 +340,9 @@ class Store {
          this.fallbackStore = null
          this.fallbackChats = null
          this.fallbackContacts = null
-      } catch (error) {
-         console.error('[store-pg] Failed to initialize PostgreSQL. Falling back to RAM-only mode:', error)
+         this.log('info', 'PostgreSQL database connection established successfully.')
+      } catch (error: any) {
+         this.log('error', `Failed to connect to PostgreSQL (${error?.message || error}). Falling back to RAM storage mode.`)
          this.pool = null
       }
    }
@@ -270,8 +354,9 @@ class Store {
          for (const row of rows) {
             this.chatsCache.set(row.id, parse(row.data))
          }
-      } catch (error) {
-         console.error('[store-pg] Failed to preload chats:', error)
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} chats into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload chats from database:', error?.message || error)
       }
    }
 
@@ -282,8 +367,9 @@ class Store {
          for (const row of rows) {
             this.contactsCache.set(row.jid, parse(row.data))
          }
-      } catch (error) {
-         console.error('[store-pg] Failed to preload contacts:', error)
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} contacts into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload contacts from database:', error?.message || error)
       }
    }
 
@@ -295,12 +381,13 @@ class Store {
             if (!this.nodes[row.jid]) this.nodes[row.jid] = []
             this.nodes[row.jid].push(parse(row.data))
          }
-      } catch (error) {
-         console.error('[store-pg] Failed to preload nodes:', error)
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} nodes into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload nodes from database:', error?.message || error)
       }
    }
 
-   public config({ dir, max, uri }: StoreConfig): this {
+   public config({ dir, max, uri, debug }: StoreConfig & { debug?: boolean }): this {
       let needsReinit = false
 
       if (dir) {
@@ -309,6 +396,11 @@ class Store {
 
       if (max !== undefined) {
          this.max = max
+      }
+
+      if (debug !== undefined) {
+         this.debug = debug
+         this.log('debug', `Debug mode set to: ${colors.yellow}${this.debug}${colors.reset}`)
       }
 
       if (uri && uri !== this.uri) {
@@ -341,7 +433,12 @@ class Store {
             }
 
             if (self.pool) {
-               self.pool.query('INSERT INTO chats (id, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at', [prop, stringify(cleanedValue), Date.now()]).catch(() => { })
+               self.pool.query(
+                  'INSERT INTO chats (id, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at',
+                  [prop, stringify(cleanedValue), Date.now()]
+               ).catch((err: any) => {
+                  self.log('error', 'Failed to save chat:', err?.message || err)
+               })
             } else if (self.fallbackChats) {
                self.fallbackChats[prop] = cleanedValue
             }
@@ -372,7 +469,12 @@ class Store {
             }
 
             if (self.pool) {
-               self.pool.query('INSERT INTO contacts (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at', [prop, stringify(cleanedValue), Date.now()]).catch(() => { })
+               self.pool.query(
+                  'INSERT INTO contacts (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at',
+                  [prop, stringify(cleanedValue), Date.now()]
+               ).catch((err: any) => {
+                  self.log('error', 'Failed to save contact:', err?.message || err)
+               })
             } else if (self.fallbackContacts) {
                self.fallbackContacts[prop] = cleanedValue
             }
@@ -428,6 +530,7 @@ class Store {
       client.messageId = this.messageId
       client.chats = this.chats
 
+      this.log('debug', 'Store successfully bound to client and socket.')
       return client
    }
 
@@ -445,34 +548,74 @@ class Store {
             this.cache.delete(this.cache.keys().next().value)
          }
          return data
-      } catch {
+      } catch (error: any) {
+         this.log('error', `Failed to read messages for ${jid}:`, error?.message || error)
          return []
       }
    }
 
-   public async loadMessage(jid: string, id: string): Promise<WAMessage | null> {
-      if (this.cache.has(jid)) {
-         const list = this.cache.get(jid)!
-         const found = list.find(v => v.key?.id === id || (v as any).id === id)
-         if (found) return found
+   public async loadMessage(jidOrId: string, id?: string): Promise<WAMessage | null> {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid && this.cache.has(targetJid)) {
+         const list = this.cache.get(targetJid)!
+         const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in memory cache.`)
+            return found
+         }
+      }
+
+      if (!targetJid) {
+         for (const [, list] of this.cache) {
+            const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+            if (found) {
+               this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in global memory cache.`)
+               return found
+            }
+         }
       }
 
       if (this.pool) {
          try {
-            const { rows }: any = await this.pool.query('SELECT data FROM messages WHERE jid = $1 AND id = $2', [jid, id])
-            return rows.length > 0 ? (parse(rows[0].data) as WAMessage) : null
-         } catch {
+            if (targetJid) {
+               const { rows }: any = await this.pool.query('SELECT data FROM messages WHERE jid = $1 AND id = $2', [targetJid, targetId])
+               if (rows.length > 0) {
+                  this.log('debug', `[loadMessage] Loaded ${colors.cyan}${targetId}${colors.reset} from PostgreSQL.`)
+                  return parse(rows[0].data) as WAMessage
+               }
+            } else {
+               const { rows }: any = await this.pool.query('SELECT data FROM messages WHERE id = $1 LIMIT 1', [targetId])
+               if (rows.length > 0) {
+                  this.log('debug', `[loadMessage] Loaded ${colors.cyan}${targetId}${colors.reset} from PostgreSQL (ID query).`)
+                  return parse(rows[0].data) as WAMessage
+               }
+            }
+         } catch (error: any) {
+            this.log('error', `Failed to load message ${targetId}:`, error?.message || error)
             return null
          }
       }
-      const list = this.fallbackStore?.[jid] || []
-      return list.find(v => v.key?.id === id || (v as any).id === id) || null
+
+      if (targetJid) {
+         const list = this.fallbackStore?.[targetJid] || []
+         return list.find(v => v.key?.id === targetId || (v as any).id === targetId) || null
+      } else if (this.fallbackStore) {
+         for (const j in this.fallbackStore) {
+            const found = this.fallbackStore[j]?.find(v => v.key?.id === targetId || (v as any).id === targetId)
+            if (found) return found
+         }
+      }
+
+      return null
    }
 
    public async loadMessages(jid: string, count: number = 25): Promise<WAMessage[] | null> {
       if (this.cache.has(jid)) {
          const list = this.cache.get(jid)!
          if (list.length > 0) {
+            this.log('debug', `[loadMessages] Loaded ${colors.green}${Math.min(list.length, count)}${colors.reset} messages from cache for ${colors.yellow}${jid}${colors.reset}`)
             return [...list].reverse().slice(0, count)
          }
       }
@@ -484,8 +627,10 @@ class Store {
                [jid, count]
             )
             if (rows.length === 0) return null
+            this.log('debug', `[loadMessages] Loaded ${colors.green}${rows.length}${colors.reset} messages from PostgreSQL for ${colors.yellow}${jid}${colors.reset}`)
             return rows.map((row: any) => parse(row.data) as WAMessage).reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load messages list for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -494,13 +639,38 @@ class Store {
       return [...list].reverse().slice(0, count)
    }
 
-   public async addMessage(jid: string, msg: WAMessage): Promise<void> {
-      const msgId = msg.key?.id || (msg as any).id
+   public async addMessage(arg1: any, arg2?: any): Promise<void> {
+      let jid: string = ''
+      let msg: any = null
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         msg = arg2
+      } else if (typeof arg2 === 'string') {
+         msg = arg1
+         jid = arg2
+      } else if (arg1 && typeof arg1 === 'object') {
+         msg = arg1
+         jid = arg1.key?.remoteJid || arg1.chat || arg1.jid || ''
+      }
+
+      if (!msg || typeof msg !== 'object') return
+
+      const msgId = msg.key?.id || msg.id
       if (!msgId) return
 
+      if (!jid || jid.endsWith('@lid')) {
+         jid = msg.key?.remoteJid || msg.chat || msg.jid || jid
+      }
+      if (!jid) return
+
+      const cleanedMsg = this.cleanMessage(msg)
+      if (!cleanedMsg) return
+
+      this.log('debug', `[addMessage] Incoming message ${colors.cyan}${msgId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (this.pool) {
-         const cleanedMsg = this.toPOJO(msg)
-         const previous = this.writeQueues.get(jid) || Promise.resolve()
+         const previous = (this.writeQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous
             .then(async () => {
                try {
@@ -508,15 +678,16 @@ class Store {
                      'INSERT INTO messages (jid, id, data, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (jid, id) DO UPDATE SET data = EXCLUDED.data, created_at = EXCLUDED.created_at',
                      [jid, msgId, stringify(cleanedMsg), Date.now()]
                   )
+                  this.log('debug', `[addMessage] Persisted message ${colors.cyan}${msgId}${colors.reset} to database.`)
 
-                  if (Math.random() < 0.1) {
+                  if (Math.random() < 0.05) {
                      await this.pool.query(
                         'DELETE FROM messages WHERE jid = $1 AND id NOT IN (SELECT id FROM messages WHERE jid = $1 ORDER BY created_at DESC LIMIT $2)',
                         [jid, this.max]
                      ).catch(() => { })
                   }
-               } catch (e) {
-                  console.error('[store-pg] addMessage error:', e)
+               } catch (e: any) {
+                  this.log('error', `Failed to persist message ${msgId} to database:`, e?.message || e)
                }
             })
             .finally(() => {
@@ -528,7 +699,7 @@ class Store {
 
          if (this.cache.has(jid)) {
             const list = this.cache.get(jid)!
-            list.push(msg)
+            list.push(cleanedMsg)
             if (list.length > this.max) list.shift()
          }
          return
@@ -538,11 +709,12 @@ class Store {
          if (!this.fallbackStore[jid]) {
             this.fallbackStore[jid] = []
          }
-         this.fallbackStore[jid].push(msg)
+         this.fallbackStore[jid].push(cleanedMsg)
 
          if (this.fallbackStore[jid].length > this.max) {
             this.fallbackStore[jid].splice(0, this.fallbackStore[jid].length - this.max)
          }
+         this.log('debug', `[addMessage] Stored message ${colors.cyan}${msgId}${colors.reset} in RAM fallback.`)
       }
    }
 
@@ -613,8 +785,10 @@ class Store {
       const cleanedNode = this.sanitizeNode(node)
       if (!cleanedNode) return
 
+      this.log('debug', `[addNode] Storing node tag: ${colors.magenta}${tag}${colors.reset} id: ${colors.cyan}${nodeId}${colors.reset}`)
+
       if (this.pool) {
-         const previous = this.nodeWriteQueues.get(jid) || Promise.resolve()
+         const previous = (this.nodeWriteQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous
             .then(async () => {
                try {
@@ -627,8 +801,8 @@ class Store {
                      'DELETE FROM nodes WHERE jid = $1 AND id NOT IN (SELECT id FROM nodes WHERE jid = $1 ORDER BY created_at DESC LIMIT $2)',
                      [jid, this.max]
                   ).catch(() => { })
-               } catch (e) {
-                  console.error('[store-pg] addNode error:', e)
+               } catch (e: any) {
+                  this.log('error', `Failed to save node ${nodeId}:`, e?.message || e)
                }
             })
             .finally(() => {
@@ -676,7 +850,8 @@ class Store {
                const { rows }: any = await this.pool.query('SELECT data FROM nodes WHERE id = $1 LIMIT 1', [targetId])
                if (rows.length > 0) return parse(rows[0].data)
             }
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load node ${targetId}:`, error?.message || error)
             return null
          }
       }
@@ -721,7 +896,8 @@ class Store {
             }
             if (rows.length === 0) return null
             return rows.map((row: any) => parse(row.data)).reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', 'Failed to load nodes:', error?.message || error)
             return null
          }
       }
@@ -812,6 +988,7 @@ class Store {
             this.chats[id] = Object.assign(this.chats[id] || { id }, update)
          }
       }
+      this.log('debug', `[chatUpdate] Processed ${colors.green}${updates.length}${colors.reset} chat updates.`)
    }
 
    public contactsUpsert(newContacts: Contact[]): Set<string> {
@@ -821,11 +998,12 @@ class Store {
          let jid = id
          if (this.socket && jid?.endsWith('lid')) {
             // @ts-ignore
-            jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+            jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
          }
          oldContacts.delete(jid)
          this.contacts[jid] = Object.assign(this.contacts[jid] || { jid }, contact)
       }
+      this.log('debug', `[contactsUpsert] Processed ${colors.green}${newContacts.length}${colors.reset} contacts.`)
       return oldContacts
    }
 
@@ -836,11 +1014,12 @@ class Store {
             let jid = id
             if (this.socket && jid?.endsWith('lid')) {
                // @ts-ignore
-               jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+               jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
             }
             this.contacts[jid] = Object.assign(this.contacts[jid] || { jid, id: jid }, update)
          }
       }
+      this.log('debug', `[contactUpdate] Processed ${colors.green}${updates.length}${colors.reset} contact updates.`)
    }
 
    public getContact(id: string): Contact | null {
@@ -881,26 +1060,29 @@ class Store {
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
       if (jid && id) {
+         const cleaned = this.cleanMessage(msg)
+
          if (this.cache.has(jid)) {
             const list = this.cache.get(jid)!
             const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
-            if (idx !== -1) list[idx] = msg
+            if (idx !== -1) list[idx] = cleaned
          }
 
          if (this.pool) {
-            const previous = this.writeQueues.get(jid) || Promise.resolve()
+            const previous = (this.writeQueues.get(jid) || Promise.resolve()).catch(() => { })
             const current = previous
                .then(async () => {
                   try {
                      await this.pool.query(
                         'INSERT INTO messages (jid, id, data, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (jid, id) DO UPDATE SET data = EXCLUDED.data, created_at = EXCLUDED.created_at',
-                        [jid, id, stringify(this.toPOJO(msg)), Date.now()]
+                        [jid, id, stringify(cleaned), Date.now()]
                      )
-                  } catch (e) {
-                     console.error('[store-pg] updateMessageWithReceipt error:', e)
+                     this.log('debug', `[updateReceipt] Updated receipt for message ${colors.cyan}${id}${colors.reset}`)
+                  } catch (e: any) {
+                     this.log('error', `Failed to update receipt for message ${id}:`, e?.message || e)
                   }
                })
                .finally(() => {
@@ -919,26 +1101,29 @@ class Store {
       msg.reactions = (msg.reactions || []).filter((r: any) => getKeyAuthor(r.key) !== authorID)
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
       if (jid && id) {
+         const cleaned = this.cleanMessage(msg)
+
          if (this.cache.has(jid)) {
             const list = this.cache.get(jid)!
             const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
-            if (idx !== -1) list[idx] = msg
+            if (idx !== -1) list[idx] = cleaned
          }
 
          if (this.pool) {
-            const previous = this.writeQueues.get(jid) || Promise.resolve()
+            const previous = (this.writeQueues.get(jid) || Promise.resolve()).catch(() => { })
             const current = previous
                .then(async () => {
                   try {
                      await this.pool.query(
                         'INSERT INTO messages (jid, id, data, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (jid, id) DO UPDATE SET data = EXCLUDED.data, created_at = EXCLUDED.created_at',
-                        [jid, id, stringify(this.toPOJO(msg)), Date.now()]
+                        [jid, id, stringify(cleaned), Date.now()]
                      )
-                  } catch (e) {
-                     console.error('[store-pg] updateMessageWithReaction error:', e)
+                     this.log('debug', `[updateReaction] Updated reaction for message ${colors.cyan}${id}${colors.reset}`)
+                  } catch (e: any) {
+                     this.log('error', `Failed to update reaction for message ${id}:`, e?.message || e)
                   }
                })
                .finally(() => {
@@ -975,7 +1160,8 @@ class Store {
             }
             if (rows.length === 0) return null
             return rows.map((row: any) => parse(row.data))
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load stories for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -995,7 +1181,8 @@ class Store {
          try {
             const { rows }: any = await this.pool.query('SELECT data FROM stories WHERE jid = $1 AND id = $2', [jid, id])
             return rows.length > 0 ? parse(rows[0].data) : null
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load story ${id}:`, error?.message || error)
             return null
          }
       }
@@ -1006,28 +1193,32 @@ class Store {
       const storyId = story.key?.id || story.id
       if (!storyId) return
 
+      const cleanedStory = this.toPOJO(story)
+
+      this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (this.pool) {
          try {
             await this.pool.query(
                'INSERT INTO stories (jid, id, data, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (jid, id) DO UPDATE SET data = EXCLUDED.data, created_at = EXCLUDED.created_at',
-               [jid, storyId, stringify(this.toPOJO(story)), Date.now()]
+               [jid, storyId, stringify(cleanedStory), Date.now()]
             )
 
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.05) {
                await this.pool.query(
                   'DELETE FROM stories WHERE jid = $1 AND id NOT IN (SELECT id FROM stories WHERE jid = $1 ORDER BY created_at DESC LIMIT $2)',
                   [jid, this.max]
                ).catch(() => { })
             }
-         } catch (e) {
-            console.error('[store-pg] addStory error:', e)
+         } catch (e: any) {
+            this.log('error', `Failed to save story ${storyId}:`, e?.message || e)
          }
       }
 
       if (!this.stories[jid]) {
          this.stories[jid] = []
       }
-      this.stories[jid].push(story)
+      this.stories[jid].push(cleanedStory)
 
       if (this.stories[jid].length > this.max) {
          this.stories[jid].splice(0, this.stories[jid].length - this.max)
@@ -1114,6 +1305,8 @@ class Store {
    }
 
    private cleanupExpiredMessages(): void {
+      this.log('debug', 'Running periodic memory cache cleanup routine.')
+
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
             if (msgArray && msgArray.length > this.max) {

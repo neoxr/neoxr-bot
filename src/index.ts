@@ -1,20 +1,54 @@
-import jsonStore from './core/store-json.js'
-import mysqlStore from './core/store-mysql.js'
-import mongoStore from './core/store-mongo.js'
-import pgsqlStore from './core/store-pgsql.js'
-import redisStore from './core/store-redis.js'
-import sqliteStore from './core/store-sqlite.js'
+declare const require: (id: string) => any
 
-const store = process.env?.USE_STORE?.includes('mysql')
-    ? mysqlStore
-    : process.env?.USE_STORE?.includes('mongo')
-        ? mongoStore
-        : (process.env?.USE_STORE?.includes('pgsql') || process.env?.USE_STORE?.includes('postgres'))
-            ? pgsqlStore
-            : process.env?.USE_STORE?.includes('redis')
-                ? redisStore
-                : process.env?.USE_STORE?.includes('sqlite')
-                    ? sqliteStore
-                    : jsonStore
+let instance: any = null
+
+function resolveStore(): any {
+    if (instance) return instance
+
+    const useStore = process.env?.USE_STORE || ''
+    let mod: any
+
+    if (useStore.includes('mysql')) {
+        mod = require('./core/store-mysql.js')
+    } else if (useStore.includes('mongo')) {
+        mod = require('./core/store-mongo.js')
+    } else if (useStore.includes('pgsql') || useStore.includes('postgres')) {
+        mod = require('./core/store-pgsql.js')
+    } else if (useStore.includes('redis')) {
+        mod = require('./core/store-redis.js')
+    } else if (useStore.includes('sqlite')) {
+        mod = require('./core/store-sqlite.js')
+    } else {
+        mod = require('./core/store-json.js')
+    }
+
+    instance = mod?.default || mod
+    return instance
+}
+
+const store = new Proxy(Object.create(null), {
+    get(_target, prop) {
+        const target = resolveStore()
+        const val = target[prop]
+        return typeof val === 'function' ? val.bind(target) : val
+    },
+    set(_target, prop, value) {
+        const target = resolveStore()
+        target[prop] = value
+        return true
+    },
+    has(_target, prop) {
+        const target = resolveStore()
+        return prop in target
+    },
+    ownKeys() {
+        const target = resolveStore()
+        return Reflect.ownKeys(target)
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+        const target = resolveStore()
+        return Reflect.getOwnPropertyDescriptor(target, prop)
+    }
+})
 
 export default store

@@ -11,24 +11,41 @@ const loadSqlite = async () => {
       const module = await import(moduleName)
       DatabaseConstructor = module.default || module
       return DatabaseConstructor
-   } catch (e) {
+   } catch {
       return null
    }
 }
 
+const colors = {
+   reset: '\x1b[0m',
+   bold: '\x1b[1m',
+   dim: '\x1b[2m',
+   red: '\x1b[31m',
+   green: '\x1b[32m',
+   yellow: '\x1b[33m',
+   blue: '\x1b[34m',
+   magenta: '\x1b[35m',
+   cyan: '\x1b[36m',
+   gray: '\x1b[90m',
+   white: '\x1b[37m'
+}
+
 const BufferJSON = {
    replacer: (k: any, value: any) => {
-      if (Buffer.isBuffer(value) || value instanceof Uint8Array || value?.type === 'Buffer') {
+      if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
          return {
             type: 'Buffer',
-            data: Buffer.from(value?.data || value).toString('base64')
+            data: Buffer.from(value).toString('base64')
          }
+      }
+      if (value && value.type === 'Buffer' && typeof value.data === 'string') {
+         return value
       }
       return value
    },
    reviver: (_: any, value: any) => {
       if (typeof value === 'object' && value !== null && (value.buffer === true || value.type === 'Buffer')) {
-         const val = value.data || value.value
+         const val = value.data ?? value.value
          return typeof val === 'string'
             ? Buffer.from(val, 'base64')
             : Buffer.from(val || [])
@@ -46,6 +63,7 @@ class Store {
    public storeDir: string
    public max: number
    public database: string
+   public debug: boolean
 
    private db: any = null
    private fallbackStore: Record<string, WAMessage[]> | null = null
@@ -64,6 +82,7 @@ class Store {
    private insertStmt: any = null
    private cleanupStmt: any = null
    private getOneStmt: any = null
+   private getOneByIdStmt: any = null
    private getLimitStmt: any = null
    private getAllDescStmt: any = null
    private getAllWithOffsetStmt: any = null
@@ -103,12 +122,13 @@ class Store {
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
 
-   constructor(dir: string = 'stores', max: number = 250) {
+   constructor(dir: string = 'stores', max: number = 250, debug: boolean = false) {
       this.client = null
       this.socket = null
       this.storeDir = path.join(process.cwd(), '.cache', dir)
       this.max = max
       this.database = 'sqlite'
+      this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
 
       this.fallbackStore = Object.create(null)
       this.fallbackChats = Object.create(null)
@@ -119,14 +139,46 @@ class Store {
 
       if (process.env?.USE_STORE?.includes('sqlite')) {
          this.initDB()
+      } else {
+         this.log('warn', 'SQLite storage flag not detected in environment. Operating in RAM storage mode.')
       }
 
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
+   private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
+      if (!this.debug && (type === 'debug' || type === 'info')) return
+
+      const prefix = `${colors.cyan}${colors.bold}[store-sqlite]${colors.reset}`
+      let badge = ''
+
+      switch (type) {
+         case 'info':
+            badge = `${colors.green}${colors.bold}[INFO]${colors.reset}`
+            break
+         case 'warn':
+            badge = `${colors.yellow}${colors.bold}[WARN]${colors.reset}`
+            break
+         case 'error':
+            badge = `${colors.red}${colors.bold}[ERROR]${colors.reset}`
+            break
+         case 'debug':
+            badge = `${colors.magenta}${colors.bold}[DEBUG]${colors.reset}`
+            break
+      }
+
+      const formattedMessage = `${colors.white}${message}${colors.reset}`
+      const out = type === 'error' ? console.error : type === 'warn' ? console.warn : console.log
+      out(`${prefix} ${badge} ${formattedMessage}`, ...args)
+   }
+
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
-      if (obj === null || typeof obj !== 'object') return obj
-      if (depth > 50) return null
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (typeof obj === 'bigint') return obj.toString()
+      if (typeof obj !== 'object') {
+         return typeof obj === 'function' ? undefined : obj
+      }
+      if (depth > 35) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -145,18 +197,13 @@ class Store {
          return obj.map(v => this.toPOJO(v, seen, depth + 1))
       }
 
-      const proto = Object.getPrototypeOf(obj)
-      const isPlain = proto === null || proto === Object.prototype
-
-      if (!isPlain) {
-         if (typeof obj.toJSON === 'function') {
-            try {
-               return this.toPOJO(obj.toJSON(), seen, depth + 1)
-            } catch {
-               return null
+      if (typeof obj.toJSON === 'function') {
+         try {
+            const json = obj.toJSON()
+            if (json && typeof json === 'object') {
+               return this.toPOJO(json, seen, depth + 1)
             }
-         }
-         return null
+         } catch { }
       }
 
       const res: any = {}
@@ -165,23 +212,51 @@ class Store {
          const key = keys[i]
          try {
             const val = obj[key]
-            if (typeof val !== 'function') {
-               res[key] = this.toPOJO(val, seen, depth + 1)
+            if (typeof val === 'function') continue
+            const pojoVal = this.toPOJO(val, seen, depth + 1)
+            if (pojoVal !== undefined) {
+               res[key] = pojoVal
             }
          } catch { }
       }
       return res
    }
 
+   private cleanMessage(msg: any): any {
+      if (!msg || typeof msg !== 'object') return null
+
+      const base: any = {
+         key: this.toPOJO(msg.key),
+         message: this.toPOJO(msg.message),
+         messageTimestamp: msg.messageTimestamp || msg.timestampSeconds || Math.floor(Date.now() / 1000),
+         pushName: msg.pushName || ''
+      }
+
+      if (msg.broadcast !== undefined) base.broadcast = msg.broadcast
+      if (msg.status !== undefined) base.status = msg.status
+      if (msg.reactions) base.reactions = this.toPOJO(msg.reactions)
+      if (msg.userReceipt) base.userReceipt = this.toPOJO(msg.userReceipt)
+      if (msg.pollUpdates) base.pollUpdates = this.toPOJO(msg.pollUpdates)
+
+      if (msg.id) base.id = msg.id
+      if (msg.chat) base.chat = msg.chat
+      if (msg.sender) base.sender = msg.sender
+      if (msg.isGroup !== undefined) base.isGroup = msg.isGroup
+      if (msg.mtype) base.mtype = msg.mtype
+      if (msg.text) base.text = msg.text
+
+      return base
+   }
+
    private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj === 'undefined') return obj
-      if (depth > 50) return null
+      if (depth > 35) return null
 
       if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
          return '[buffer]'
       }
 
-      if (typeof obj !== 'object') return obj
+      if (typeof obj !== 'object') return typeof obj === 'function' ? undefined : obj
       if (seen.has(obj)) return null
       seen.add(obj)
 
@@ -210,7 +285,7 @@ class Store {
       const SQLite = await loadSqlite()
 
       if (!SQLite) {
-         console.warn('[store-sqlite] better-sqlite3 module not installed! Running in RAM-only mode.')
+         this.log('warn', 'Library "better-sqlite3" is not installed. Operating in RAM storage mode.')
          return
       }
 
@@ -225,6 +300,8 @@ class Store {
       }
 
       try {
+         this.log('debug', `Opening SQLite database at: ${colors.gray}${dbPath}${colors.reset}`)
+
          this.db = new SQLite(dbPath)
 
          this.db.pragma('journal_mode = WAL')
@@ -241,6 +318,7 @@ class Store {
                PRIMARY KEY (jid, id)
             );
             CREATE INDEX IF NOT EXISTS idx_messages_jid_created_at ON messages (jid, created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_messages_id ON messages (id);
             
             CREATE TABLE IF NOT EXISTS chats (
                id TEXT PRIMARY KEY,
@@ -276,11 +354,12 @@ class Store {
 
          try {
             this.db.exec('ALTER TABLE chats ADD COLUMN updated_at INTEGER;')
-         } catch (e) { }
+         } catch { }
 
          this.insertStmt = this.db.prepare('INSERT OR REPLACE INTO messages (jid, id, data, created_at) VALUES (?, ?, ?, ?)')
          this.cleanupStmt = this.db.prepare('DELETE FROM messages WHERE jid = ? AND id NOT IN (SELECT id FROM messages WHERE jid = ? ORDER BY created_at DESC LIMIT ?)')
          this.getOneStmt = this.db.prepare('SELECT data FROM messages WHERE jid = ? AND id = ?')
+         this.getOneByIdStmt = this.db.prepare('SELECT data FROM messages WHERE id = ? LIMIT 1')
          this.getLimitStmt = this.db.prepare('SELECT data FROM messages WHERE jid = ? ORDER BY created_at DESC LIMIT ?')
          this.getAllDescStmt = this.db.prepare('SELECT data FROM messages WHERE jid = ? ORDER BY created_at DESC')
          this.getAllWithOffsetStmt = this.db.prepare('SELECT data FROM messages WHERE jid = ? ORDER BY created_at ASC LIMIT -1 OFFSET ?')
@@ -324,9 +403,9 @@ class Store {
          this.fallbackStore = null
          this.fallbackChats = null
          this.fallbackContacts = null
-
-      } catch (error) {
-         console.error('[store-sqlite] Failed to initialize SQLite database. Falling back to RAM-only mode:', error)
+         this.log('info', 'SQLite database connection established successfully.')
+      } catch (error: any) {
+         this.log('error', `Failed to initialize SQLite database (${error?.message || error}). Operating in RAM storage mode.`)
          this.db = null
       }
    }
@@ -338,7 +417,10 @@ class Store {
          for (const row of rows) {
             this.chatsCache.set(row.id, parse(row.data))
          }
-      } catch { }
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} chats into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload chats from database:', error?.message || error)
+      }
    }
 
    private preloadContacts(): void {
@@ -348,7 +430,10 @@ class Store {
          for (const row of rows) {
             this.contactsCache.set(row.jid, parse(row.data))
          }
-      } catch { }
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} contacts into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload contacts from database:', error?.message || error)
+      }
    }
 
    private preloadNodes(): void {
@@ -359,10 +444,13 @@ class Store {
             if (!this.nodes[row.jid]) this.nodes[row.jid] = []
             this.nodes[row.jid].push(parse(row.data))
          }
-      } catch { }
+         this.log('debug', `Preloaded ${colors.green}${rows.length}${colors.reset} nodes into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload nodes from database:', error?.message || error)
+      }
    }
 
-   public config({ dir, max }: StoreConfig): this {
+   public config({ dir, max, debug }: StoreConfig & { debug?: boolean }): this {
       let dbNeedsReinit = false
 
       if (dir) {
@@ -375,6 +463,11 @@ class Store {
 
       if (max !== undefined) {
          this.max = max
+      }
+
+      if (debug !== undefined) {
+         this.debug = debug
+         this.log('debug', `Debug mode set to: ${colors.yellow}${this.debug}${colors.reset}`)
       }
 
       if (dbNeedsReinit) {
@@ -395,11 +488,15 @@ class Store {
             if (typeof prop !== 'string') return false
             const cleanedValue = self.toPOJO(value)
             self.chatsCache.set(prop, cleanedValue)
+
             if (self.db && self.insertChatStmt) {
                try {
                   self.insertChatStmt.run(prop, stringify(cleanedValue), Date.now())
                   return true
-               } catch { return false }
+               } catch (err: any) {
+                  self.log('error', 'Failed to save chat:', err?.message || err)
+                  return false
+               }
             }
             if (self.fallbackChats) {
                self.fallbackChats[prop] = cleanedValue
@@ -431,11 +528,15 @@ class Store {
             if (typeof prop !== 'string') return false
             const cleanedValue = self.toPOJO(value)
             self.contactsCache.set(prop, cleanedValue)
+
             if (self.db && self.insertContactStmt) {
                try {
                   self.insertContactStmt.run(prop, stringify(cleanedValue), Date.now())
                   return true
-               } catch { return false }
+               } catch (err: any) {
+                  self.log('error', 'Failed to save contact:', err?.message || err)
+                  return false
+               }
             }
             if (self.fallbackContacts) {
                self.fallbackContacts[prop] = cleanedValue
@@ -499,46 +600,68 @@ class Store {
       client.messageId = this.messageId
       client.chats = this.chats
 
+      this.log('debug', 'Store successfully bound to client and socket.')
       return client
    }
 
-   public loadMessage(jid: string, id: string): WAMessage | null {
-      if (this.db && this.getOneStmt) {
+   public loadMessage(jidOrId: string, id?: string): WAMessage | null {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (this.db) {
          try {
-            const row = this.getOneStmt.get(jid, id) as { data: string } | undefined
-            return row ? (parse(row.data) as WAMessage) : null
-         } catch {
+            if (targetJid && this.getOneStmt) {
+               const row = this.getOneStmt.get(targetJid, targetId) as { data: string } | undefined
+               if (row) {
+                  this.log('debug', `[loadMessage] Loaded ${colors.cyan}${targetId}${colors.reset} from SQLite.`)
+                  return parse(row.data) as WAMessage
+               }
+            } else if (this.getOneByIdStmt) {
+               const row = this.getOneByIdStmt.get(targetId) as { data: string } | undefined
+               if (row) {
+                  this.log('debug', `[loadMessage] Loaded ${colors.cyan}${targetId}${colors.reset} from SQLite (ID query).`)
+                  return parse(row.data) as WAMessage
+               }
+            }
+         } catch (error: any) {
+            this.log('error', `Failed to load message ${targetId}:`, error?.message || error)
             return null
          }
       }
 
-      if (this.fallbackStore) {
-         const list = this.fallbackStore[jid] || []
-         return list.find(v => v.key?.id === id || (v as any).id === id) || null
+      if (targetJid && this.fallbackStore) {
+         const list = this.fallbackStore[targetJid] || []
+         return list.find(v => v.key?.id === targetId || (v as any).id === targetId) || null
+      } else if (this.fallbackStore) {
+         for (const j in this.fallbackStore) {
+            const found = this.fallbackStore[j]?.find(v => v.key?.id === targetId || (v as any).id === targetId)
+            if (found) return found
+         }
       }
 
       return null
    }
 
    public loadMessages(jid: string, count?: number): WAMessage[] | null {
+      const targetCount = count && count > 0 ? count : 25
+
       if (this.db) {
          try {
             let rows: { data: string }[] = []
 
-            if (count !== undefined && count > 0) {
-               if (this.getLimitStmt) {
-                  rows = this.getLimitStmt.all(jid, count) as { data: string }[]
-               }
-            } else {
-               if (this.getAllDescStmt) {
-                  rows = this.getAllDescStmt.all(jid) as { data: string }[]
-               }
+            if (this.getLimitStmt) {
+               rows = this.getLimitStmt.all(jid, targetCount) as { data: string }[]
+            } else if (this.getAllDescStmt) {
+               rows = this.getAllDescStmt.all(jid) as { data: string }[]
+               rows = rows.slice(0, targetCount)
             }
 
             if (rows.length === 0) return null
 
+            this.log('debug', `[loadMessages] Loaded ${colors.green}${rows.length}${colors.reset} messages from SQLite for ${colors.yellow}${jid}${colors.reset}`)
             return rows.map(row => parse(row.data) as WAMessage)
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load messages list for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -547,23 +670,50 @@ class Store {
          const list = this.fallbackStore[jid]
          if (!list || list.length === 0) return null
 
-         const slice = count ? list.slice(-count) : list
+         const slice = list.slice(-targetCount)
          return [...slice].reverse()
       }
 
       return null
    }
 
-   public addMessage(jid: string, msg: WAMessage): void {
+   public addMessage(arg1: any, arg2?: any): void {
+      let jid: string = ''
+      let msg: any = null
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         msg = arg2
+      } else if (typeof arg2 === 'string') {
+         msg = arg1
+         jid = arg2
+      } else if (arg1 && typeof arg1 === 'object') {
+         msg = arg1
+         jid = arg1.key?.remoteJid || arg1.chat || arg1.jid || ''
+      }
+
+      if (!msg || typeof msg !== 'object') return
+
+      const msgId = msg.key?.id || msg.id
+      if (!msgId) return
+
+      if (!jid || jid.endsWith('@lid')) {
+         jid = msg.key?.remoteJid || msg.chat || msg.jid || jid
+      }
+      if (!jid) return
+
+      const cleanedMsg = this.cleanMessage(msg)
+      if (!cleanedMsg) return
+
+      this.log('debug', `[addMessage] Incoming message ${colors.cyan}${msgId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (this.db && this.insertStmt && this.cleanupStmt) {
-         const msgId = msg.key?.id || (msg as any).id
-         if (msgId) {
-            try {
-               this.insertStmt.run(jid, msgId, stringify(this.toPOJO(msg)), Date.now())
-               this.cleanupStmt.run(jid, jid, this.max)
-            } catch (e) {
-               console.error('[store-sqlite] addMessage error:', e)
-            }
+         try {
+            this.insertStmt.run(jid, msgId, stringify(cleanedMsg), Date.now())
+            this.cleanupStmt.run(jid, jid, this.max)
+            this.log('debug', `[addMessage] Persisted message ${colors.cyan}${msgId}${colors.reset} to database.`)
+         } catch (e: any) {
+            this.log('error', `Failed to persist message ${msgId} to database:`, e?.message || e)
          }
          return
       }
@@ -572,11 +722,12 @@ class Store {
          if (!this.fallbackStore[jid]) {
             this.fallbackStore[jid] = []
          }
-         this.fallbackStore[jid].push(msg)
+         this.fallbackStore[jid].push(cleanedMsg)
 
          if (this.fallbackStore[jid].length > this.max) {
             this.fallbackStore[jid].splice(0, this.fallbackStore[jid].length - this.max)
          }
+         this.log('debug', `[addMessage] Stored message ${colors.cyan}${msgId}${colors.reset} in RAM fallback.`)
       }
    }
 
@@ -660,14 +811,16 @@ class Store {
       const cleanedNode = this.sanitizeNode(node)
       if (!cleanedNode) return
 
+      this.log('debug', `[addNode] Storing node tag: ${colors.magenta}${tag}${colors.reset} id: ${colors.cyan}${nodeId}${colors.reset}`)
+
       if (this.db && this.insertNodeStmt) {
          try {
             this.insertNodeStmt.run(jid, nodeId, tag, stringify(cleanedNode), Date.now())
             if (this.cleanupNodeStmt) {
                this.cleanupNodeStmt.run(jid, jid, this.max)
             }
-         } catch (e) {
-            console.error('[store-sqlite] addNode error:', e)
+         } catch (e: any) {
+            this.log('error', `Failed to save node ${nodeId}:`, e?.message || e)
          }
       }
 
@@ -740,7 +893,8 @@ class Store {
             }
             if (rows.length === 0) return null
             return rows.map(row => parse(row.data))
-         } catch {
+         } catch (error: any) {
+            this.log('error', 'Failed to load nodes:', error?.message || error)
             return null
          }
       }
@@ -827,6 +981,7 @@ class Store {
             this.chats[id] = Object.assign(this.chats[id] || { id }, update)
          }
       }
+      this.log('debug', `[chatUpdate] Processed ${colors.green}${updates.length}${colors.reset} chat updates.`)
    }
 
    public contactsUpsert(newContacts: Contact[]): Set<string> {
@@ -841,6 +996,7 @@ class Store {
          oldContacts.delete(jid)
          this.contacts[jid] = Object.assign(this.contacts[jid] || { jid }, contact)
       }
+      this.log('debug', `[contactsUpsert] Processed ${colors.green}${newContacts.length}${colors.reset} contacts.`)
       return oldContacts
    }
 
@@ -856,6 +1012,7 @@ class Store {
             this.contacts[jid] = Object.assign(this.contacts[jid] || { jid, id: jid }, update)
          }
       }
+      this.log('debug', `[contactUpdate] Processed ${colors.green}${updates.length}${colors.reset} contact updates.`)
    }
 
    public getContact(id: string): Contact | null {
@@ -896,12 +1053,16 @@ class Store {
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
       if (this.db && this.insertStmt && jid && id) {
          try {
-            this.insertStmt.run(jid, id, stringify(this.toPOJO(msg)), Date.now())
-         } catch { }
+            const cleaned = this.cleanMessage(msg)
+            this.insertStmt.run(jid, id, stringify(cleaned), Date.now())
+            this.log('debug', `[updateReceipt] Updated receipt for message ${colors.cyan}${id}${colors.reset}`)
+         } catch (e: any) {
+            this.log('error', `Failed to update receipt for message ${id}:`, e?.message || e)
+         }
       }
    }
 
@@ -911,12 +1072,16 @@ class Store {
       msg.reactions = (msg.reactions || []).filter((r: any) => getKeyAuthor(r.key) !== authorID)
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
       if (this.db && this.insertStmt && jid && id) {
          try {
-            this.insertStmt.run(jid, id, stringify(this.toPOJO(msg)), Date.now())
-         } catch { }
+            const cleaned = this.cleanMessage(msg)
+            this.insertStmt.run(jid, id, stringify(cleaned), Date.now())
+            this.log('debug', `[updateReaction] Updated reaction for message ${colors.cyan}${id}${colors.reset}`)
+         } catch (e: any) {
+            this.log('error', `Failed to update reaction for message ${id}:`, e?.message || e)
+         }
       }
    }
 
@@ -935,7 +1100,8 @@ class Store {
             }
             if (rows.length === 0) return null
             return rows.map(row => parse(row.data))
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load stories for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -950,7 +1116,8 @@ class Store {
          try {
             const row = this.getStoryOneStmt.get(jid, id) as { data: string } | undefined
             return row ? parse(row.data) : null
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load story ${id}:`, error?.message || error)
             return null
          }
       }
@@ -963,12 +1130,15 @@ class Store {
       const storyId = story.key?.id || story.id
       if (!storyId) return
 
+      const cleanedStory = this.toPOJO(story)
+      this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (this.db && this.insertStoryStmt && this.cleanupStoriesStmt) {
          try {
-            this.insertStoryStmt.run(jid, storyId, stringify(this.toPOJO(story)), Date.now())
+            this.insertStoryStmt.run(jid, storyId, stringify(cleanedStory), Date.now())
             this.cleanupStoriesStmt.run(jid, jid, this.max)
-         } catch (e) {
-            console.error('[store-sqlite] addStory error:', e)
+         } catch (e: any) {
+            this.log('error', `Failed to save story ${storyId}:`, e?.message || e)
          }
          return
       }
@@ -976,7 +1146,7 @@ class Store {
       if (!this.stories[jid]) {
          this.stories[jid] = []
       }
-      this.stories[jid].push(story)
+      this.stories[jid].push(cleanedStory)
 
       if (this.stories[jid].length > this.max) {
          this.stories[jid].splice(0, this.stories[jid].length - this.max)
@@ -1057,6 +1227,8 @@ class Store {
    }
 
    private cleanupExpiredMessages(): void {
+      this.log('debug', 'Running periodic memory cache cleanup routine.')
+
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
             if (msgArray && msgArray.length > this.max) {

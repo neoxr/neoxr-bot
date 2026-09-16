@@ -10,9 +10,23 @@ const loadMongo = async () => {
       const module = await import(moduleName)
       MongoConstructor = module.MongoClient || module.default?.MongoClient || module
       return MongoConstructor
-   } catch (e) {
+   } catch {
       return null
    }
+}
+
+const colors = {
+   reset: '\x1b[0m',
+   bold: '\x1b[1m',
+   dim: '\x1b[2m',
+   red: '\x1b[31m',
+   green: '\x1b[32m',
+   yellow: '\x1b[33m',
+   blue: '\x1b[34m',
+   magenta: '\x1b[35m',
+   cyan: '\x1b[36m',
+   gray: '\x1b[90m',
+   white: '\x1b[37m'
 }
 
 class Store {
@@ -22,6 +36,7 @@ class Store {
    public max: number
    public uri: string | undefined
    public database: string
+   public debug: boolean
 
    private mongoClient: any = null
    private db: any = null
@@ -53,31 +68,64 @@ class Store {
    private chatsCache = new Map<string, any>()
    private chatsProxyInstance: Record<string, any>
 
-   constructor(dir: string = 'stores', max: number = 250, uri?: string) {
+   constructor(dir: string = 'stores', max: number = 250, uri?: string, debug: boolean = false) {
       this.client = null
       this.socket = null
       this.storeDir = path.join(process.cwd(), '.cache', dir)
       this.max = max
       this.uri = uri || process.env.USE_STORE
       this.database = 'mongodb'
+      this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
+
+      this.fallbackStore = Object.create(null)
+      this.fallbackChats = Object.create(null)
+      this.fallbackContacts = Object.create(null)
 
       this.chatsProxyInstance = this.createChatsProxy()
       this.contactsProxyInstance = this.createContactsProxy()
 
-      if (this.uri?.includes('mongodb')) {
+      const targetUri = this.uri || process.env?.USE_STORE
+      if (targetUri && (targetUri.includes('mongodb') || targetUri.includes('mongo'))) {
+         this.uri = targetUri
          this.initDB()
-      } else {
-         this.fallbackStore = Object.create(null)
-         this.fallbackChats = Object.create(null)
-         this.fallbackContacts = Object.create(null)
       }
 
       setInterval(() => this.cleanupExpiredMessages(), 120000)
    }
 
+   private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
+      if (!this.debug && (type === 'debug' || type === 'info')) return
+
+      const prefix = `${colors.cyan}${colors.bold}[store-mongo]${colors.reset}`
+      let badge = ''
+
+      switch (type) {
+         case 'info':
+            badge = `${colors.green}${colors.bold}[INFO]${colors.reset}`
+            break
+         case 'warn':
+            badge = `${colors.yellow}${colors.bold}[WARN]${colors.reset}`
+            break
+         case 'error':
+            badge = `${colors.red}${colors.bold}[ERROR]${colors.reset}`
+            break
+         case 'debug':
+            badge = `${colors.magenta}${colors.bold}[DEBUG]${colors.reset}`
+            break
+      }
+
+      const formattedMessage = `${colors.white}${message}${colors.reset}`
+      const out = type === 'error' ? console.error : type === 'warn' ? console.warn : console.log
+      out(`${prefix} ${badge} ${formattedMessage}`, ...args)
+   }
+
    private toPOJO(obj: any, seen = new WeakSet(), depth = 0): any {
-      if (obj === null || typeof obj !== 'object') return obj
-      if (depth > 50) return null
+      if (obj === null || typeof obj === 'undefined') return obj
+      if (typeof obj === 'bigint') return obj.toString()
+      if (typeof obj !== 'object') {
+         return typeof obj === 'function' ? undefined : obj
+      }
+      if (depth > 35) return null
       if (seen.has(obj)) return null
 
       if (Buffer.isBuffer(obj)) {
@@ -96,18 +144,13 @@ class Store {
          return obj.map(v => this.toPOJO(v, seen, depth + 1))
       }
 
-      const proto = Object.getPrototypeOf(obj)
-      const isPlain = proto === null || proto === Object.prototype
-
-      if (!isPlain) {
-         if (typeof obj.toJSON === 'function') {
-            try {
-               return this.toPOJO(obj.toJSON(), seen, depth + 1)
-            } catch {
-               return null
+      if (typeof obj.toJSON === 'function') {
+         try {
+            const json = obj.toJSON()
+            if (json && typeof json === 'object') {
+               return this.toPOJO(json, seen, depth + 1)
             }
-         }
-         return null
+         } catch { }
       }
 
       const res: any = {}
@@ -116,23 +159,51 @@ class Store {
          const key = keys[i]
          try {
             const val = obj[key]
-            if (typeof val !== 'function') {
-               res[key] = this.toPOJO(val, seen, depth + 1)
+            if (typeof val === 'function') continue
+            const pojoVal = this.toPOJO(val, seen, depth + 1)
+            if (pojoVal !== undefined) {
+               res[key] = pojoVal
             }
          } catch { }
       }
       return res
    }
 
+   private cleanMessage(msg: any): any {
+      if (!msg || typeof msg !== 'object') return null
+
+      const base: any = {
+         key: this.toPOJO(msg.key),
+         message: this.toPOJO(msg.message),
+         messageTimestamp: msg.messageTimestamp || msg.timestampSeconds || Math.floor(Date.now() / 1000),
+         pushName: msg.pushName || ''
+      }
+
+      if (msg.broadcast !== undefined) base.broadcast = msg.broadcast
+      if (msg.status !== undefined) base.status = msg.status
+      if (msg.reactions) base.reactions = this.toPOJO(msg.reactions)
+      if (msg.userReceipt) base.userReceipt = this.toPOJO(msg.userReceipt)
+      if (msg.pollUpdates) base.pollUpdates = this.toPOJO(msg.pollUpdates)
+
+      if (msg.id) base.id = msg.id
+      if (msg.chat) base.chat = msg.chat
+      if (msg.sender) base.sender = msg.sender
+      if (msg.isGroup !== undefined) base.isGroup = msg.isGroup
+      if (msg.mtype) base.mtype = msg.mtype
+      if (msg.text) base.text = msg.text
+
+      return base
+   }
+
    private sanitizeNode(obj: any, seen = new WeakSet(), depth = 0): any {
       if (obj === null || typeof obj === 'undefined') return obj
-      if (depth > 50) return null
+      if (depth > 35) return null
 
       if (Buffer.isBuffer(obj) || obj instanceof Uint8Array || obj?.type === 'Buffer') {
          return '[buffer]'
       }
 
-      if (typeof obj !== 'object') return obj
+      if (typeof obj !== 'object') return typeof obj === 'function' ? undefined : obj
       if (seen.has(obj)) return null
       seen.add(obj)
 
@@ -159,8 +230,19 @@ class Store {
 
    private async initDB(): Promise<void> {
       const MongoClient = await loadMongo()
-      if (!MongoClient || !this.uri) return
+      if (!MongoClient) {
+         this.log('warn', 'Missing "mongodb" library. Operating in RAM storage mode.')
+         return
+      }
+
+      if (!this.uri) {
+         this.log('warn', 'MongoDB URI undefined. Operating in RAM storage mode.')
+         return
+      }
+
       try {
+         this.log('debug', `Initiating MongoDB connection to: ${colors.gray}${this.uri}${colors.reset}`)
+
          this.mongoClient = new MongoClient(this.uri, { maxPoolSize: 10, minPoolSize: 1 })
          await this.mongoClient.connect()
          this.db = this.mongoClient.db()
@@ -173,6 +255,8 @@ class Store {
 
          await this.messagesCollection.createIndex({ jid: 1, id: 1 }, { unique: true })
          await this.messagesCollection.createIndex({ jid: 1, created_at: -1 })
+         await this.messagesCollection.createIndex({ id: 1 })
+
          await this.chatsCollection.createIndex({ id: 1 }, { unique: true })
          await this.contactsCollection.createIndex({ jid: 1 }, { unique: true })
          await this.storiesCollection.createIndex({ jid: 1, id: 1 }, { unique: true })
@@ -189,7 +273,9 @@ class Store {
          this.fallbackStore = null
          this.fallbackChats = null
          this.fallbackContacts = null
-      } catch (error) {
+         this.log('info', 'MongoDB database connection established successfully.')
+      } catch (error: any) {
+         this.log('error', `Failed to connect to MongoDB (${error?.message || error}). Falling back to RAM storage mode.`)
          if (!this.fallbackStore) {
             this.fallbackStore = Object.create(null)
             this.fallbackChats = Object.create(null)
@@ -209,7 +295,10 @@ class Store {
          for (const doc of docs) {
             this.chatsCache.set(doc.id, doc.data)
          }
-      } catch (e) { }
+         this.log('debug', `Preloaded ${colors.green}${docs.length}${colors.reset} chats into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload chats from database:', error?.message || error)
+      }
    }
 
    private async preloadContacts(): Promise<void> {
@@ -223,7 +312,10 @@ class Store {
          for (const doc of docs) {
             this.contactsCache.set(doc.jid, doc.data)
          }
-      } catch (e) { }
+         this.log('debug', `Preloaded ${colors.green}${docs.length}${colors.reset} contacts into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload contacts from database:', error?.message || error)
+      }
    }
 
    private async preloadNodes(): Promise<void> {
@@ -237,7 +329,10 @@ class Store {
             if (!this.nodes[doc.jid]) this.nodes[doc.jid] = []
             this.nodes[doc.jid].push(doc.data)
          }
-      } catch (e) { }
+         this.log('debug', `Preloaded ${colors.green}${docs.length}${colors.reset} nodes into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload nodes from database:', error?.message || error)
+      }
    }
 
    private createChatsProxy(): Record<string, any> {
@@ -249,7 +344,6 @@ class Store {
          },
          set: (target, prop, value) => {
             if (typeof prop !== 'string') return false
-
             const cleanedValue = self.toPOJO(value)
             self.chatsCache.set(prop, cleanedValue)
 
@@ -258,7 +352,9 @@ class Store {
                   { id: prop },
                   { $set: { data: cleanedValue, updated_at: Date.now() } },
                   { upsert: true }
-               ).catch(() => { })
+               ).catch((err: any) => {
+                  self.log('error', 'Failed to save chat:', err?.message || err)
+               })
             } else if (self.fallbackChats) {
                self.fallbackChats[prop] = cleanedValue
             }
@@ -278,7 +374,6 @@ class Store {
          },
          set: (target, prop, value) => {
             if (typeof prop !== 'string') return false
-
             const cleanedValue = self.toPOJO(value)
             self.contactsCache.set(prop, cleanedValue)
 
@@ -287,7 +382,9 @@ class Store {
                   { jid: prop },
                   { $set: { data: cleanedValue, updated_at: Date.now() } },
                   { upsert: true }
-               ).catch(() => { })
+               ).catch((err: any) => {
+                  self.log('error', 'Failed to save contact:', err?.message || err)
+               })
             } else if (self.fallbackContacts) {
                self.fallbackContacts[prop] = cleanedValue
             }
@@ -342,6 +439,7 @@ class Store {
       client.messageId = this.messageId
       client.chats = this.chats
 
+      this.log('debug', 'Store successfully bound to client and socket.')
       return client
    }
 
@@ -353,19 +451,48 @@ class Store {
          const docs = await this.messagesCollection.find({ jid }).sort({ created_at: -1 }).limit(limitVal).toArray()
          const data = docs.map((doc: any) => doc.data).reverse()
          this.cache.set(jid, data)
-         if (this.cache.size > this.maxCachedJids) this.cache.delete(this.cache.keys().next().value)
+         if (this.cache.size > this.maxCachedJids) {
+            this.cache.delete(this.cache.keys().next().value)
+         }
          return data
-      } catch { return [] }
+      } catch (error: any) {
+         this.log('error', `Failed to read messages for ${jid}:`, error?.message || error)
+         return []
+      }
    }
 
-   public async addMessage(jid: string, msg: WAMessage): Promise<void> {
-      const msgId = msg.key?.id || (msg as any).id
+   public async addMessage(arg1: any, arg2?: any): Promise<void> {
+      let jid: string = ''
+      let msg: any = null
+
+      if (typeof arg1 === 'string') {
+         jid = arg1
+         msg = arg2
+      } else if (typeof arg2 === 'string') {
+         msg = arg1
+         jid = arg2
+      } else if (arg1 && typeof arg1 === 'object') {
+         msg = arg1
+         jid = arg1.key?.remoteJid || arg1.chat || arg1.jid || ''
+      }
+
+      if (!msg || typeof msg !== 'object') return
+
+      const msgId = msg.key?.id || msg.id
       if (!msgId) return
 
-      if (this.messagesCollection) {
-         const cleanedMsg = this.toPOJO(msg)
-         const previous = this.writeQueues.get(jid) || Promise.resolve()
+      if (!jid || jid.endsWith('@lid')) {
+         jid = msg.key?.remoteJid || msg.chat || msg.jid || jid
+      }
+      if (!jid) return
 
+      const cleanedMsg = this.cleanMessage(msg)
+      if (!cleanedMsg) return
+
+      this.log('debug', `[addMessage] Incoming message ${colors.cyan}${msgId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
+      if (this.messagesCollection) {
+         const previous = (this.writeQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous.then(async () => {
             try {
                await this.messagesCollection.updateOne(
@@ -373,37 +500,48 @@ class Store {
                   { $set: { data: cleanedMsg, created_at: Date.now() } },
                   { upsert: true }
                )
+               this.log('debug', `[addMessage] Persisted message ${colors.cyan}${msgId}${colors.reset} to database.`)
 
-               const count = await this.messagesCollection.countDocuments({ jid })
-               if (count > this.max) {
-                  const toDelete = await this.messagesCollection.find({ jid })
-                     .sort({ created_at: 1 })
-                     .limit(count - this.max)
-                     .project({ _id: 1 })
-                     .toArray()
+               if (Math.random() < 0.05) {
+                  const count = await this.messagesCollection.countDocuments({ jid })
+                  if (count > this.max) {
+                     const toDelete = await this.messagesCollection.find({ jid })
+                        .sort({ created_at: 1 })
+                        .limit(count - this.max)
+                        .project({ _id: 1 })
+                        .toArray()
 
-                  if (toDelete.length > 0) {
-                     await this.messagesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                     if (toDelete.length > 0) {
+                        await this.messagesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                     }
                   }
                }
-            } catch (e) {
-               console.error('[store-mongo] addMessage error:', e)
+            } catch (e: any) {
+               this.log('error', `Failed to persist message ${msgId} to database:`, e?.message || e)
             }
          }).finally(() => {
-            if (this.writeQueues.get(jid) === current) this.writeQueues.delete(jid)
+            if (this.writeQueues.get(jid) === current) {
+               this.writeQueues.delete(jid)
+            }
          })
 
          this.writeQueues.set(jid, current)
 
          if (this.cache.has(jid)) {
             const list = this.cache.get(jid)!
-            list.push(msg)
-            if (list.length > 100) list.shift()
+            list.push(cleanedMsg)
+            if (list.length > this.max) list.shift()
          }
-      } else if (this.fallbackStore) {
+         return
+      }
+
+      if (this.fallbackStore) {
          if (!this.fallbackStore[jid]) this.fallbackStore[jid] = []
-         this.fallbackStore[jid].push(msg)
-         if (this.fallbackStore[jid].length > this.max) this.fallbackStore[jid].shift()
+         this.fallbackStore[jid].push(cleanedMsg)
+         if (this.fallbackStore[jid].length > this.max) {
+            this.fallbackStore[jid].splice(0, this.fallbackStore[jid].length - this.max)
+         }
+         this.log('debug', `[addMessage] Stored message ${colors.cyan}${msgId}${colors.reset} in RAM fallback.`)
       }
    }
 
@@ -414,12 +552,24 @@ class Store {
       if (recp) Object.assign(recp, receipt)
       else msg.userReceipt.push(receipt)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
 
-      if (jid && id && this.messagesCollection) {
-         const cleanedMsg = this.toPOJO(msg)
-         this.messagesCollection.updateOne({ jid, id }, { $set: { data: cleanedMsg } }).catch(() => { })
+      if (jid && id) {
+         const cleanedMsg = this.cleanMessage(msg)
+
+         if (this.cache.has(jid)) {
+            const list = this.cache.get(jid)!
+            const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
+            if (idx !== -1) list[idx] = cleanedMsg
+         }
+
+         if (this.messagesCollection) {
+            this.messagesCollection.updateOne({ jid, id }, { $set: { data: cleanedMsg } }).catch((err: any) => {
+               this.log('error', `Failed to update receipt for message ${id}:`, err?.message || err)
+            })
+            this.log('debug', `[updateReceipt] Updated receipt for message ${colors.cyan}${id}${colors.reset}`)
+         }
       }
    }
 
@@ -429,30 +579,88 @@ class Store {
       msg.reactions = (msg.reactions || []).filter((r: any) => getKeyAuthor(r.key) !== authorID)
       if (reaction.text) msg.reactions.push(reaction)
 
-      const jid = msg.key?.remoteJid
+      const jid = msg.key?.remoteJid || msg.chat || msg.jid
       const id = msg.key?.id || msg.id
 
-      if (jid && id && this.messagesCollection) {
-         const cleanedMsg = this.toPOJO(msg)
-         this.messagesCollection.updateOne({ jid, id }, { $set: { data: cleanedMsg } }).catch(() => { })
+      if (jid && id) {
+         const cleanedMsg = this.cleanMessage(msg)
+
+         if (this.cache.has(jid)) {
+            const list = this.cache.get(jid)!
+            const idx = list.findIndex(v => v.key?.id === id || (v as any).id === id)
+            if (idx !== -1) list[idx] = cleanedMsg
+         }
+
+         if (this.messagesCollection) {
+            this.messagesCollection.updateOne({ jid, id }, { $set: { data: cleanedMsg } }).catch((err: any) => {
+               this.log('error', `Failed to update reaction for message ${id}:`, err?.message || err)
+            })
+            this.log('debug', `[updateReaction] Updated reaction for message ${colors.cyan}${id}${colors.reset}`)
+         }
       }
    }
 
-   public async loadMessage(jid: string, id: string): Promise<WAMessage | null> {
+   public async loadMessage(jidOrId: string, id?: string): Promise<WAMessage | null> {
+      const targetId = id || jidOrId
+      const targetJid = id ? jidOrId : null
+
+      if (targetJid && this.cache.has(targetJid)) {
+         const list = this.cache.get(targetJid)!
+         const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+         if (found) {
+            this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in memory cache.`)
+            return found
+         }
+      }
+
+      if (!targetJid) {
+         for (const [, list] of this.cache) {
+            const found = list.find(v => v.key?.id === targetId || (v as any).id === targetId)
+            if (found) {
+               this.log('debug', `[loadMessage] Found ${colors.cyan}${targetId}${colors.reset} in global memory cache.`)
+               return found
+            }
+         }
+      }
+
       if (this.messagesCollection) {
          try {
-            const doc = await this.messagesCollection.findOne({ jid, id })
-            return doc ? doc.data : null
-         } catch {
+            const query: any = { id: targetId }
+            if (targetJid) query.jid = targetJid
+            const doc = await this.messagesCollection.findOne(query)
+            if (doc) {
+               this.log('debug', `[loadMessage] Loaded ${colors.cyan}${targetId}${colors.reset} from MongoDB.`)
+               return doc.data
+            }
+            return null
+         } catch (error: any) {
+            this.log('error', `Failed to load message ${targetId}:`, error?.message || error)
             return null
          }
       }
 
-      const list = this.fallbackStore?.[jid] || []
-      return list.find(v => v.key?.id === id || (v as any).id === id) || null
+      if (targetJid) {
+         const list = this.fallbackStore?.[targetJid] || []
+         return list.find(v => v.key?.id === targetId || (v as any).id === targetId) || null
+      } else if (this.fallbackStore) {
+         for (const j in this.fallbackStore) {
+            const found = this.fallbackStore[j]?.find(v => v.key?.id === targetId || (v as any).id === targetId)
+            if (found) return found
+         }
+      }
+
+      return null
    }
 
    public async loadMessages(jid: string, count: number = 25): Promise<WAMessage[] | null> {
+      if (this.cache.has(jid)) {
+         const list = this.cache.get(jid)!
+         if (list.length > 0) {
+            this.log('debug', `[loadMessages] Loaded ${colors.green}${Math.min(list.length, count)}${colors.reset} messages from cache for ${colors.yellow}${jid}${colors.reset}`)
+            return [...list].reverse().slice(0, count)
+         }
+      }
+
       if (this.messagesCollection) {
          try {
             const docs = await this.messagesCollection.find({ jid })
@@ -461,8 +669,10 @@ class Store {
                .toArray()
 
             if (docs.length === 0) return null
+            this.log('debug', `[loadMessages] Loaded ${colors.green}${docs.length}${colors.reset} messages from MongoDB for ${colors.yellow}${jid}${colors.reset}`)
             return docs.map((doc: any) => doc.data).reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load messages list for ${jid}:`, error?.message || error)
             return null
          }
       }
@@ -495,8 +705,10 @@ class Store {
       const cleanedNode = this.sanitizeNode(node)
       if (!cleanedNode) return
 
+      this.log('debug', `[addNode] Storing node tag: ${colors.magenta}${tag}${colors.reset} id: ${colors.cyan}${nodeId}${colors.reset}`)
+
       if (this.nodesCollection) {
-         const previous = this.nodeWriteQueues.get(jid) || Promise.resolve()
+         const previous = (this.nodeWriteQueues.get(jid) || Promise.resolve()).catch(() => { })
          const current = previous.then(async () => {
             try {
                await this.nodesCollection.updateOne(
@@ -505,23 +717,27 @@ class Store {
                   { upsert: true }
                )
 
-               const count = await this.nodesCollection.countDocuments({ jid })
-               if (count > this.max) {
-                  const toDelete = await this.nodesCollection.find({ jid })
-                     .sort({ created_at: 1 })
-                     .limit(count - this.max)
-                     .project({ _id: 1 })
-                     .toArray()
+               if (Math.random() < 0.05) {
+                  const count = await this.nodesCollection.countDocuments({ jid })
+                  if (count > this.max) {
+                     const toDelete = await this.nodesCollection.find({ jid })
+                        .sort({ created_at: 1 })
+                        .limit(count - this.max)
+                        .project({ _id: 1 })
+                        .toArray()
 
-                  if (toDelete.length > 0) {
-                     await this.nodesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                     if (toDelete.length > 0) {
+                        await this.nodesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                     }
                   }
                }
-            } catch (e) {
-               console.error('[store-mongo] addNode error:', e)
+            } catch (e: any) {
+               this.log('error', `Failed to save node ${nodeId}:`, e?.message || e)
             }
          }).finally(() => {
-            if (this.nodeWriteQueues.get(jid) === current) this.nodeWriteQueues.delete(jid)
+            if (this.nodeWriteQueues.get(jid) === current) {
+               this.nodeWriteQueues.delete(jid)
+            }
          })
 
          this.nodeWriteQueues.set(jid, current)
@@ -560,8 +776,9 @@ class Store {
             const query: any = { id: targetId }
             if (targetJid) query.jid = targetJid
             const doc = await this.nodesCollection.findOne(query)
-            return doc ? doc.data : null
-         } catch {
+            if (doc) return doc.data
+         } catch (error: any) {
+            this.log('error', `Failed to load node ${targetId}:`, error?.message || error)
             return null
          }
       }
@@ -598,7 +815,8 @@ class Store {
 
             if (docs.length === 0) return null
             return docs.map((doc: any) => doc.data).reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', 'Failed to load nodes:', error?.message || error)
             return null
          }
       }
@@ -669,6 +887,7 @@ class Store {
       for (const update of updates) {
          if (update.id) this.chats[update.id] = Object.assign(this.chats[update.id] || { id: update.id }, update)
       }
+      this.log('debug', `[chatUpdate] Processed ${colors.green}${updates.length}${colors.reset} chat updates.`)
    }
 
    public contactsUpsert(newContacts: Contact[]): Set<string> {
@@ -678,11 +897,12 @@ class Store {
          let jid = id
          if (this.socket && jid?.endsWith('lid')) {
             // @ts-ignore
-            jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+            jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
          }
          oldContacts.delete(jid)
          this.contacts[jid] = Object.assign(this.contacts[jid] || { jid }, contact)
       }
+      this.log('debug', `[contactsUpsert] Processed ${colors.green}${newContacts.length}${colors.reset} contacts.`)
       return oldContacts
    }
 
@@ -693,11 +913,12 @@ class Store {
             let jid = id
             if (this.socket && jid?.endsWith('lid')) {
                // @ts-ignore
-               jid = this.socket?.decodeJid(this.socket?.signalRepository.lidMapping.getPNForLID(jid)) ?? id
+               jid = this.socket?.decodeJid(this.socket?.signalRepository?.lidMapping?.getPNForLID(jid)) ?? id
             }
             this.contacts[jid] = Object.assign(this.contacts[jid] || { jid, id: jid }, update)
          }
       }
+      this.log('debug', `[contactUpdate] Processed ${colors.green}${updates.length}${colors.reset} contact updates.`)
    }
 
    public getContact(id: string): Contact | null {
@@ -737,6 +958,8 @@ class Store {
    }
 
    private cleanupExpiredMessages(): void {
+      this.log('debug', 'Running periodic memory cache cleanup routine.')
+
       if (this.fallbackStore) {
          Object.values(this.fallbackStore).forEach((msgArray) => {
             if (msgArray && msgArray.length > this.max) {
@@ -806,8 +1029,10 @@ class Store {
       const storyId = story.key?.id || story.id
       if (!storyId) return
 
+      const cleanedStory = this.toPOJO(story)
+      this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
+
       if (this.storiesCollection) {
-         const cleanedStory = this.toPOJO(story)
          try {
             await this.storiesCollection.updateOne(
                { jid, id: storyId },
@@ -815,26 +1040,30 @@ class Store {
                { upsert: true }
             )
 
-            const count = await this.storiesCollection.countDocuments({ jid })
-            if (count > this.max) {
-               const toDelete = await this.storiesCollection.find({ jid })
-                  .sort({ created_at: 1 })
-                  .limit(count - this.max)
-                  .project({ _id: 1 })
-                  .toArray()
+            if (Math.random() < 0.05) {
+               const count = await this.storiesCollection.countDocuments({ jid })
+               if (count > this.max) {
+                  const toDelete = await this.storiesCollection.find({ jid })
+                     .sort({ created_at: 1 })
+                     .limit(count - this.max)
+                     .project({ _id: 1 })
+                     .toArray()
 
-               if (toDelete.length > 0) {
-                  await this.storiesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                  if (toDelete.length > 0) {
+                     await this.storiesCollection.deleteMany({ _id: { $in: toDelete.map((d: any) => d._id) } })
+                  }
                }
             }
-         } catch (e) {
-            console.error('[store-mongo] addStory error:', e)
+         } catch (e: any) {
+            this.log('error', `Failed to save story ${storyId}:`, e?.message || e)
          }
       }
 
       if (!this.stories[jid]) this.stories[jid] = []
-      this.stories[jid].push(story)
-      if (this.stories[jid].length > this.max) this.stories[jid].shift()
+      this.stories[jid].push(cleanedStory)
+      if (this.stories[jid].length > this.max) {
+         this.stories[jid].splice(0, this.stories[jid].length - this.max)
+      }
    }
 
    public async loadStories(jid: string, count?: number): Promise<any[]> {
@@ -849,7 +1078,8 @@ class Store {
             if (count) query.limit(count)
             const docs = await query.toArray()
             return docs.map((doc: any) => doc.data).reverse()
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load stories for ${jid}:`, error?.message || error)
             return []
          }
       }
@@ -867,7 +1097,8 @@ class Store {
          try {
             const doc = await this.storiesCollection.findOne({ jid, id })
             return doc ? doc.data : null
-         } catch {
+         } catch (error: any) {
+            this.log('error', `Failed to load story ${id}:`, error?.message || error)
             return null
          }
       }
@@ -908,9 +1139,31 @@ class Store {
       })
    }
 
-   public config({ max, uri }: StoreConfig): this {
-      if (max) this.max = max
-      if (uri && uri !== this.uri) { this.uri = uri; this.initDB() }
+   public config({ dir, max, uri, debug }: StoreConfig & { debug?: boolean }): this {
+      let needsReinit = false
+
+      if (dir) {
+         this.storeDir = path.join(process.cwd(), '.cache', dir)
+      }
+
+      if (max !== undefined) {
+         this.max = max
+      }
+
+      if (debug !== undefined) {
+         this.debug = debug
+         this.log('debug', `Debug mode set to: ${colors.yellow}${this.debug}${colors.reset}`)
+      }
+
+      if (uri && uri !== this.uri) {
+         this.uri = uri
+         needsReinit = true
+      }
+
+      if (needsReinit) {
+         this.initDB()
+      }
+
       return this
    }
 }
