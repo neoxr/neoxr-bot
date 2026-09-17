@@ -112,8 +112,6 @@ class Store {
       if (targetUri && (targetUri.includes('postgres') || targetUri.includes('pgsql'))) {
          this.uri = targetUri
          this.initDB()
-      } else {
-         this.log('warn', 'PostgreSQL URI not specified or protocol invalid. Operating in RAM storage mode.')
       }
 
       setInterval(() => this.cleanupExpiredMessages(), 120000)
@@ -122,7 +120,7 @@ class Store {
    private log(type: 'info' | 'warn' | 'error' | 'debug', message: string, ...args: any[]): void {
       if (!this.debug && (type === 'debug' || type === 'info')) return
 
-      const prefix = `${colors.cyan}${colors.bold}[store-postgres]${colors.reset}`
+      const prefix = `${colors.cyan}${colors.bold}[store-pg]${colors.reset}`
       let badge = ''
 
       switch (type) {
@@ -292,6 +290,7 @@ class Store {
                PRIMARY KEY (jid, id)
             );
             CREATE INDEX IF NOT EXISTS idx_messages_jid_created_at ON messages (jid, created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_messages_id ON messages (id);
             
             CREATE TABLE IF NOT EXISTS chats (
                id VARCHAR(255) NOT NULL,
@@ -470,7 +469,7 @@ class Store {
 
             if (self.pool) {
                self.pool.query(
-                  'INSERT INTO contacts (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at',
+                  'INSERT INTO contacts (jid, data, updated_at) VALUES ($1, $2, $3) ON CONFLICT (jid) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at',
                   [prop, stringify(cleanedValue), Date.now()]
                ).catch((err: any) => {
                   self.log('error', 'Failed to save contact:', err?.message || err)
@@ -1194,7 +1193,6 @@ class Store {
       if (!storyId) return
 
       const cleanedStory = this.toPOJO(story)
-
       this.log('debug', `[addStory] Storing story ${colors.cyan}${storyId}${colors.reset} for ${colors.yellow}${jid}${colors.reset}`)
 
       if (this.pool) {
