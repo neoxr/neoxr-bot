@@ -14,6 +14,7 @@
     "checkJs": false,
     "outDir": "lib",
     // "outDir": "../zapojs-demo/node_modules/@neoxr/store/lib",
+    // "outDir": "../v5.1-optima/node_modules/@neoxr/store/lib",
     "rootDir": "./src",
     "strict": false,
     "strictNullChecks": true,

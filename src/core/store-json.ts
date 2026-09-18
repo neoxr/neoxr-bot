@@ -56,6 +56,7 @@ class Store {
    private readonly maxCachedJids = 10
    private readonly maxCachedChats = 500
    private readonly maxCachedContacts = 1000
+   private readonly maxCachedGroups = 500
    private readonly maxCachedStoryJids = 250
    private cleanupTimer: NodeJS.Timeout
    private pendingJidWrites = new Set<string>()
@@ -68,6 +69,11 @@ class Store {
    private contactsFilePath: string
    private contactsPendingWrite = false
    private contactsProxyInstance: Record<string, Contact>
+
+   public groupMetadata = new Map<string, any>()
+   private groupMetadataLastAccess = new Map<string, number>()
+   private groupMetadataFilePath: string
+   private groupMetadataPendingWrite = false
 
    public stories: Record<string, any[]> = Object.create(null)
    public nodes: Record<string, any[]> = Object.create(null)
@@ -96,6 +102,7 @@ class Store {
       this.debug = debug || process.env.STORE_DEBUG === 'true' || process.env.DEBUG === 'true'
       this.chatsFilePath = path.join(this.storeDir, 'chats.json')
       this.contactsFilePath = path.join(this.storeDir, 'contacts.json')
+      this.groupMetadataFilePath = path.join(this.storeDir, 'group_metadata.json')
       this.storiesFilePath = path.join(this.storeDir, 'stories.json')
       this.nodesFilePath = path.join(this.storeDir, 'nodes.json')
 
@@ -108,6 +115,7 @@ class Store {
 
       this.loadChats()
       this.loadContacts()
+      this.loadGroupMetadataData()
       this.loadStoriesData()
       this.loadNodesData()
 
@@ -328,6 +336,29 @@ class Store {
       }
    }
 
+   private loadGroupMetadataData(): void {
+      try {
+         if (fs.existsSync(this.groupMetadataFilePath)) {
+            const content = fs.readFileSync(this.groupMetadataFilePath, 'utf-8')
+            const list = parse(content) as any[]
+            list.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0))
+            const capped = list.slice(0, this.maxCachedGroups)
+            const now = Date.now()
+            for (const meta of capped) {
+               if (meta?.id) {
+                  this.groupMetadata.set(meta.id, meta)
+                  this.groupMetadataLastAccess.set(meta.id, now)
+               }
+            }
+            this.log('debug', `Loaded ${colors.green}${this.groupMetadata.size}${colors.reset} group metadata from disk.`)
+         }
+      } catch (error: any) {
+         if (error.code !== 'ENOENT') {
+            this.log('error', 'Failed to load group metadata:', error)
+         }
+      }
+   }
+
    private loadStoriesData(): void {
       try {
          if (fs.existsSync(this.storiesFilePath)) {
@@ -424,6 +455,28 @@ class Store {
       })
    }
 
+   private writeGroupMetadataData(): void {
+      if (this.groupMetadataPendingWrite) return
+      this.groupMetadataPendingWrite = true
+
+      this.schedule(2000, () => {
+         this.groupMetadataPendingWrite = false
+         this.pruneMapByUpdatedAt(this.groupMetadata, this.maxCachedGroups)
+         const list = this.toPOJO(Array.from(this.groupMetadata.values()))
+
+         this.enqueueWrite('group_metadata', async () => {
+            const tempPath = `${this.groupMetadataFilePath}.tmp`
+            try {
+               await fs.promises.writeFile(tempPath, stringify(list), 'utf-8')
+               await fs.promises.rename(tempPath, this.groupMetadataFilePath)
+               this.log('debug', `Saved ${colors.green}${list.length}${colors.reset} group metadata to disk.`)
+            } catch (error) {
+               this.log('error', 'Failed to write group metadata to disk:', error)
+            }
+         })
+      })
+   }
+
    private writeStoriesData(): void {
       if (this.storiesPendingWrite) return
       this.storiesPendingWrite = true
@@ -482,6 +535,7 @@ class Store {
          this.storeDir = path.join(process.cwd(), '.cache', dir)
          this.chatsFilePath = path.join(this.storeDir, 'chats.json')
          this.contactsFilePath = path.join(this.storeDir, 'contacts.json')
+         this.groupMetadataFilePath = path.join(this.storeDir, 'group_metadata.json')
          this.storiesFilePath = path.join(this.storeDir, 'stories.json')
          this.nodesFilePath = path.join(this.storeDir, 'nodes.json')
 
@@ -491,6 +545,7 @@ class Store {
 
          this.loadChats()
          this.loadContacts()
+         this.loadGroupMetadataData()
          this.loadStoriesData()
          this.loadNodesData()
       }
@@ -557,44 +612,78 @@ class Store {
       return this.chatsProxyInstance
    }
 
+   public set chats(value: any) {
+      if (value && typeof value === 'object') {
+         Object.assign(this.chatsProxyInstance, value)
+      }
+   }
+
    public get contacts(): Record<string, Contact> {
       return this.contactsProxyInstance
    }
 
-   public bind<T extends Client>(client: T, socket: any): T {
+   public set contacts(value: any) {
+      if (value && typeof value === 'object') {
+         Object.assign(this.contactsProxyInstance, value)
+      }
+   }
+
+   public bind<T extends Client>(client: T, socket?: any): T {
       this.client = client
-      this.socket = socket
+      if (socket) this.socket = socket
 
-      client.loadMessage = this.loadMessage.bind(this)
-      client.loadMessages = this.loadMessages.bind(this)
-      client.addMessage = this.addMessage.bind(this)
-      client.getAllMessages = this.getAllMessages.bind(this)
+      const safeAssign = (target: any, prop: string, value: any) => {
+         try {
+            target[prop] = value
+         } catch {
+            try {
+               Object.defineProperty(target, prop, {
+                  value,
+                  writable: true,
+                  configurable: true,
+                  enumerable: true
+               })
+            } catch { }
+         }
+      }
 
-      client.chatUpdate = this.chatUpdate.bind(this)
-      client.contactsUpsert = this.contactsUpsert.bind(this)
-      client.contactUpdate = this.contactUpdate.bind(this)
-      client.getContact = this.getContact.bind(this)
-      client.getAllContacts = this.getAllContacts.bind(this)
-      client.updateMessageWithReceipt = this.updateMessageWithReceipt.bind(this)
-      client.updateMessageWithReaction = this.updateMessageWithReaction.bind(this)
-      client.loadStories = this.loadStories.bind(this)
-      client.loadStory = this.loadStory.bind(this)
-      client.addStory = this.addStory.bind(this)
-      client.getAllStories = this.getAllStories.bind(this)
-      client.recordMessageId = this.recordMessageId.bind(this)
+      safeAssign(client, 'loadMessage', this.loadMessage.bind(this))
+      safeAssign(client, 'loadMessages', this.loadMessages.bind(this))
+      safeAssign(client, 'addMessage', this.addMessage.bind(this))
+      safeAssign(client, 'getAllMessages', this.getAllMessages.bind(this))
 
-      client.addNode = this.addNode.bind(this)
-      client.loadNode = this.loadNode.bind(this)
-      client.loadNodes = this.loadNodes.bind(this)
-      client.getAllNodes = this.getAllNodes.bind(this)
+      safeAssign(client, 'chatUpdate', this.chatUpdate.bind(this))
+      safeAssign(client, 'contactsUpsert', this.contactsUpsert.bind(this))
+      safeAssign(client, 'contactUpdate', this.contactUpdate.bind(this))
+      safeAssign(client, 'getContact', this.getContact.bind(this))
+      safeAssign(client, 'getAllContacts', this.getAllContacts.bind(this))
 
-      client.contacts = this.contacts
-      client.stories = this.stories
-      client.nodes = this.nodes
-      client.presences = this.presences
-      client.state = this.state
-      client.messageId = this.messageId
-      client.chats = this.chats
+      safeAssign(client, 'groupMetadata', this.groupMetadata)
+      safeAssign(client, 'loadGroupMetadata', this.loadGroupMetadata.bind(this))
+      safeAssign(client, 'addGroupMetadata', this.addGroupMetadata.bind(this))
+      safeAssign(client, 'groupMetadataUpsert', this.groupMetadataUpsert.bind(this))
+      safeAssign(client, 'deleteGroupMetadata', this.deleteGroupMetadata.bind(this))
+
+      safeAssign(client, 'updateMessageWithReceipt', this.updateMessageWithReceipt.bind(this))
+      safeAssign(client, 'updateMessageWithReaction', this.updateMessageWithReaction.bind(this))
+      safeAssign(client, 'loadStories', this.loadStories.bind(this))
+      safeAssign(client, 'loadStory', this.loadStory.bind(this))
+      safeAssign(client, 'addStory', this.addStory.bind(this))
+      safeAssign(client, 'getAllStories', this.getAllStories.bind(this))
+      safeAssign(client, 'recordMessageId', this.recordMessageId.bind(this))
+
+      safeAssign(client, 'addNode', this.addNode.bind(this))
+      safeAssign(client, 'loadNode', this.loadNode.bind(this))
+      safeAssign(client, 'loadNodes', this.loadNodes.bind(this))
+      safeAssign(client, 'getAllNodes', this.getAllNodes.bind(this))
+
+      safeAssign(client, 'contacts', this.contacts)
+      safeAssign(client, 'stories', this.stories)
+      safeAssign(client, 'nodes', this.nodes)
+      safeAssign(client, 'presences', this.presences)
+      safeAssign(client, 'state', this.state)
+      safeAssign(client, 'messageId', this.messageId)
+      safeAssign(client, 'chats', this.chats)
 
       this.log('debug', 'Store successfully bound to client and socket.')
       return client
@@ -788,6 +877,57 @@ class Store {
       }
 
       return sliced
+   }
+
+   public addGroupMetadata(groupId: string, metadata: any): void {
+      if (!groupId || !metadata) return
+      const id = groupId.includes('@g.us') ? groupId : `${groupId}@g.us`
+      const cleaned = this.toPOJO(metadata)
+      cleaned.updated_at = Date.now()
+
+      this.groupMetadata.set(id, cleaned)
+      this.groupMetadataLastAccess.set(id, Date.now())
+
+      this.pruneMapByUpdatedAt(this.groupMetadata, this.maxCachedGroups)
+      this.writeGroupMetadataData()
+      this.log('debug', `[addGroupMetadata] Saved metadata for ${colors.yellow}${id}${colors.reset}`)
+   }
+
+   public async groupMetadataUpsert(newGroupMetadatas: any[]): Promise<void> {
+      if (!Array.isArray(newGroupMetadatas)) return
+      for (const meta of newGroupMetadatas) {
+         if (meta?.id) {
+            this.addGroupMetadata(meta.id, meta)
+         }
+      }
+      this.log('debug', `[groupMetadataUpsert] Processed ${colors.green}${newGroupMetadatas.length}${colors.reset} group metadatas.`)
+   }
+
+   public loadGroupMetadata(jid: string): any | null {
+      if (!jid) return null
+      const id = jid.includes('@g.us') ? jid : `${jid}@g.us`
+
+      if (this.groupMetadata.has(id)) {
+         this.groupMetadataLastAccess.set(id, Date.now())
+         return this.groupMetadata.get(id)
+      }
+
+      return null
+   }
+
+   public deleteGroupMetadata(groupId: string): boolean {
+      if (!groupId) return false
+      const id = groupId.includes('@g.us') ? groupId : `${groupId}@g.us`
+
+      const deleted = this.groupMetadata.delete(id)
+      this.groupMetadataLastAccess.delete(id)
+
+      if (deleted) {
+         this.writeGroupMetadataData()
+         this.log('debug', `[deleteGroupMetadata] Deleted group metadata for ${colors.yellow}${id}${colors.reset}`)
+      }
+
+      return deleted
    }
 
    public addNode(arg1: any, arg2?: any): void {
@@ -1153,6 +1293,30 @@ class Store {
             this.nodes[jid] = list.slice(-this.max)
             this.writeNodesData()
          }
+      }
+
+      const IDLE_CACHE_TTL = 3600000
+      let groupEvicted = false
+      for (const [jid, at] of this.groupMetadataLastAccess.entries()) {
+         if (now - at > IDLE_CACHE_TTL) {
+            this.groupMetadata.delete(jid)
+            this.groupMetadataLastAccess.delete(jid)
+            groupEvicted = true
+         }
+      }
+
+      if (this.groupMetadata.size > this.maxCachedGroups) {
+         const overflow = this.groupMetadata.size - this.maxCachedGroups
+         const sorted = [...this.groupMetadataLastAccess.entries()].sort((a, b) => a[1] - b[1])
+         for (let i = 0; i < overflow && i < sorted.length; i++) {
+            this.groupMetadata.delete(sorted[i][0])
+            this.groupMetadataLastAccess.delete(sorted[i][0])
+         }
+         groupEvicted = true
+      }
+
+      if (groupEvicted) {
+         this.writeGroupMetadataData()
       }
 
       if (this.pruneStoriesCache()) {

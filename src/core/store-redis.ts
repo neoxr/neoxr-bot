@@ -69,9 +69,13 @@ class Store {
    private fallbackStore: Record<string, WAMessage[]> | null = null
    private fallbackChats: Record<string, any> | null = null
    private fallbackContacts: Record<string, Contact> | null = null
+   private fallbackGroupMetadata: Record<string, any> | null = null
 
    private contactsCache = new Map<string, Contact>()
    private contactsProxyInstance: Record<string, Contact>
+
+   public groupMetadata = new Map<string, any>()
+   private groupMetadataLastAccess = new Map<string, number>()
 
    public stories: Record<string, any[]> = Object.create(null)
    public nodes: Record<string, any[]> = Object.create(null)
@@ -100,6 +104,7 @@ class Store {
       this.fallbackStore = Object.create(null)
       this.fallbackChats = Object.create(null)
       this.fallbackContacts = Object.create(null)
+      this.fallbackGroupMetadata = Object.create(null)
 
       this.chatsProxyInstance = this.createChatsProxy()
       this.contactsProxyInstance = this.createContactsProxy()
@@ -280,11 +285,13 @@ class Store {
          await this.redis.connect()
          await this.preloadChats()
          await this.preloadContacts()
+         await this.preloadGroupMetadata()
          await this.preloadNodes()
 
          this.fallbackStore = null
          this.fallbackChats = null
          this.fallbackContacts = null
+         this.fallbackGroupMetadata = null
          this.log('info', 'Redis database connection established successfully.')
       } catch (error: any) {
          this.log('error', `Failed to connect to Redis (${error?.message || error}). Falling back to RAM storage mode.`)
@@ -329,6 +336,28 @@ class Store {
          this.log('debug', `Preloaded ${colors.green}${keys?.length || 0}${colors.reset} contacts into memory.`)
       } catch (error: any) {
          this.log('error', 'Failed to preload contacts from Redis:', error?.message || error)
+      }
+   }
+
+   private async preloadGroupMetadata(): Promise<void> {
+      if (!this.redis) return
+      try {
+         const reply = await this.redis.scan('0', { MATCH: 'group_metadata_store:*', COUNT: 500 })
+         const keys = reply.keys
+         if (keys && keys.length > 0) {
+            const now = Date.now()
+            for (const key of keys) {
+               const raw = await this.redis.get(key)
+               if (raw) {
+                  const id = key.replace('group_metadata_store:', '')
+                  this.groupMetadata.set(id, parse(raw))
+                  this.groupMetadataLastAccess.set(id, now)
+               }
+            }
+         }
+         this.log('debug', `Preloaded ${colors.green}${keys?.length || 0}${colors.reset} group metadata into memory.`)
+      } catch (error: any) {
+         this.log('error', 'Failed to preload group metadata from Redis:', error?.message || error)
       }
    }
 
@@ -438,44 +467,78 @@ class Store {
       return this.chatsProxyInstance
    }
 
+   public set chats(value: any) {
+      if (value && typeof value === 'object') {
+         Object.assign(this.chatsProxyInstance, value)
+      }
+   }
+
    public get contacts(): Record<string, Contact> {
       return this.contactsProxyInstance
    }
 
-   public bind<T extends Client>(client: T, socket: any): T {
+   public set contacts(value: any) {
+      if (value && typeof value === 'object') {
+         Object.assign(this.contactsProxyInstance, value)
+      }
+   }
+
+   public bind<T extends Client>(client: T, socket?: any): T {
       this.client = client
-      this.socket = socket
+      if (socket) this.socket = socket
 
-      client.loadMessage = this.loadMessage.bind(this)
-      client.loadMessages = this.loadMessages.bind(this)
-      client.addMessage = this.addMessage.bind(this)
-      client.getAllMessages = this.getAllMessages.bind(this)
+      const safeAssign = (target: any, prop: string, value: any) => {
+         try {
+            target[prop] = value
+         } catch {
+            try {
+               Object.defineProperty(target, prop, {
+                  value,
+                  writable: true,
+                  configurable: true,
+                  enumerable: true
+               })
+            } catch { }
+         }
+      }
 
-      client.chatUpdate = this.chatUpdate.bind(this)
-      client.contactsUpsert = this.contactsUpsert.bind(this)
-      client.contactUpdate = this.contactUpdate.bind(this)
-      client.getContact = this.getContact.bind(this)
-      client.getAllContacts = this.getAllContacts.bind(this)
-      client.updateMessageWithReceipt = this.updateMessageWithReceipt.bind(this)
-      client.updateMessageWithReaction = this.updateMessageWithReaction.bind(this)
-      client.loadStories = this.loadStories.bind(this)
-      client.loadStory = this.loadStory.bind(this)
-      client.addStory = this.addStory.bind(this)
-      client.getAllStories = this.getAllStories.bind(this)
-      client.recordMessageId = this.recordMessageId.bind(this)
+      safeAssign(client, 'loadMessage', this.loadMessage.bind(this))
+      safeAssign(client, 'loadMessages', this.loadMessages.bind(this))
+      safeAssign(client, 'addMessage', this.addMessage.bind(this))
+      safeAssign(client, 'getAllMessages', this.getAllMessages.bind(this))
 
-      client.addNode = this.addNode.bind(this)
-      client.loadNode = this.loadNode.bind(this)
-      client.loadNodes = this.loadNodes.bind(this)
-      client.getAllNodes = this.getAllNodes.bind(this)
+      safeAssign(client, 'chatUpdate', this.chatUpdate.bind(this))
+      safeAssign(client, 'contactsUpsert', this.contactsUpsert.bind(this))
+      safeAssign(client, 'contactUpdate', this.contactUpdate.bind(this))
+      safeAssign(client, 'getContact', this.getContact.bind(this))
+      safeAssign(client, 'getAllContacts', this.getAllContacts.bind(this))
 
-      client.contacts = this.contacts
-      client.stories = this.stories
-      client.nodes = this.nodes
-      client.presences = this.presences
-      client.state = this.state
-      client.messageId = this.messageId
-      client.chats = this.chats
+      safeAssign(client, 'groupMetadata', this.groupMetadata)
+      safeAssign(client, 'loadGroupMetadata', this.loadGroupMetadata.bind(this))
+      safeAssign(client, 'addGroupMetadata', this.addGroupMetadata.bind(this))
+      safeAssign(client, 'groupMetadataUpsert', this.groupMetadataUpsert.bind(this))
+      safeAssign(client, 'deleteGroupMetadata', this.deleteGroupMetadata.bind(this))
+
+      safeAssign(client, 'updateMessageWithReceipt', this.updateMessageWithReceipt.bind(this))
+      safeAssign(client, 'updateMessageWithReaction', this.updateMessageWithReaction.bind(this))
+      safeAssign(client, 'loadStories', this.loadStories.bind(this))
+      safeAssign(client, 'loadStory', this.loadStory.bind(this))
+      safeAssign(client, 'addStory', this.addStory.bind(this))
+      safeAssign(client, 'getAllStories', this.getAllStories.bind(this))
+      safeAssign(client, 'recordMessageId', this.recordMessageId.bind(this))
+
+      safeAssign(client, 'addNode', this.addNode.bind(this))
+      safeAssign(client, 'loadNode', this.loadNode.bind(this))
+      safeAssign(client, 'loadNodes', this.loadNodes.bind(this))
+      safeAssign(client, 'getAllNodes', this.getAllNodes.bind(this))
+
+      safeAssign(client, 'contacts', this.contacts)
+      safeAssign(client, 'stories', this.stories)
+      safeAssign(client, 'nodes', this.nodes)
+      safeAssign(client, 'presences', this.presences)
+      safeAssign(client, 'state', this.state)
+      safeAssign(client, 'messageId', this.messageId)
+      safeAssign(client, 'chats', this.chats)
 
       this.log('debug', 'Store successfully bound to client and socket.')
       return client
@@ -748,6 +811,94 @@ class Store {
       }
 
       return promiseWithMethods
+   }
+
+   public addGroupMetadata(groupId: string, metadata: any): void {
+      if (!groupId || !metadata) return
+      const id = groupId.includes('@g.us') ? groupId : `${groupId}@g.us`
+      const cleaned = this.toPOJO(metadata)
+
+      this.groupMetadata.set(id, cleaned)
+      this.groupMetadataLastAccess.set(id, Date.now())
+
+      if (this.redis) {
+         this.redis.set(`group_metadata_store:${id}`, stringify(cleaned)).then(() => {
+            this.log('debug', `[addGroupMetadata] Saved metadata for ${colors.yellow}${id}${colors.reset}`)
+         }).catch((err: any) => {
+            this.log('error', `Failed to save group metadata for ${id}:`, err?.message || err)
+         })
+         return
+      }
+
+      if (this.fallbackGroupMetadata) {
+         this.fallbackGroupMetadata[id] = cleaned
+      }
+   }
+
+   public async groupMetadataUpsert(newGroupMetadatas: any[]): Promise<void> {
+      if (!Array.isArray(newGroupMetadatas)) return
+      for (const meta of newGroupMetadatas) {
+         if (meta?.id) {
+            this.addGroupMetadata(meta.id, meta)
+         }
+      }
+      this.log('debug', `[groupMetadataUpsert] Processed ${colors.green}${newGroupMetadatas.length}${colors.reset} group metadatas.`)
+   }
+
+   public async loadGroupMetadata(jid: string): Promise<any | null> {
+      if (!jid) return null
+      const id = jid.includes('@g.us') ? jid : `${jid}@g.us`
+
+      if (this.groupMetadata.has(id)) {
+         this.groupMetadataLastAccess.set(id, Date.now())
+         return this.groupMetadata.get(id)
+      }
+
+      if (this.redis) {
+         try {
+            const raw = await this.redis.get(`group_metadata_store:${id}`)
+            if (raw) {
+               const parsed = parse(raw)
+               this.groupMetadata.set(id, parsed)
+               this.groupMetadataLastAccess.set(id, Date.now())
+               return parsed
+            }
+         } catch (e: any) {
+            this.log('error', `Failed to load group metadata for ${id}:`, e?.message || e)
+         }
+      }
+
+      if (this.fallbackGroupMetadata && this.fallbackGroupMetadata[id]) {
+         return this.fallbackGroupMetadata[id]
+      }
+
+      return null
+   }
+
+   public async deleteGroupMetadata(groupId: string): Promise<boolean> {
+      if (!groupId) return false
+      const id = groupId.includes('@g.us') ? groupId : `${groupId}@g.us`
+
+      this.groupMetadata.delete(id)
+      this.groupMetadataLastAccess.delete(id)
+
+      if (this.redis) {
+         try {
+            await this.redis.del(`group_metadata_store:${id}`)
+            this.log('debug', `[deleteGroupMetadata] Deleted group metadata for ${colors.yellow}${id}${colors.reset}`)
+            return true
+         } catch (e: any) {
+            this.log('error', `Failed to delete group metadata for ${id}:`, e?.message || e)
+            return false
+         }
+      }
+
+      if (this.fallbackGroupMetadata && this.fallbackGroupMetadata[id]) {
+         delete this.fallbackGroupMetadata[id]
+         return true
+      }
+
+      return false
    }
 
    public async addNode(arg1: any, arg2?: any): Promise<void> {
@@ -1279,6 +1430,25 @@ class Store {
          })
          if (instanceMap.size === 0) this.messageId.delete(instance)
       })
+
+      const IDLE_CACHE_TTL = 3600000
+      const MAX_TRACKED_GROUPS = 500
+
+      for (const [jid, at] of this.groupMetadataLastAccess.entries()) {
+         if (now - at > IDLE_CACHE_TTL) {
+            this.groupMetadata.delete(jid)
+            this.groupMetadataLastAccess.delete(jid)
+         }
+      }
+
+      if (this.groupMetadata.size > MAX_TRACKED_GROUPS) {
+         const overflow = this.groupMetadata.size - MAX_TRACKED_GROUPS
+         const sorted = [...this.groupMetadataLastAccess.entries()].sort((a, b) => a[1] - b[1])
+         for (let i = 0; i < overflow && i < sorted.length; i++) {
+            this.groupMetadata.delete(sorted[i][0])
+            this.groupMetadataLastAccess.delete(sorted[i][0])
+         }
+      }
    }
 }
 

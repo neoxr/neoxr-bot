@@ -70,11 +70,17 @@ export interface Client {
 
    chats?: Record<string, any>
    contacts?: Record<string, any>
+   groupMetadata?: Map<string, any>
    stories?: Record<string, any[]>
    nodes?: Record<string, any[]>
    presences?: Record<string, any>
    state?: any
    messageId?: Map<string, Map<string, { at: number }>>
+
+   loadGroupMetadata?: (jid: string) => any | null
+   addGroupMetadata?: (groupId: string, metadata: any) => void
+   groupMetadataUpsert?: (newGroupMetadatas: any[]) => Promise<void>
+   deleteGroupMetadata?: (groupId: string) => boolean
 
    chatUpdate?: (updates: any[]) => void
    contactsUpsert?: (newContacts: any[]) => Set<string>
