@@ -7,26 +7,28 @@ export const run = {
       text,
       Utils
    }) => {
-      let number = isNaN(text) ? (text.startsWith('+') ? text.replace(/[()+\s-]/g, '') : (text).split`@` [1]) : text
-      if (!text && !m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Mention or reply chat target.`), m)
-      if (isNaN(number)) return client.reply(m.chat, Utils.texted('bold', `🚩 Invalid number.`), m)
-      if (number.length > 15) return client.reply(m.chat, Utils.texted('bold', `🚩 Invalid format.`), m)
       try {
-         if (text) {
-            var user = number + '@s.whatsapp.net'
-         } else if (m.quoted.sender) {
-            var user = m.quoted.sender
-         } else if (m.mentionedJid) {
-            var user = number + '@s.whatsapp.net'
+         let user = m.mentionedJid?.[0] || m.quoted?.sender
+         const validate = Utils.validatePhone(text?.trim())
+
+         if (text && validate.valid) {
+            user = validate.jid_format
+         } else if (text && !user) {
+            const cleanNum = text.replace(/[^0-9]/g, '')
+            if (cleanNum.length > 0 && cleanNum.length <= 16) {
+               user = cleanNum + '@s.whatsapp.net'
+            }
          }
-      } catch (e) {} finally {
-         var pic = false
-         try {
-            var pic = await client.profilePictureUrl(user, 'image')
-         } catch {} finally {
-            if (!pic) return client.reply(m.chat, Utils.texted('bold', `🚩 He/She didn't put a profile picture.`), m)
-            client.sendFile(m.chat, pic, '', '', m)
-         }
+
+         if (!user) return client.reply(m.chat, Utils.texted('bold', '🚩 Mention, reply, or enter a valid number target.'), m)
+
+         const avatar = await client.profilePictureUrl(user, 'image').catch(() => null)
+         if (!avatar) return client.reply(m.chat, Utils.texted('bold', "🚩 Target didn't put a profile picture."), m)
+
+         client.sendFile(m.chat, avatar, '', '', m)
+      } catch (e) {
+         console.error(e)
+         return client.reply(m.chat, global.status.error, m)
       }
    },
    error: false
