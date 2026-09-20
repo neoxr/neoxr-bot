@@ -345,9 +345,10 @@ class Store {
             const capped = list.slice(0, this.maxCachedGroups)
             const now = Date.now()
             for (const meta of capped) {
-               if (meta?.id) {
-                  this.groupMetadata.set(meta.id, meta)
-                  this.groupMetadataLastAccess.set(meta.id, now)
+               const id = meta?.id ?? meta?.jid
+               if (id) {
+                  this.groupMetadata.set(id, meta)
+                  this.groupMetadataLastAccess.set(id, now)
                }
             }
             this.log('debug', `Loaded ${colors.green}${this.groupMetadata.size}${colors.reset} group metadata from disk.`)
@@ -896,8 +897,9 @@ class Store {
    public async groupMetadataUpsert(newGroupMetadatas: any[]): Promise<void> {
       if (!Array.isArray(newGroupMetadatas)) return
       for (const meta of newGroupMetadatas) {
-         if (meta?.id) {
-            this.addGroupMetadata(meta.id, meta)
+         const id = meta?.id ?? meta?.jid
+         if (meta) {
+            this.addGroupMetadata(id, meta)
          }
       }
       this.log('debug', `[groupMetadataUpsert] Processed ${colors.green}${newGroupMetadatas.length}${colors.reset} group metadatas.`)

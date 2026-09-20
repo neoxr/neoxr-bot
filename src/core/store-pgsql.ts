@@ -853,8 +853,9 @@ class Store {
    public async groupMetadataUpsert(newGroupMetadatas: any[]): Promise<void> {
       if (!Array.isArray(newGroupMetadatas)) return
       for (const meta of newGroupMetadatas) {
-         if (meta?.id) {
-            this.addGroupMetadata(meta.id, meta)
+         const id = meta?.id ?? meta?.jid
+         if (meta) {
+            this.addGroupMetadata(id, meta)
          }
       }
       this.log('debug', `[groupMetadataUpsert] Processed ${colors.green}${newGroupMetadatas.length}${colors.reset} group metadatas.`)

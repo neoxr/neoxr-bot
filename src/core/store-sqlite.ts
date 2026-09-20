@@ -891,8 +891,9 @@ class Store {
 
       const runBatch = () => {
          for (const meta of newGroupMetadatas) {
-            if (meta?.id) {
-               this.addGroupMetadata(meta.id, meta)
+            const id = meta?.id ?? meta?.jid
+            if (meta) {
+               this.addGroupMetadata(id, meta)
             }
          }
       }
