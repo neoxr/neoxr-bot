@@ -17,7 +17,6 @@ if (!global.typo) global.typo = new Map()
 export default async (client, ctx) => {
    let { store, m, body, prefix, plugins, commands, args, command, text, prefixes, core, system } = ctx
    try {
-      if (m.sender && m.sender.endsWith('lid')) m.sender = client.getRealJid(m.sender) || m.sender
       const [groupMetadata, blockList] = await Promise.all([
          m.isGroup ? client.resolveGroupMetadata(m.chat) : Promise.resolve({}),
          client.fetchBlocklist().catch(() => [])
@@ -39,7 +38,13 @@ export default async (client, ctx) => {
       const chats = global.db.chats.get(m.chat)
       const users = global.db.users.get(m.sender)
       const setting = global.db.setting
-      const isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), Config.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+
+      const owners = [
+         client.decodeJid(client.user?.id ?? client.user?.lid ?? '').replace(/@.+/, ''),
+         ...(setting?.owners || [])
+      ]
+
+      const isOwner = Utils.hasRole(m, owners)
       const isPrem = users && users.premium || isOwner
       const participants = m.isGroup ? groupMetadata ? client.lidParser(groupMetadata.participants) : [] : [] || []
       const admins = m.isGroup ? client.getAdmin(participants) : []
@@ -102,8 +107,7 @@ export default async (client, ctx) => {
       if (!users) return
       if (users) {
          if (!users.lid) {
-            const { lid } = await client.getUserId(m.sender)
-            users.lid = lid ?? (m.isGroup ? m?.key?.participant : m.chat)
+            users.lid = m.isGroup ? m?.key?.participant : m.chat
          }
          users.name = m.pushName
          users.lastseen = new Date() * 1
