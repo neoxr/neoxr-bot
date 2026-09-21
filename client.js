@@ -104,7 +104,7 @@ const connect = async () => {
             }
          })
 
-         extra(system, client)
+         extra(system, client, store)
       })
    } catch (e) {
       Utils.printError(e)
