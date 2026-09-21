@@ -35,7 +35,7 @@ export const run = {
             if (q.mtype === 'albumMessage') {
                client.sendReact(m.chat, '🕒', m.key)
                const allMsgs = await store.loadMessages(m.chat, 250)
-               const result = new AlbumResolver(allMsgs).resolve(q, q.id)
+               const result = new AlbumResolver(allMsgs ?? []).resolve(q, q.id)
 
                if (!result?.items?.length) return client.reply(m.chat, Utils.texted('bold', `❌ Album message doesn't exist in the store. Reupload or forward it to generate the sticker pack.`), m)
 
@@ -193,7 +193,7 @@ class AlbumResolver {
 
       return retryUntil(async (attempt) => {
          const allMsgs = await loadMsgsFn(attempt)
-         const resolver = new AlbumResolver(allMsgs)
+         const resolver = new AlbumResolver(allMsgs ?? [])
          const result = resolver.resolve(q, targetId)
 
          if (!result) return { ok: false, value: result }

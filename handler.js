@@ -88,7 +88,8 @@ export default async (client, ctx) => {
          prefix, command, commands, users, cooldown,
          show: 'all', // options: 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
          banned_times: users?.ban_times,
-         exception: isOwner || isPrem
+         exception: isOwner || isPrem,
+         store
       })
 
       plugins = Object.fromEntries(Object.entries(plugins).filter(([dir, _]) => !setting.pluginDisable.includes(path.basename(dir, '.js'))))
