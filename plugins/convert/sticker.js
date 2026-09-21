@@ -75,7 +75,7 @@ export const run = {
                            AlbumResolver.getMediaType(child) === 'video'
                      )
 
-                     const results = await Promise.all(items.map(c => c.download()))
+                     const results = await Promise.all(items.map(c => getMedia(c)))
 
                      const stickers = results.map(buffer => ({ data: buffer }))
 
