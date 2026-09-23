@@ -1,4 +1,4 @@
-name: Check and Update @neoxr/wb
+name: Check and Update @neoxr Packages
 
 on:
   schedule:
@@ -36,30 +36,51 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Check for @neoxr/wb Updates
+      - name: Check for Package Updates
         id: check-update
         run: |
-          LATEST_VER=$(npm view @neoxr/wb version)
-          echo "Latest version on NPM: $LATEST_VER"
+          WB_VER=$(npm view @neoxr/wb version)
+          STORE_VER=$(npm view @neoxr/store version)
+          echo "Latest @neoxr/wb on NPM: $WB_VER"
+          echo "Latest @neoxr/store on NPM: $STORE_VER"
 
-          yarn add @neoxr/wb@latest
+          yarn add @neoxr/wb@latest @neoxr/store@latest
 
           if git diff --quiet package.json; then
             echo "has_update=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_update=true" >> "$GITHUB_OUTPUT"
-            echo "latest_version=$LATEST_VER" >> "$GITHUB_OUTPUT"
+
+            # Deteksi package mana saja yang mengalami update
+            CHANGES=()
+            BRANCH_PARTS=()
+
+            if git diff package.json | grep -q '"@neoxr/wb"'; then
+              CHANGES+=("@neoxr/wb to v${WB_VER}")
+              BRANCH_PARTS+=("wb-v${WB_VER}")
+            fi
+
+            if git diff package.json | grep -q '"@neoxr/store"'; then
+              CHANGES+=("@neoxr/store to v${STORE_VER}")
+              BRANCH_PARTS+=("store-v${STORE_VER}")
+            fi
+
+            SUMMARY=$(IFS=", "; echo "${CHANGES[*]}")
+            BRANCH_NAME="bump-$(IFS="-"; echo "${BRANCH_PARTS[*]}")"
+
+            echo "summary=$SUMMARY" >> "$GITHUB_OUTPUT"
+            echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Branch, PR and Merge
         if: steps.check-update.outputs.has_update == 'true'
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-          VERSION: ${{ steps.check-update.outputs.latest_version }}
+          BRANCH_NAME: ${{ steps.check-update.outputs.branch_name }}
+          SUMMARY: ${{ steps.check-update.outputs.summary }}
         run: |
-          BRANCH_NAME="bump-wb-v${VERSION}"
-
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "Branch $BRANCH_NAME already exists, skipping..."
             exit 0
           fi
 
@@ -68,12 +89,12 @@ jobs:
 
           git checkout -b "$BRANCH_NAME"
           git add -f package.json yarn.lock
-          git commit -m "chore(deps): update @neoxr/wb to v${VERSION}"
+          git commit -m "chore(deps): update ${SUMMARY}"
           git push origin "$BRANCH_NAME"
 
           PR_URL=$(gh pr create \
-            --title "chore(deps): bump @neoxr/wb to v${VERSION}" \
-            --body "Automated dependency update for \`@neoxr/wb\` to version \`${VERSION}\`." \
+            --title "chore(deps): bump ${SUMMARY}" \
+            --body "Automated dependency update for: ${SUMMARY}." \
             --head "$BRANCH_NAME" \
             --base 5.0-ESM)
 

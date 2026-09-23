@@ -521,10 +521,10 @@
   version "0.0.5"
   resolved "https://codeload.github.com/neoxr/neoxr-bot/tar.gz/3d124f6b54ef31ac6505c19ae3524e2e216d3d1d"
 
-"@neoxr/wb@^6.0.0-rc.75":
-  version "6.0.0-rc.75"
-  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.0-rc.75.tgz#1195e30ddceafd2341e2d5c437b7f369d00f04b4"
-  integrity sha512-cHdgZMYqa8lqNifPJyfEShwT7ljGUK981bGziz0nEvGxErDQ22+pUL/4inKieQYM15qfhGCm+Fi86FfuB13Npw==
+"@neoxr/wb@^6.0.0-rc.77":
+  version "6.0.0-rc.77"
+  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.0-rc.77.tgz#612a6f93bdefd3751951c99f04478e5ad749bfa2"
+  integrity sha512-SNtzO2jJs0CFrLVV4gzQZjORZip/NmNrr1XMyWg2T/Rc4j+KfmFd+0wAIm1LOwiNzJxsehvnF6sQ8av0PX01cQ==
   dependencies:
     "@cacheable/node-cache" "~3.0.1"
     "@neoxr/api" "^1.5.3"
