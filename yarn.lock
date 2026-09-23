@@ -517,9 +517,10 @@
     file-type "~16.5.2"
     form-data "~4.0.0"
 
-"@neoxr/store@github:neoxr/neoxr-bot#feat/store":
-  version "0.0.5"
-  resolved "https://codeload.github.com/neoxr/neoxr-bot/tar.gz/3d124f6b54ef31ac6505c19ae3524e2e216d3d1d"
+"@neoxr/store@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.6.tgz#eeec1c485b4112c5a6e0ddae124452fdce561fbf"
+  integrity sha512-/G3wO6G2394E10uiUFFwFzx9Ef8Jf0fBVHf2EqXiyFs9RNBFdm5LL7sLEEblX+ctS7a8Gpx2E2Tbo1l11qHkLg==
 
 "@neoxr/wb@^6.0.0-rc.77":
   version "6.0.0-rc.77"
