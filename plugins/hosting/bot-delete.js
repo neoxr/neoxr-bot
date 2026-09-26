@@ -68,5 +68,6 @@ export const run = {
          return client.reply(m.chat, `An internal error occurred: ${error.message}`, m)
       }
    },
-   error: false
+   error: false,
+   limit: true
 }

@@ -1,5 +1,5 @@
 export const run = {
-   usage: ['profile', 'me'],
+   usage: ['me'],
    category: 'user',
    async: async (m, {
       client,
