@@ -1,0 +1,28 @@
+{
+   "name": "@neoxr/telegram",
+   "version": "6.0.0",
+   "description": "Simplicity Telegram Bot (Telegraf)",
+   "type": "module",
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/neoxr/neoxr-bot.git"
+   },
+   "keywords": [
+      "whattapp-bot",
+      "whatsapp-api",
+      "bot",
+      "whatsapp",
+      "wabot",
+      "baileys"
+   ],
+   "author": "Wildan Izzudin",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/neoxr/neoxr-bot/issues"
+   },
+   "homepage": "https://github.com/neoxr/neoxr-bot#readme",
+   "dependencies": {
+      "@neoxr/telegram": "^0.0.1",
+      "cfonts": "^3.3.1"
+   }
+}

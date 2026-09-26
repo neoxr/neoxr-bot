@@ -1,0 +1,15 @@
+{
+   "operator": "neoxr",
+   "operator_name": "Wildan Izzudin",
+   "database": "data",
+   "limit": 15,
+   "ram_limit": "900mb",
+   "cooldown": 1,
+   "timer": 180000,
+   "timeout": 1800000,
+   "hold_threshold": 2,
+   "permanent_threshold": 3,
+   "notify_threshold": 4,
+   "banned_threshold": 5,
+   "evaluate_chars":  ["=>", "~>", "<", ">", "$"]
+}
