@@ -1,0 +1,28 @@
+{
+  "name": "neoxr-bot",
+  "version": "5.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "yarn install --ignore-engines && yarn cache clean",
+    "start": "node .",
+    "test": "node test.js"
+  },
+  "author": "neoxr <neoxr@null.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@neoxr/store": "^0.0.6",
+    "@neoxr/zapo": "^1.0.0",
+    "@zapo-js/store-sqlite": "^1.2.0",
+    "better-sqlite3": "^13.0.3",
+    "cfonts": "3.1.1",
+    "cheerio": "~1.0.0-rc.5",
+    "html-entities": "^2.6.0",
+    "translate-google-api": "^1.0.4",
+    "yt-search": "^2.13.1",
+    "zapo-js": "^1.9.0"
+  },
+  "devDependencies": {
+    "pm2": "~7.0.3"
+  }
+}
