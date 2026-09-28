@@ -27,7 +27,7 @@ export const run = {
                )
             })
          } else if (/video/.test(mime)) {
-            if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
+            if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
             const buffer = await q.download()
             if (!buffer) return client.reply(m.chat, global.status.wrong, m)
             await client.sendReact(m.chat, '🕒', m.key)
@@ -45,7 +45,8 @@ export const run = {
             })
          } else client.reply(m.chat, Utils.texted('bold', `Stress ??`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

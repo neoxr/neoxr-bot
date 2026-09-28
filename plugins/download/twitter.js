@@ -5,17 +5,19 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       args,
       isPrefix,
       command,
       Utils
    }) => {
+      const [argumen] = args
       try {
-         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://twitter.com/mosidik/status/1475812845249957889?s=20'), m)
-         if (!args[0].match(/(x.com)/gi)) return client.reply(m.chat, global.status.invalid, m)
+         if (!args || !argumen) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://twitter.com/mosidik/status/1475812845249957889?s=20'), m)
+         if (!argumen.match(/(x.com)/gi)) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/twitter', {
-            url: args[0]
+            url: argumen
          })
          let old = new Date()
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
@@ -28,9 +30,10 @@ export const run = {
                })
             }
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

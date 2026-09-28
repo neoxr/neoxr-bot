@@ -4,7 +4,8 @@ export const run = {
    usage: ['fixdb'],
    category: 'owner',
    async: async (m, {
-      Utils
+      Utils,
+      setting
    }) => {
       try {
          const isObject = (item) => (item && typeof item === 'object' && !Array.isArray(item))
@@ -30,7 +31,7 @@ export const run = {
          if (Array.isArray(global.db.players)) global.db.players.forEach(p => validate(p, models.players))
          if (Array.isArray(global.db.groups)) global.db.groups.forEach(g => validate(g, models.groups))
          if (Array.isArray(global.db.chats)) global.db.chats.forEach(c => validate(c, models.chats))
-         if (global.db.setting) validate(global.db.setting, models.setting)
+         if (setting) validate(setting, models.setting)
 
          let pr = `✅ *Database successfully synchronized* :\n\n`
          pr += `┌  ◦  Users : ${global.db.users?.length || 0}\n`
@@ -41,7 +42,7 @@ export const run = {
          m.reply(pr)
       } catch (e) {
          console.error(e)
-         return m.reply(Utils.jsonFormat(e))
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

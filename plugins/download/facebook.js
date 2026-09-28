@@ -5,6 +5,7 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       args,
       isPrefix,
       command,
@@ -12,12 +13,13 @@ export const run = {
       Config,
       Utils
    }) => {
+      const [argumen] = args
       try {
-         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://fb.watch/7B5KBCgdO3'), m)
-         if (!args[0].match(/(?:https?:\/\/(web\.|www\.|m\.)?(facebook|fb)\.(com|watch)\S+)?$/)) return client.reply(m.chat, global.status.invalid, m)
+         if (!args || !argumen) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://fb.watch/7B5KBCgdO3'), m)
+         if (!argumen.match(/(?:https?:\/\/(web\.|www\.|m\.)?(facebook|fb)\.(com|watch)\S+)?$/)) return client.reply(m.chat, global.status.invalid, m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/fb', {
-            url: args[0]
+            url: argumen
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          let result = json.data.find(v => v.quality == 'HD' && v.response == 200)
@@ -36,9 +38,10 @@ export const run = {
             if (chSize.oversize) return client.reply(m.chat, isOver, m)
             client.sendFile(m.chat, result.url, Utils.filename('mp4'), `◦ *Quality* : SD`, m)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

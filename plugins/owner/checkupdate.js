@@ -16,16 +16,16 @@ export const run = [{
 
          logOutput = censorTextEmail(logOutput)
 
-         let message = `🚩 *LATEST UPDATE*\n\n${logOutput.trim()}`
+         let message = `❌ *LATEST UPDATE*\n\n${logOutput.trim()}`
 
          if (statusOutput.trim()) {
-            message += `\n\n🚩 *LOCAL CHANGES*\n\n${statusOutput.trim()}`
+            message += `\n\n❌ *LOCAL CHANGES*\n\n${statusOutput.trim()}`
          }
 
          client.reply(m.chat, message, m)
       } catch (e) {
-         const errorMessage = e.stderr || e.stdout || e.message || String(e)
-         client.reply(m.chat, `❌ Failed to fetch logs:\n\n${errorMessage}`, m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true
@@ -47,12 +47,12 @@ export const run = [{
 
          logOutput = censorTextEmail(logOutput)
 
-         const message = `🚩 *PENDING UPDATES*\n\n${logOutput.trim()}`
+         const message = `❌ *PENDING UPDATES*\n\n${logOutput.trim()}`
 
          client.reply(m.chat, message, m)
       } catch (e) {
-         const errorMessage = e.stderr || e.stdout || e.message || String(e)
-         client.reply(m.chat, `❌ Failed to check pending updates:\n\n${errorMessage}`, m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

@@ -9,6 +9,7 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
       text,
       isPrefix,
       command,
@@ -26,7 +27,7 @@ export const run = {
                fs.unlinkSync(filePath)
             })
          } catch {
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
          }
       } else if (text) {
          let lang = text.slice(0, 2)
@@ -38,9 +39,10 @@ export const run = {
                client.sendFile(m.chat, await Utils.fetchAsBuffer(filePath), 'audio.mp3', '', m)
                fs.unlinkSync(filePath)
             })
+         limitter()
          } catch (e) {
-            console.log(e)
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            console.error(e)
+            client.reply(m.chat, global.status.error, m)
          }
       }
    },

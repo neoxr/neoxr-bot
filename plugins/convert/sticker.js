@@ -7,6 +7,7 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
       setting: exif,
       store,
       Utils,
@@ -113,9 +114,10 @@ export const run = {
                }
             }
          }
+         limitter()
       } catch (e) {
          console.error(e)
-         return client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

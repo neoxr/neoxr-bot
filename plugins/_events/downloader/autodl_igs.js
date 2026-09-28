@@ -2,6 +2,7 @@ export const run = {
    regex: /^(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/)(?:stories\/)(?:\S+)?$/,
    async: async (m, {
       client,
+      limitter,
       body,
       users,
       Utils
@@ -16,14 +17,14 @@ export const run = {
                   let limit = 1
                   if (users.limit >= limit) {
                      users.limit -= limit
-                  } else return client.reply(m.chat, Utils.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
+                  } else return client.reply(m.chat, Utils.texted('bold', `❌ Your limit is not enough to use this feature.`), m)
                }
                client.sendReact(m.chat, '🕒', m.key)
                let old = new Date()
                Utils.hitstat('igs', m.sender)
                links.map(async link => {
                   const json = await Api.neoxr('/ig', {
-                  	url: link
+                     url: link
                   })
                   if (!json.status) return client.reply(m.chat, `${global.status.fail} : [ @${link.split('/')[4]} ]`, m)
                   for (let v of json.data) {
@@ -34,8 +35,10 @@ export const run = {
                })
             }
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    limit: true,

@@ -11,7 +11,7 @@ export const run = {
       try {
          return client.groupParticipantsUpdate(m.chat, [m.sender], 'promote').then(res => client.reply(m.chat, Utils.jsonFormat(res), m))
       } catch (e) {
-         console.log(e)
+         console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },

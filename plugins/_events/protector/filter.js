@@ -15,7 +15,7 @@ export const run = {
             if (body && (new RegExp('\\b' + toxic.join('\\b|\\b') + '\\b')).test(body.toLowerCase())) {
                groupSet.member[m.sender].warning += 1
                let warning = groupSet.member[m.sender].warning
-               if (warning > 4) return client.reply(m.chat, Utils.texted('bold', `🚩 Warning : [ 5 / 5 ], good bye ~~`), m).then(() => {
+               if (warning > 4) return client.reply(m.chat, Utils.texted('bold', `❌ Warning : [ 5 / 5 ], good bye ~~`), m).then(() => {
                   client.groupParticipantsUpdate(m.chat, [m.sender], 'remove').then(async () => {
                      groupSet.member[m.sender].warning = 0
                      client.sendMessage(m.chat, {
@@ -39,7 +39,8 @@ export const run = {
             }
          }
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    group: true

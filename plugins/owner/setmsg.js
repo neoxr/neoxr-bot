@@ -4,18 +4,20 @@ export const run = {
    category: 'owner',
    async: async (m, {
       client,
+      setting,
       text,
       isPrefix,
       command,
       Utils
    }) => {
       try {
-         let setting = global.db.setting
+         let setting = setting
          if (!text) return client.reply(m.chat, explain(isPrefix, command), m)
          setting.msg = text
-         client.reply(m.chat, Utils.texted('bold', `🚩 Menu Message successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ Menu Message successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

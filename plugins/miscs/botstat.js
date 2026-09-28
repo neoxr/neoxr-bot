@@ -104,4 +104,4 @@ const buildStatisticMessage = (Utils, stats, system) => {
    result += `\t◦  ${systemStats.replace(/\n/g, '\n\t◦  ')}\n\n`
    result += `${global.footer}`
    return result.trim()
-} 
+}

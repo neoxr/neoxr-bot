@@ -4,12 +4,15 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
+      setting,
       args,
       isPrefix,
       command,
       Utils,
       Scraper
    }) => {
+      const [argumen] = args
       try {
          let style = ["triangle","circle","pentagon","star","hexagon","octagon","spider","broken","love"]
          let print = `Use this feature based on the style below :\n\n`
@@ -23,9 +26,9 @@ export const run = {
             }
          }).join('\n')
          print += `\n\n${global.footer}`
-         if (!args || !args[0]) return client.sendFile(m.chat, 'https://iili.io/HtfsWdv.jpg', '', print, m)
-         if (!style.includes(args[0].toLowerCase())) return client.sendFile(m.chat, 'https://iili.io/HtfsWdv.jpg', '', print, m)
-         let exif = global.db.setting
+         if (!args || !argumen) return client.sendFile(m.chat, 'https://iili.io/HtfsWdv.jpg', '', print, m)
+         if (!style.includes(argumen.toLowerCase())) return client.sendFile(m.chat, 'https://iili.io/HtfsWdv.jpg', '', print, m)
+         let exif = setting
          client.sendReact(m.chat, '🕒', m.key)
          if (m.quoted ? m.quoted.message : m.msg.viewOnce) {
             let type = m.quoted ? Object.keys(m.quoted.message)[0] : m.mtype
@@ -35,24 +38,24 @@ export const run = {
                let json = await Scraper.uploadImage(img)
                let res = await Api.neoxr('/cropshape', {
                   image: json.data.url,
-                  style: args[0].toLowerCase()
+                  style: argumen.toLowerCase()
                })
                if (!res.status) return m.reply(Utils.jsonFormat(res))
                client.sendSticker(m.chat, res.data.url, m, {
                   packname: exif.sk_pack,
                   author: exif.sk_author
                })
-            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `❌ Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
             let img = await q.download()
             let json = await Scraper.uploadImage(img)
             let res = await Api.neoxr('/cropshape', {
                image: json.data.url,
-               style: args[0].toLowerCase()
+               style: argumen.toLowerCase()
             })
             if (!res.status) return m.reply(Utils.jsonFormat(res))
             client.sendSticker(m.chat, res.data.url, m, {
@@ -60,8 +63,10 @@ export const run = {
                author: exif.sk_author
             })
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

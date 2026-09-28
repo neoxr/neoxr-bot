@@ -4,13 +4,15 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
+      setting,
       isPrefix,
       command,
       Utils,
       Scraper
    }) => {
       try {
-         let exif = global.db.setting
+         let exif = setting
          if (m.quoted ? m.quoted.message : m.msg.viewOnce) {
             let type = m.quoted ? Object.keys(m.quoted.message)[0] : m.mtype
             let q = m.quoted ? m.quoted.message[type] : m.msg
@@ -26,12 +28,12 @@ export const run = {
                   packname: exif.sk_pack,
                   author: exif.sk_author
                })
-            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `❌ Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
             client.sendReact(m.chat, '🕒', m.key)
             let img = await q.download()
             let image = await Scraper.uploadImageV2(img)
@@ -44,8 +46,10 @@ export const run = {
                author: exif.sk_author
             })
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

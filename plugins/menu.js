@@ -63,7 +63,7 @@ export const run = {
                         })
                   }
                })
-               print += commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `	◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
+               print += commands.sort((a, b) => a.usage.localeCompare(b.usage)).map(v => `   ◦  ${isPrefix + v.usage} ${v.use}`).join('\n')
             }
             client.sendMessageModify(m.chat, Utils.Styles(print) + '\n\n' + global.footer, m, {
                ads: false,
@@ -441,7 +441,8 @@ export const run = {
             }
          }
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

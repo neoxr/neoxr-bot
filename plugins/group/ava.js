@@ -20,15 +20,15 @@ export const run = {
             }
          }
 
-         if (!user) return client.reply(m.chat, Utils.texted('bold', '🚩 Mention, reply, or enter a valid number target.'), m)
+         if (!user) return client.reply(m.chat, Utils.texted('bold', '❌ Mention, reply, or enter a valid number target.'), m)
 
          const avatar = await client.profilePictureUrl(user, 'image').catch(() => null)
-         if (!avatar) return client.reply(m.chat, Utils.texted('bold', "🚩 Target didn't put a profile picture."), m)
+         if (!avatar) return client.reply(m.chat, Utils.texted('bold', "❌ Target didn't put a profile picture."), m)
 
          client.sendFile(m.chat, avatar, '', '', m)
       } catch (e) {
          console.error(e)
-         return client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

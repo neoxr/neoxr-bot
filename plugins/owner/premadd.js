@@ -10,6 +10,7 @@ export const run = {
       command,
       Utils
    }) => {
+      const [argumen] = args
       const parseDuration = (input) => {
          const getUnitName = (unitChar, value) => {
             switch (unitChar) {
@@ -74,11 +75,11 @@ export const run = {
          let user = global.db.users
 
          if (m.quoted) {
-            if (m.quoted.isBot) return client.reply(m.chat, Utils.texted('bold', `🚩 Cannot make the bot a premium user.`), m)
+            if (m.quoted.isBot) return client.reply(m.chat, Utils.texted('bold', `❌ Cannot make the bot a premium user.`), m)
 
-            const parsedDuration = parseDuration(args[0])
+            const parsedDuration = parseDuration(argumen)
             if (!parsedDuration) {
-               return client.reply(m.chat, Utils.texted('bold', `🚩 Invalid duration format. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
+               return client.reply(m.chat, Utils.texted('bold', `❌ Invalid duration format. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
             }
 
             let durationMs = parsedDuration.ms
@@ -95,7 +96,7 @@ export const run = {
          } else if (m.mentionedJid.length != 0) {
             const parsedDuration = parseDuration(args[1])
             if (!parsedDuration) {
-               return client.reply(m.chat, Utils.texted('bold', `🚩 Invalid duration format. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
+               return client.reply(m.chat, Utils.texted('bold', `❌ Invalid duration format. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
             }
 
             let durationMs = parsedDuration.ms
@@ -111,11 +112,11 @@ export const run = {
          } else if (text && /\|/.test(text)) {
             let [number, durationInput] = text.split`|`
             let p = (await client.onWhatsApp(String(number).startsWith('0') ? '62' + String(number).slice(1) : number.startsWith('+') ? number.match(/\d+/g).join('') : number))[0] || {}
-            if (!p.exists) return client.reply(m.chat, Utils.texted('bold', '🚩 Number not registered on WhatsApp.'), m)
+            if (!p.exists) return client.reply(m.chat, Utils.texted('bold', '❌ Number not registered on WhatsApp.'), m)
 
             const parsedDuration = parseDuration(durationInput)
             if (!parsedDuration) {
-               return client.reply(m.chat, Utils.texted('bold', `🚩 Invalid duration format for the duration input. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
+               return client.reply(m.chat, Utils.texted('bold', `❌ Invalid duration format for the duration input. Use examples: '30d', '1h', '5m', '10s' or just a number for days.`), m)
             }
 
             let durationMs = parsedDuration.ms
@@ -124,12 +125,12 @@ export const run = {
 
             let jid = client.decodeJid(p.jid)
             const users = user.find(v => v.jid == jid)
-            if (!users) return client.reply(m.chat, Utils.texted('bold', `🚩 Could not find user data.`), m)
+            if (!users) return client.reply(m.chat, Utils.texted('bold', `❌ Could not find user data.`), m)
 
             users.limit += 1000
             users.expired += users.premium ? durationMs : ((new Date() * 1) + durationMs)
 
-            client.reply(m.chat, users.premium ? Utils.texted('bold', `🚩 Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `🚩 Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m).then(() => users.premium = true)
+            client.reply(m.chat, users.premium ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m).then(() => users.premium = true)
 
          } else {
             let teks = `• *Usage Example* :\n\n`
@@ -142,7 +143,7 @@ export const run = {
          }
       } catch (e) {
          console.error(e)
-         client.reply(m.chat, Utils.texted('bold', `🚩 User does not exist in the database or an error occurred.`), m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

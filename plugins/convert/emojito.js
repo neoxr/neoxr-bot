@@ -4,27 +4,32 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
+      setting,
       args,
       isPrefix,
       command,
       Utils
    }) => {
+      const [argumen] = args
       try {
-         let exif = global.db.setting
-         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, '😳'), m)
+         let exif = setting
+         if (!args || !argumen) return client.reply(m.chat, Utils.example(isPrefix, command, '😳'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/emojito', {
-            q: args[0]
+            q: argumen
          })
-         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${json.msg}`), m)
+         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `❌ ${json.msg}`), m)
          const buffer = await Utils.fetchAsBuffer(json.data.url)
          client.sendSticker(m.chat, buffer, m, {
             packname: exif.sk_pack,
             author: exif.sk_author,
-            categories: [args[0]]
+            categories: [argumen]
          })
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

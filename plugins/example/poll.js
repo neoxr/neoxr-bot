@@ -16,7 +16,8 @@ export const run = {
             votes
          }, m)
       } catch (e) {
-         m.reply(Utils.jsonFormat(e))
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

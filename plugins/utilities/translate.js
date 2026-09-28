@@ -22,7 +22,7 @@ export const run = {
             })
             client.reply(m.chat, result[0], m)
          } catch {
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
          }
       } else if (text) {
          let lang = text.slice(0, 2)
@@ -33,7 +33,7 @@ export const run = {
             })
             client.reply(m.chat, result[0], m)
          } catch {
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
          }
       }
    },

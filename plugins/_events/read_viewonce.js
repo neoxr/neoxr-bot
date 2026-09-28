@@ -1,5 +1,5 @@
 /*
- * IMPORTANT: 
+ * IMPORTANT:
  * This feature requires the orignal baileys library to function.
  * Please refer to this PR for further information and updates:
  * https://github.com/WhiskeySockets/Baileys/pull/2201
@@ -35,6 +35,7 @@ export const run = {
          }
       } catch (e) {
          console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

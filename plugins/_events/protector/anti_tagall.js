@@ -8,7 +8,8 @@ export const run = {
       try {
          if (!isOwner && !isAdmin && (m?.mentionedJid?.length > 10 || m.message?.[m.mtype || 'none']?.contextInfo?.nonJidMentions)) return client.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

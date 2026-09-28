@@ -11,14 +11,15 @@ export const run = {
       try {
          const q = m.quoted ? m.quoted : m
          const mime = (q.msg || q).mimetype || ''
-         if (!/image/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Image not found.`), m)
+         if (!/image/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Image not found.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const buffer = await cropToLandscapeBuffer(await q.download())
          if (!buffer) throw new Error(global.status.wrong)
          setting.cover = Buffer.from(buffer).toString('base64')
-         client.reply(m.chat, Utils.texted('bold', `🚩 Cover successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ Cover successfully set.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

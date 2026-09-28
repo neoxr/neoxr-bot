@@ -33,10 +33,11 @@ export const run = {
                   }
                ]
             })
-            client.reply(m.chat, Utils.texted('bold', `🚩 Profile photo has been successfully changed.`), m)
-         } else return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to the photo that will be made into the bot's profile photo.`), m)
+            client.reply(m.chat, Utils.texted('bold', `✅ Profile photo has been successfully changed.`), m)
+         } else return client.reply(m.chat, Utils.texted('bold', `❌ Reply to the photo that will be made into the bot's profile photo.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

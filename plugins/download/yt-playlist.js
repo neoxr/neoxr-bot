@@ -5,6 +5,7 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       args,
       isPrefix,
       command,
@@ -13,26 +14,27 @@ export const run = {
       Config,
       Utils
    }) => {
+      const [argumen] = args
       try {
          client.ytplaylist = client.ytplaylist ? client.ytplaylist : []
-         if (!args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.youtube.com/playlist?list=PLFIM0718LjIW-XBdVOerYgKegBtD6rSfD'), m)
+         if (!argumen) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.youtube.com/playlist?list=PLFIM0718LjIW-XBdVOerYgKegBtD6rSfD'), m)
          const check = client.ytplaylist.find(v => v.jid == m.sender)
-         if (/get?(mp4|mp3)/.test(command) && !check && !isNaN(args[0])) return m.reply(Utils.texted('bold', `🚩 Your session has expired / does not exist, do another search using the keywords you want.`))
-         if (/get?(mp4|mp3)/.test(command) && check && !isNaN(args[0])) {
-            if (Number(args[0]) > check.results.length) return m.reply(Utils.texted('bold', `🚩 Exceed amount of data.`))
+         if (/get?(mp4|mp3)/.test(command) && !check && !isNaN(argumen)) return m.reply(Utils.texted('bold', `❌ Your session has expired / does not exist, do another search using the keywords you want.`))
+         if (/get?(mp4|mp3)/.test(command) && check && !isNaN(argumen)) {
+            if (Number(argumen) > check.results.length) return m.reply(Utils.texted('bold', `❌ Exceed amount of data.`))
             client.sendReact(m.chat, '🕒', m.key)
             if (command === 'getmp3') {
                var json = await Api.neoxr('/youtube', {
-                  url: check.results[Number(args[0]) - 1],
+                  url: check.results[Number(argumen) - 1],
                   type: 'audio',
                   quality: '128kbps'
                })
                if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
                let caption = `乂  *Y T - P L A Y*\n\n`
-               caption += `	◦  *Title* : ${json.title}\n`
-               caption += `	◦  *Size* : ${json.data.size}\n`
-               caption += `	◦  *Duration* : ${json.duration}\n`
-               caption += `	◦  *Bitrate* : ${json.data.quality}\n\n`
+               caption += `   ◦  *Title* : ${json.title}\n`
+               caption += `   ◦  *Size* : ${json.data.size}\n`
+               caption += `   ◦  *Duration* : ${json.duration}\n`
+               caption += `   ◦  *Bitrate* : ${json.data.quality}\n\n`
                caption += global.footer
                const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
                const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
@@ -54,23 +56,23 @@ export const run = {
                })
             } else if (command === 'getmp4') {
                var json = await Api.neoxr('/youtube', {
-                  url: check.results[Number(args[0]) - 1],
+                  url: check.results[Number(argumen) - 1],
                   type: 'video',
                   quality: '720p'
                })
                if (!json.status) {
                   var json = await Api.neoxr('/youtube', {
-                     url: check.results[Number(args[0]) - 1],
+                     url: check.results[Number(argumen) - 1],
                      type: 'video',
                      quality: '480p'
                   })
                }
                if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
                let caption = `乂  *Y T - M P 4*\n\n`
-               caption += `	◦  *Title* : ${json.title}\n`
-               caption += `	◦  *Size* : ${json.data.size}\n`
-               caption += `	◦  *Duration* : ${json.duration}\n`
-               caption += `	◦  *Quality* : ${json.data.quality}\n\n`
+               caption += `   ◦  *Title* : ${json.title}\n`
+               caption += `   ◦  *Size* : ${json.data.size}\n`
+               caption += `   ◦  *Duration* : ${json.duration}\n`
+               caption += `   ◦  *Quality* : ${json.data.quality}\n\n`
                caption += global.footer
                const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
                const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
@@ -95,7 +97,7 @@ export const run = {
          } else if (['ytplaylist', 'playlist', 'ytlist'].includes(command)) {
             client.sendReact(m.chat, '🕒', m.key)
             const json = await Api.neoxr('/yt-playlist', {
-               url: args[0]
+               url: argumen
             })
             if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
             if (!check) {
@@ -120,8 +122,10 @@ export const run = {
                Utils.removeItem(client.ytplaylist, session)
             }
          }, 60_000)
+         limitter()
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

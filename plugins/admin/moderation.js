@@ -10,20 +10,22 @@ export const run = {
       isBotAdmin,
       Utils
    }) => {
+      const [argumen] = args
       try {
          let setting = global.db.groups.find(v => v.jid == m.chat)
          let type = command.toLowerCase()
          if (!isBotAdmin && /antilink|antivirtex|filter|localonly|antitagsw/.test(type)) return client.reply(m.chat, global.status.botAdmin, m)
-         if (!args || !args[0]) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
-         let option = args[0].toLowerCase()
+         if (!args || !argumen) return client.reply(m.chat, `❌ *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
+         let option = argumen.toLowerCase()
          let optionList = ['on', 'off']
-         if (!optionList.includes(option)) return client.reply(m.chat, `🚩 *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
+         if (!optionList.includes(option)) return client.reply(m.chat, `❌ *Current status* : [ ${setting[type] ? 'ON' : 'OFF'} ] (Enter *On* or *Off*)`, m)
          let status = option != 'on' ? false : true
-         if (setting[type] == status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
+         if (setting[type] == status) return client.reply(m.chat, Utils.texted('bold', `✅ ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} previously.`), m)
          setting[type] = status
-         client.reply(m.chat, Utils.texted('bold', `🚩 ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    admin: true,

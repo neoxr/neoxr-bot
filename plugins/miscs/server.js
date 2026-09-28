@@ -11,10 +11,10 @@ export const run = {
          const json = await Utils.fetchAsJSON('http://ip-api.com/json')
          delete json.status
          delete json.query
-         
+
          const memoryUsage = getMemoryStats()
          const cpuUsage = await getCpuPercentage()
-         
+
          let caption = `┌  ◦  Directory : ${process.cwd()}\n`
          caption += `│  ◦  OS : ${os.type()} (${os.arch()} / ${os.release()})\n`
          caption += `│  ◦  Node : ${process.version}\n`
@@ -30,7 +30,7 @@ export const run = {
          caption += `│  ◦  Platform : ${os.platform()}\n`
          caption += `│  ◦  Uptime : ${Utils.toTime(os.uptime() * 1000)}\n`
          caption += `└  ◦  Processor : ${os.cpus()[0].model}\n\n`
-         
+
          client.sendIAMessage(m.chat, [{
             name: 'inapp_signup',
             buttonParamsJson: JSON.stringify({})
@@ -39,7 +39,8 @@ export const run = {
             content: caption.trim()
          })
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

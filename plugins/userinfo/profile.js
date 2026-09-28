@@ -23,10 +23,10 @@ export const run = {
             }
          }
 
-         if (!user) return client.reply(m.chat, Utils.texted('bold', '🚩 Mention, reply, or enter a valid number target.'), m)
+         if (!user) return client.reply(m.chat, Utils.texted('bold', '❌ Mention, reply, or enter a valid number target.'), m)
 
          const target = global.db.users.get(user)
-         if (!target) return client.reply(m.chat, Utils.texted('bold', "🚩 Can't find user data."), m)
+         if (!target) return client.reply(m.chat, Utils.texted('bold', "❌ Can't find user data."), m)
 
          const avatar = await client.profilePicture(user).catch(() => null)
          const blocked = blockList.includes(user)
@@ -57,7 +57,7 @@ export const run = {
          })
       } catch (e) {
          console.error(e)
-         return client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

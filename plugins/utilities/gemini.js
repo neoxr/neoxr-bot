@@ -4,6 +4,7 @@ export const run = {
    category: 'utilities',
    async: async (m, {
       client,
+      limitter,
       text,
       isPrefix,
       command,
@@ -17,8 +18,10 @@ export const run = {
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          client.reply(m.chat, json.data.message, m)
+         limitter()
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

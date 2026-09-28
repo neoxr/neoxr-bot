@@ -4,16 +4,18 @@ export const run = {
    category: 'utilities',
    async: async (m, {
       client,
+      limitter,
+      setting,
       command,
       Utils,
       Scraper
    }) => {
       try {
-         let exif = global.db.setting
-         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to sticker you want to ${command.toLowerCase()}.`), m)
+         let exif = setting
+         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `❌ Reply to sticker you want to ${command.toLowerCase()}.`), m)
          let q = m.quoted ? m.quoted : m
          let mime = (q.msg || q).mimetype || ''
-         if (!/webp/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to sticker you want to ${command.toLowerCase()}.`), m)
+         if (!/webp/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Reply to sticker you want to ${command.toLowerCase()}.`), m)
          let buffer = await q.download()
          const file = await Scraper.uploadImageV2(buffer)
          if (!file.status) return m.reply(Utils.jsonFormat(file))
@@ -26,8 +28,10 @@ export const run = {
             packname: exif.sk_pack,
             author: exif.sk_author
          })
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, global.status.error, m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

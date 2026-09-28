@@ -2,6 +2,7 @@ export const run = {
    regex: /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/,
    async: async (m, {
       client,
+      limitter,
       body,
       users,
       setting,
@@ -18,7 +19,7 @@ export const run = {
                   let limit = 1
                   if (users.limit >= limit) {
                      users.limit -= limit
-                  } else return client.reply(m.chat, Utils.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
+                  } else return client.reply(m.chat, Utils.texted('bold', `❌ Your limit is not enough to use this feature.`), m)
                }
                client.sendReact(m.chat, '🕒', m.key)
                let old = new Date()
@@ -38,10 +39,10 @@ export const run = {
                   }
                   if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
                   let caption = `乂  *Y T - M P 4*\n\n`
-                  caption += `	◦  *Title* : ${json.title}\n`
-                  caption += `	◦  *Size* : ${json.data.size}\n`
-                  caption += `	◦  *Duration* : ${json.duration}\n`
-                  caption += `	◦  *Quality* : ${json.data.quality}\n\n`
+                  caption += `   ◦  *Title* : ${json.title}\n`
+                  caption += `   ◦  *Size* : ${json.data.size}\n`
+                  caption += `   ◦  *Duration* : ${json.duration}\n`
+                  caption += `   ◦  *Quality* : ${json.data.quality}\n\n`
                   caption += global.footer
                   const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
                   const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
@@ -63,9 +64,10 @@ export const run = {
                })
             }
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, global.status.error, m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    limit: true,

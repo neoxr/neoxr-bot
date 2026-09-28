@@ -5,6 +5,7 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       args,
       text,
       isPrefix,
@@ -31,7 +32,9 @@ export const run = {
             const imgUrl = Utils.random(json.data)
             client.sendFile(m.chat, imgUrl, '', '', m)
          }
-      } catch {
+         limitter()
+      } catch (e) {
+         console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },

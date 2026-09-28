@@ -5,6 +5,7 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       text,
       isPrefix,
       command,
@@ -20,10 +21,10 @@ export const run = {
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          let caption = `乂  *Y T - V I D E O*\n\n`
-         caption += `	◦  *Title* : ${json.title}\n`
-         caption += `	◦  *Size* : ${json.data.size}\n`
-         caption += `	◦  *Duration* : ${json.duration}\n`
-         caption += `	◦  *Bitrate* : ${json.data.quality}\n\n`
+         caption += `   ◦  *Title* : ${json.title}\n`
+         caption += `   ◦  *Size* : ${json.data.size}\n`
+         caption += `   ◦  *Duration* : ${json.duration}\n`
+         caption += `   ◦  *Bitrate* : ${json.data.quality}\n\n`
          caption += global.footer
          const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
          const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
@@ -35,8 +36,10 @@ export const run = {
             jpegThumbnail: await Utils.generateImageThumbnail(json.thumbnail)
          })
          client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
+         limitter()
       } catch (e) {
-         client.reply(m.chat, UtilsjsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

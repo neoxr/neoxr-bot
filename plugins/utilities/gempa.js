@@ -11,12 +11,12 @@ export const run = {
          let json = await Api.neoxr('/gempa')
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          let caption = `乂  *G E M P A*\n\n`
-         caption += `	◦  *Lintang* : ${json.data.lintang}\n`
-         caption += `	◦  *Bujur* : ${json.data.bujur}\n`
-         caption += `	◦  *Skala* : ${json.data.magnitudo}\n`
-         caption += `	◦  *Kedalaman* : ${json.data.kedalaman}\n`
-         caption += `	◦  *Waktu* : ${json.data.waktu}\n`
-         caption += `	◦  *Pusat Gempa* : ${json.data.wilayah}\n\n`
+         caption += `   ◦  *Lintang* : ${json.data.lintang}\n`
+         caption += `   ◦  *Bujur* : ${json.data.bujur}\n`
+         caption += `   ◦  *Skala* : ${json.data.magnitudo}\n`
+         caption += `   ◦  *Kedalaman* : ${json.data.kedalaman}\n`
+         caption += `   ◦  *Waktu* : ${json.data.waktu}\n`
+         caption += `   ◦  *Pusat Gempa* : ${json.data.wilayah}\n\n`
          caption += global.footer
          client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
@@ -27,7 +27,8 @@ export const run = {
             icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

@@ -4,26 +4,29 @@ export const run = {
    category: 'downloader',
    async: async (m, {
       client,
+      limitter,
       args,
       isPrefix,
       command,
       Utils
    }) => {
+      const [argumen] = args
       try {
-         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.threads.net/@httpnald_/post/CwWvCFvJr_N/?igshid=NTc4MTIwNjQ2YQ=='), m)
+         if (!args || !argumen) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.threads.net/@httpnald_/post/CwWvCFvJr_N/?igshid=NTc4MTIwNjQ2YQ=='), m)
          client.sendReact(m.chat, '🕒', m.key)
          let old = new Date()
          const json = await Api.neoxr('/threads', {
-            url: args[0]
+            url: argumen
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
          for (let v of json.data) {
             client.sendFile(m.chat, v.url, v.type == 'mp4' ? Utils.filename('mp4') : Utils.filename('jpg'), `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
             await Utils.delay(1500)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

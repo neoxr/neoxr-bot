@@ -5,9 +5,15 @@ export const run = {
       client,
       text
    }) => {
-      let number = m.quoted ? (m.quoted.sender).split`@` [0] : (m.sender).split`@` [0]
-      let chat = text ? text : 'hai'
-      client.reply(m.chat, `https://wa.me/${number}?text=${encodeURI(chat)}`, m)
+      try {
+         let number = m.quoted ? (m.quoted.sender).split`@` [0] : (m.sender).split`@` [0]
+         let chat = text ? text : 'hai'
+         client.reply(m.chat, `https://wa.me/${number}?text=${encodeURI(chat)}`, m)
+
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
+      }
    },
    error: false
 }

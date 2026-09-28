@@ -107,7 +107,7 @@ export const run = {
                         name: "cta_url",
                         buttonParamsJson: JSON.stringify({
                            display_text: 'Community',
-                           url: global.db.setting.link,
+                           url: setting.link,
                            webview_presentation: null
                         })
                      }]
@@ -344,7 +344,8 @@ export const run = {
                break
          }
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

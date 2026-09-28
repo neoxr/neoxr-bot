@@ -9,14 +9,20 @@ export const run = {
       command,
       Utils
    }) => {
-      let value = m.quoted ? m.quoted.text : text
-      if (command == 'setname') {
-         if (!value) return client.reply(m.chat, Utils.example(isPrefix, command, 'CHATBOT'), m)
-         if (value > 25) return client.reply(m.chat, Utils.texted('bold', `🚩 Text is too long, maximum 25 character.`), m)
-         await client.groupUpdateSubject(m.chat, value)
-      } else if (command == 'setdesc') {
-     	if (!value) return client.reply(m.chat, Utils.example(isPrefix, command, `Follow the rules if you don't want to be kicked.`), m)
-         await client.groupUpdateDescription(m.chat, value)
+      try {
+         let value = m.quoted ? m.quoted.text : text
+         if (command == 'setname') {
+            if (!value) return client.reply(m.chat, Utils.example(isPrefix, command, 'CHATBOT'), m)
+            if (value > 25) return client.reply(m.chat, Utils.texted('bold', `❌ Text is too long, maximum 25 character.`), m)
+            await client.groupUpdateSubject(m.chat, value)
+         } else if (command == 'setdesc') {
+           if (!value) return client.reply(m.chat, Utils.example(isPrefix, command, `Follow the rules if you don't want to be kicked.`), m)
+            await client.groupUpdateDescription(m.chat, value)
+         }
+
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    group: true,

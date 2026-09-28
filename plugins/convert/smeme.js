@@ -4,6 +4,8 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
+      limitter,
+      setting,
       text,
       isPrefix,
       command,
@@ -11,7 +13,7 @@ export const run = {
       Scraper
    }) => {
       try {
-         let exif = global.db.setting
+         let exif = setting
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'Hi | Dude'), m)
          client.sendReact(m.chat, '🕒', m.key)
          let [top, bottom] = text.split`|`
@@ -26,12 +28,12 @@ export const run = {
                   packname: exif.sk_pack,
                   author: exif.sk_author
                })
-            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `❌ Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
             let img = await q.download()
             let json = await Scraper.uploadImageV2(img)
             let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
@@ -40,8 +42,10 @@ export const run = {
                author: exif.sk_author
             })
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

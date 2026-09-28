@@ -4,21 +4,23 @@ export const run = {
    category: 'owner',
    async: async (m, {
       client,
+      setting,
       text,
       isPrefix,
       command,
       Utils
    }) => {
       try {
-         let setting = global.db.setting
+         let setting = setting
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'Sticker by | @neoxrs'), m)
          let [packname, ...author] = text.split`|`
          author = (author || []).join`|`
          setting.sk_pack = packname || ''
          setting.sk_author = author || ''
-         client.reply(m.chat, Utils.texted('bold', `🚩 Sticker Watermark successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ Sticker Watermark successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true
