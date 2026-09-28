@@ -264,7 +264,27 @@ export default async (client, ctx) => {
                client.reply(m.chat, global.status.private, m)
                continue
             }
-            cmd.async(m, { client, args, text, isPrefix: prefix, prefixes, command, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper })
+
+            const pluginParams = { client, args, text, isPrefix: prefix, prefixes, command, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper }
+
+            if (limitCost > 0) {
+               const reservation = { cost: limitCost, committed: false }
+               users.limit -= limitCost
+
+               pluginParams.limitter = () => { reservation.committed = true }
+
+               cmd.async(m, pluginParams)
+                  .catch(e => {
+                     console.error(e)
+                     client.reply(m.chat, global.status.error, m)
+                  })
+                  .finally(() => {
+                     if (!reservation.committed) users.limit += reservation.cost // rollback kalau tidak commit
+                  })
+            } else {
+               cmd.async(m, pluginParams)
+            }
+
             break
          }
       } else {
@@ -299,7 +319,12 @@ export default async (client, ctx) => {
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue
             if (event.download && body && Utils.socmed(body) && !setting.autodownload && Utils.generateLink(body) && Utils.generateLink(body).some(v => Utils.socmed(v))) continue
-            event.async(m, { client, body, prefixes, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper })
+
+            const limitter = event.limit ? () => users.limit -= 1 : () => { }
+            event.async(m, { client, body, prefixes, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper, limitter }).catch(e => {
+               console.error(e)
+               client.reply(m.chat, global.status.error, m)
+            })
          }
       }
    } catch (e) {
