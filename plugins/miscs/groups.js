@@ -9,6 +9,7 @@ export const run = {
       isPrefix,
       Utils
    }) => {
+      try {
       let group = global.db.groups
       if (!group) group = []
 
@@ -49,7 +50,11 @@ export const run = {
       caption += groupDetails
       caption += `\n\n${global.footer}`
 
-      m.reply(caption)
+      m.reply(caption)
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
+      }
    },
    error: false
 }

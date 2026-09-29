@@ -6,19 +6,21 @@ export const run = {
    category: 'converter',
    async: async (m, {
       client,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
-         if (!/sticker/gis.test(m?.quoted?.mtype)) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply to sticker or video you want to convert to an image/photo (not supported for sticker animation).`), m)
-         if (/lottie/gis.test(m?.quoted?.mtype)) return client.reply(m.chat, Utils.texted('bold', `🚩 Lottie Sticker is not supported.`), m)
+         if (!/sticker/gis.test(m?.quoted?.mtype)) return client.reply(m.chat, Utils.texted('bold', `❌ Reply to sticker or video you want to convert to an image/photo (not supported for sticker animation).`), m)
+         if (/lottie/gis.test(m?.quoted?.mtype)) return client.reply(m.chat, Utils.texted('bold', `❌ Lottie Sticker is not supported.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const buffer = await sharp(await m.quoted.download())
             .png()
             .toBuffer()
          client.sendFile(m.chat, buffer, '', '', m)
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

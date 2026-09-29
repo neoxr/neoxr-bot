@@ -12,7 +12,7 @@ export const run = {
       Utils
    }) => {
       try {
-         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply viewonce message to use this command.`), m)
+         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `❌ Reply viewonce message to use this command.`), m)
          await client.sendReact(m.chat, '🕒', m.key)
          const type = m.quoted?.message ? Object.keys(m.quoted.message)?.[0] : m.quoted?.mimetype
          if (m.quoted && m.quoted?.message) {
@@ -26,7 +26,7 @@ export const run = {
                const result = Utils.filename('mp3')
                exec(`ffmpeg -i ${media} -vn -ar 44100 -ac 2 -b:a 128k ${result}`, async (err, stderr, stdout) => {
                   remove(media)
-                  if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
+                  if (err) return client.reply(m.chat, Utils.texted('bold', `❌ Conversion failed.`), m)
                   let buff = read(result)
                   client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
                      remove(result)
@@ -43,7 +43,7 @@ export const run = {
                const result = Utils.filename('mp3')
                exec(`ffmpeg -i ${media} -vn -ar 44100 -ac 2 -b:a 128k ${result}`, async (err, stderr, stdout) => {
                   remove(media)
-                  if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
+                  if (err) return client.reply(m.chat, Utils.texted('bold', `❌ Conversion failed.`), m)
                   let buff = read(result)
                   client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
                      remove(result)

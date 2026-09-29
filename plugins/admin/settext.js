@@ -10,18 +10,23 @@ export const run = {
       command,
       Utils
    }) => {
+      try {
       let setup = global.db.groups.find(v => v.jid == m.chat)
       if (command == 'setwelcome') {
          if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
          setup.text_welcome = text
-         await client.reply(m.chat, Utils.texted('bold', `🚩 Successfully set.`), m)
+         await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
       } else if (/set(out|left)/i.test(command)) {
          if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
          setup.text_left = text
-         await client.reply(m.chat, Utils.texted('bold', `🚩 Successfully set.`), m)
+         await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
+      }
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
-   admin: true
+   error: true
 }
 
 const formatWel = (prefix, command) => {

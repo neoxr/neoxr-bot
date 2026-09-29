@@ -8,9 +8,10 @@ export const run = {
     blockList,
     Utils
   }) => {
+      try {
     if (command === 'listban') {
       const data = global.db.users.filter(v => v.banned)
-      if (data.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
+      if (data.length < 1) return m.reply(Utils.texted('bold', `❌ Data empty.`))
       let text = `乂  *L I S T B A N*\n\n`
       text += data.map((v, i) => {
         if (i == 0) {
@@ -25,12 +26,12 @@ export const run = {
     } else if (command === 'listprem') {
       if (!isOwner) return m.reply(global.status.owner)
       const data = global.db.users.filter(v => v.premium)
-      if (data.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
+      if (data.length < 1) return m.reply(Utils.texted('bold', `❌ Data empty.`))
       let text = `乂  *L I S T P R E M*\n\n`
       text += data.map((v, i) => '   ┌ @' + client.decodeJid(v.jid).replace(/@.+/, '') + '\n   │ ' + Utils.texted('bold', 'Hitstat') + ' : ' + Utils.formatNumber(v.hit) + '\n   └ ' + Utils.texted('bold', 'Expired') + ' : ' + Utils.timeReverse(v.expired - new Date() * 1)).join`\n\n`
       m.reply(text + '\n\n' + global.footer)
     } else if (command === 'listblock') {
-      if (blockList.length < 1) return m.reply(Utils.texted('bold', `🚩 Data empty.`))
+      if (blockList.length < 1) return m.reply(Utils.texted('bold', `❌ Data empty.`))
       let text = `乂 *L I S T B L O C K*\n\n`
       text += blockList.map((v, i) => {
         if (i == 0) {
@@ -43,6 +44,10 @@ export const run = {
       }).join('\n')
       m.reply(text + '\n\n' + global.footer)
     }
+     } catch (e) {
+        console.error(e)
+        client.reply(m.chat, global.status.error, m)
+     }
   },
   error: false
 }

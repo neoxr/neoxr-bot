@@ -17,11 +17,11 @@ export const run = {
             user = validate.jid_format
          }
 
-         if (!user) return client.reply(m.chat, Utils.texted('bold', '🚩 Mention, reply, or enter a valid number target.'), m)
+         if (!user) return client.reply(m.chat, Utils.texted('bold', '❌ Mention, reply, or enter a valid number target.'), m)
 
          if (!participants.some(v =>
             v.id == user || v.lid == user
-         ) && ['kick'].includes(command)) return client.reply(m.chat, Utils.texted('bold', `🚩 Target already left or does not exist in this group.`), m)
+         ) && ['kick'].includes(command)) return client.reply(m.chat, Utils.texted('bold', `❌ Target already left or does not exist in this group.`), m)
 
          if (['kick', 'promote', 'demote'].includes(command)) {
             const [json] = await client.groupParticipantsUpdate(m.chat, [user], command === 'kick' ? 'remove' : command)

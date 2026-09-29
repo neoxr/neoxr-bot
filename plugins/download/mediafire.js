@@ -13,7 +13,8 @@ export const run = {
       users,
       setting,
       Config,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.mediafire.com/file/1fqjqg7e8e2v3ao/YOWA.v8.87_By.SamMods.apk/file'), m)
@@ -42,9 +43,10 @@ export const run = {
          }).then(async () => {
             client.sendFile(m.chat, json.data.url, unescape(decode(json.data.title)), '', m)
          })
+         limitter()
       } catch (e) {
-         console.log(e)
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

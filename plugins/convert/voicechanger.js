@@ -10,10 +10,11 @@ export const run = {
    async: async (m, {
       client,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
-         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply audio to use this command.`), m)
+         if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `❌ Reply audio to use this command.`), m)
          let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
          let set
          if (/bass/.test(command)) set = '-af equalizer=f=94:width_type=o:width=2:g=30'
@@ -35,7 +36,7 @@ export const run = {
             let ran = Utils.filename('mp3')
             exec(`ffmpeg -i ${parse.file} ${set} ${ran}`, async (err, stderr, stdout) => {
                fs.unlinkSync(parse.file)
-               if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
+               if (err) return client.reply(m.chat, Utils.texted('bold', `❌ Conversion failed.`), m)
                let buff = fs.readFileSync(ran)
                if (m.quoted.ptt) return client.sendFile(m.chat, buff, 'audio.mp3', '', m, {
                   ptt: true
@@ -47,11 +48,12 @@ export const run = {
                })
             })
          } else {
-            client.reply(m.chat, Utils.texted('bold', `🚩 Reply audio to use this command.`), m)
+            client.reply(m.chat, Utils.texted('bold', `❌ Reply audio to use this command.`), m)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

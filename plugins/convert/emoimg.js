@@ -9,7 +9,8 @@ export const run = {
       isPrefix,
       command,
       setting: exif,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, '😳'), m)
@@ -19,15 +20,17 @@ export const run = {
             q: emoji,
             style: style || 'apple'
          })
-         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${json.msg}`), m)
+         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `❌ ${json.msg}`), m)
          const buffer = await Utils.fetchAsBuffer(json.data.url)
          client.sendSticker(m.chat, buffer, m, {
             packname: exif.sk_pack,
             author: exif.sk_author,
             categories: [emoji]
          })
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

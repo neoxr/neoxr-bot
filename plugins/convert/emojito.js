@@ -7,24 +7,27 @@ export const run = {
       args,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter,
+      setting
    }) => {
       try {
-         let exif = global.db.setting
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, '😳'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/emojito', {
             q: args[0]
          })
-         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `🚩 ${json.msg}`), m)
+         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `❌ ${json.msg}`), m)
          const buffer = await Utils.fetchAsBuffer(json.data.url)
          client.sendSticker(m.chat, buffer, m, {
-            packname: exif.sk_pack,
-            author: exif.sk_author,
+            packname: setting.sk_pack,
+            author: setting.sk_author,
             categories: [args[0]]
          })
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

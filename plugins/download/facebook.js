@@ -10,7 +10,8 @@ export const run = {
       command,
       users,
       Config,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://fb.watch/7B5KBCgdO3'), m)
@@ -36,9 +37,10 @@ export const run = {
             if (chSize.oversize) return client.reply(m.chat, isOver, m)
             client.sendFile(m.chat, result.url, Utils.filename('mp4'), `◦ *Quality* : SD`, m)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

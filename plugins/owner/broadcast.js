@@ -27,7 +27,7 @@ export const run = {
                   ? premiumJid
                   : groupJid
 
-         if (!id?.length) return client.reply(m.chat, Utils.texted('bold', `🚩 Error: ID does not exist.`), m)
+         if (!id?.length) return client.reply(m.chat, Utils.texted('bold', `❌ Error: ID does not exist.`), m)
 
          const q = m.quoted ? m.quoted : m
          const mime = (q.msg || q).mimetype || ''
@@ -40,7 +40,7 @@ export const run = {
 
             if (!mediaCache.has(keyId)) {
                media = await q.download()
-               if (!media) return client.reply(m.chat, '🚩 Failed to download media.', m)
+               if (!media) return client.reply(m.chat, '❌ Failed to download media.', m)
                mediaCache.add(keyId)
             }
 
@@ -53,7 +53,7 @@ export const run = {
                })
                await Utils.delay(1500)
             }
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
+            return client.reply(m.chat, Utils.texted('bold', `✅ Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
                if (mediaCache.has(keyId)) mediaCache.delete(keyId)
             })
          }
@@ -65,7 +65,7 @@ export const run = {
 
             if (!mediaCache.has(keyId)) {
                media = await q.download()
-               if (!media) return client.reply(m.chat, '🚩 Failed to download media.', m)
+               if (!media) return client.reply(m.chat, '❌ Failed to download media.', m)
                mediaCache.add(keyId)
             }
 
@@ -91,7 +91,7 @@ export const run = {
                await Utils.delay(1500)
             }
 
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
+            return client.reply(m.chat, Utils.texted('bold', `✅ Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
                if (mediaCache.has(keyId)) mediaCache.delete(keyId)
             })
          }
@@ -103,7 +103,7 @@ export const run = {
 
             if (!mediaCache.has(keyId)) {
                media = q.ptt ? await Converter.toPTT(await q.download()) : await q.download()
-               if (!media) return client.reply(m.chat, '🚩 Failed to download media.', m)
+               if (!media) return client.reply(m.chat, '❌ Failed to download media.', m)
                mediaCache.add(keyId)
             }
 
@@ -121,7 +121,7 @@ export const run = {
                }, properties)
                await Utils.delay(1500)
             }
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
+            return client.reply(m.chat, Utils.texted('bold', `✅ Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m).then(() => {
                if (mediaCache.has(keyId)) mediaCache.delete(keyId)
             })
          }
@@ -140,10 +140,10 @@ export const run = {
                }, { mentionedJid: command === 'bcgc' ? member : [] })
                await Utils.delay(1500)
             }
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m)
+            return client.reply(m.chat, Utils.texted('bold', `✅ Successfully send broadcast message to ${id.length} ${command == 'bc' ? 'chats' : command === 'bcprem' ? 'premium users' : 'groups'}`), m)
          }
 
-         client.reply(m.chat, Utils.texted('bold', `🚩 Use this command with text or by replying to an image, video or audio.`), m)
+         client.reply(m.chat, Utils.texted('bold', `❌ Use this command with text or by replying to an image, video or audio.`), m)
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
       }

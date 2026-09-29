@@ -5,7 +5,8 @@ export const run = {
    async: async (m, {
       client,
       args,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          client.sendReact(m.chat, '🕒', m.key)
@@ -30,8 +31,10 @@ export const run = {
          caption += `	◦  *Caption* : ${json.data.caption || '-'}\n\n`
          caption += global.footer
          client.sendFile(m.chat, json.data.video.url, 'video.mp4', caption, m)
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

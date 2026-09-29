@@ -7,6 +7,7 @@ export const run = {
       client,
       isBotAdmin
    }) => {
+      try {
       if (!m.quoted) return
       client.sendMessage(m.chat, {
          delete: {
@@ -16,6 +17,10 @@ export const run = {
             participant: m.quoted.sender
          }
       })
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
+      }
    },
    error: false,
    group: true

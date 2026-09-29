@@ -10,7 +10,8 @@ export const run = {
       command,
       Config,
       users,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'lathi'), m)
@@ -35,8 +36,10 @@ export const run = {
             jpegThumbnail: await Utils.generateImageThumbnail(json.thumbnail)
          })
          client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
+         limitter()
       } catch (e) {
-         client.reply(m.chat, UtilsjsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

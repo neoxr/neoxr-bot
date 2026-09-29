@@ -7,13 +7,13 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      setting
    }) => {
       try {
-         let setting = global.db.setting
          if (!text) return client.reply(m.chat, explain(isPrefix, command), m)
          setting.msg = text
-         client.reply(m.chat, Utils.texted('bold', `🚩 Menu Message successfully set.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ Menu Message successfully set.`), m)
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
       }

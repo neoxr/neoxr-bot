@@ -10,9 +10,10 @@ export const run = {
       setting,
       Utils
    }) => {
+      try {
       const types = command == 'hitstat' ? global.db.statistic : Object.fromEntries(Object.entries(global.db.statistic).filter(([_, prop]) => moment(prop.lasthit).format('DDMMYY') == moment(new Date).format('DDMMYY')))
       let stat = Object.keys(types)
-      if (stat.length == 0) return client.reply(true, Utils.texted('bold', `🚩 No command used.`), m)
+      if (stat.length == 0) return client.reply(true, Utils.texted('bold', `❌ No command used.`), m)
       class Hit extends Array {
          total(key) {
             return this.reduce((a, b) => a + (b[key] || 0), 0)
@@ -34,6 +35,10 @@ export const run = {
          thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
          icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
       })
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
+      }
    },
    error: false
 }

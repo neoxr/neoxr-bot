@@ -15,11 +15,11 @@ export const run = {
          let [_, code] = args[0].match(link) || []
          if (!code) return client.reply(m.chat, global.status.invalid, m)
          let id = await client.groupAcceptInvite(code)
-         if (!id.endsWith('g.us')) return client.reply(m.chat, Utils.texted('bold', `🚩 Sorry i can't join to this group :(`), m)
+         if (!id.endsWith('g.us')) return client.reply(m.chat, Utils.texted('bold', `❌ Sorry i can't join to this group :(`), m)
          let member = await (await client.groupMetadata(id)).participants.map(v => v.id)
-         return client.reply(m.chat, `🚩 Joined!`, m)
+         return client.reply(m.chat, `✅ Joined!`, m)
       } catch {
-         return client.reply(m.chat, Utils.texted('bold', `🚩 Sorry i can't join to this group :(`), m)
+         return client.reply(m.chat, Utils.texted('bold', `❌ Sorry i can't join to this group :(`), m)
       }
    },
    owner: true

@@ -12,10 +12,12 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
-      if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'id i love you'), m)
-      if (text && m.quoted && m.quoted.text) {
+      try {
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'id i love you'), m)
+         if (text && m.quoted && m.quoted.text) {
          let lang = text.slice(0, 2)
          try {
             let data = m.quoted.text
@@ -26,9 +28,9 @@ export const run = {
                fs.unlinkSync(filePath)
             })
          } catch {
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
          }
-      } else if (text) {
+         } else if (text) {
          let lang = text.slice(0, 2)
          try {
             let data = text.substring(2).trim()
@@ -40,8 +42,13 @@ export const run = {
             })
          } catch (e) {
             console.log(e)
-            return client.reply(m.chat, Utils.texted('bold', `🚩 Language code not supported.`), m)
+            return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
          }
+         }
+         limitter()
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

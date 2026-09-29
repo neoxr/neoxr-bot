@@ -9,7 +9,8 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://pin.it/6oMTJmFiq'), m)
@@ -31,7 +32,9 @@ export const run = {
             const imgUrl = Utils.random(json.data)
             client.sendFile(m.chat, imgUrl, '', '', m)
          }
-      } catch {
+         limitter()
+      } catch (e) {
+         console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },

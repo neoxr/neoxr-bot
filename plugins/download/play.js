@@ -10,7 +10,8 @@ export const run = {
       users,
       setting,
       Config,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'lathi'), m)
@@ -28,23 +29,24 @@ export const run = {
          const chSize = Utils.sizeLimit(json.data.size, users.premium ? Config.max_upload : Config.max_upload_free)
          const isOver = users.premium ? `💀 File size (${json.data.size}) exceeds the maximum limit.` : `⚠️ File size (${json.data.size}), you can only download files with a maximum size of ${Config.max_upload_free} MB and for premium users a maximum of ${Config.max_upload} MB.`
          if (chSize.oversize) return client.reply(m.chat, isOver, m)
-         client.sendMessageModify(m.chat, caption, m, {
+         await client.sendMessageModify(m.chat, caption, m, {
             largeThumb: true,
             type: 'preview-link',
-            /* choose: landscape (default), potrait, square */
             ratio: 'landscape',
             thumbnail: json.thumbnail,
             icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          }).then(async () => {
-            client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
+            await client.sendFile(m.chat, json.data.url, json.data.filename, '', m, {
                document: true,
                APIC: await Utils.fetchAsBuffer(json.thumbnail)
             }, {
                jpegThumbnail: await Utils.generateImageThumbnail(json.thumbnail)
             })
          })
+         limitter()
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

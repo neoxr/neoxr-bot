@@ -20,7 +20,7 @@ export const run = {
                   let limit = 1
                   if (users.limit >= limit) {
                      users.limit -= limit
-                  } else return client.reply(m.chat, Utils.texted('bold', `🚩 Your limit is not enough to use this feature.`), m)
+                  } else return client.reply(m.chat, Utils.texted('bold', `❌ Your limit is not enough to use this feature.`), m)
                }
                client.sendReact(m.chat, '🕒', m.key)
                let old = new Date()

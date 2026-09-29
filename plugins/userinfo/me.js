@@ -9,6 +9,7 @@ export const run = {
       setting,
       Utils
    }) => {
+      try {
       const avatar = await client.profilePicture(m.sender)
       let blocked = blockList.includes(m.sender) ? true : false
       let now = new Date() * 1
@@ -36,6 +37,10 @@ export const run = {
          thumbnail: avatar,
          icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
       })
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
+      }
    },
    error: false
 }
