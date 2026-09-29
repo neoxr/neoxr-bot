@@ -35,9 +35,7 @@ export const run = {
          }))
 
          limitter()
-
-         limitter()
-            return client.sendAlbumMessage(m.chat, files, m)
+         return client.sendAlbumMessage(m.chat, files, m)
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)

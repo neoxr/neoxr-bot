@@ -4,6 +4,7 @@ export const run = {
    async: async (m, {
       client,
       setting,
+      limiter,
       Utils
    }) => {
       try {
@@ -32,10 +33,13 @@ export const run = {
             thumbnail: thumb,
             icon
          })
+
+         limiter()
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },
-   error: false
+   error: false,
+   limite: true
 }

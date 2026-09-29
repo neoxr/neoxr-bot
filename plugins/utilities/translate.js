@@ -10,6 +10,7 @@ export const run = {
       text,
       isPrefix,
       command,
+      limitter,
       Utils
    }) => {
       try {
@@ -22,6 +23,7 @@ export const run = {
                   to: lang
                })
                client.reply(m.chat, result[0], m)
+               limitter()
             } catch {
                return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
             }
@@ -33,6 +35,7 @@ export const run = {
                   to: lang
                })
                client.reply(m.chat, result[0], m)
+               limitter()
             } catch {
                return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
             }
@@ -43,5 +46,6 @@ export const run = {
          client.reply(m.chat, global.status.error, m)
       }
    },
-   error: false
+   error: false,
+   limit: true
 }

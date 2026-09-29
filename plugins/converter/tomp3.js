@@ -22,20 +22,17 @@ export const run = {
             if (/tomp3|toaudio/.test(command)) {
                const buff = await Converter.toAudio(await q.download())
                limitter()
-               limitter()
-            return client.sendFile(m.chat, buff, 'audio.mp3', '', m)
+               return client.sendFile(m.chat, buff, 'audio.mp3', '', m)
             } else if (/tovn/.test(command)) {
                const buff = await Converter.toPTT(await q.download())
                limitter()
-               limitter()
-            return client.sendFile(m.chat, buff, '', '', m, {
+               return client.sendFile(m.chat, buff, '', '', m, {
                   ptt: true
                })
             } else {
                client.reply(m.chat, Utils.texted('bold', `❌ This feature only for audio / video.`), m)
             }
          }
-         limitter()
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)

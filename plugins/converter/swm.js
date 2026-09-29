@@ -35,8 +35,6 @@ export const run = {
                meta: true
             })
          } else client.reply(m.chat, `❌ To create a watermark on sticker reply media photo or video and use this format *${isPrefix + command} packname | author*`, m)
-
-         limitter()
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)

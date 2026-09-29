@@ -6,6 +6,7 @@ export const run = {
       client,
       command,
       setting: exif,
+      limiter,
       Utils
    }) => {
       try {
@@ -21,7 +22,10 @@ export const run = {
                author: exif.sk_author,
                meta: true,
                exclusive: true
-            }).then(() => m.react('✅'))
+            }).then(() => {
+               m.react('✅')
+               limiter()
+            })
          } else if (/video/.test(mime)) {
             if (client.message.get(q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
             const buffer = await q.download()
@@ -32,7 +36,10 @@ export const run = {
                author: exif.sk_author,
                meta: true,
                exclusive: true
-            }).then(() => m.react('✅'))
+            }).then(() => {
+               m.react('✅')
+               limiter()
+            })
          } else client.reply(m.chat, Utils.texted('bold', `Stress ??`), m)
       } catch (e) {
          console.error(e)
