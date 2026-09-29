@@ -32,7 +32,8 @@ export default async (client, ctx) => {
       const setting = global.db.setting
 
       const owners = [
-         client.decodeJid(client.user?.id ?? client.user?.lid ?? '').replace(/@.+/, ''),
+         client.decodeJid(client.user?.id).replace(/@.+/, ''),
+         client.decodeJid(client.user?.lid).replace(/@.+/, ''),
          ...(setting?.owners || [])
       ]
 

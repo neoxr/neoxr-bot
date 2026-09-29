@@ -4,6 +4,7 @@ export const run = {
    async: async (m, {
       client,
       setting,
+      limitter,
       Utils
    }) => {
       try {
@@ -26,9 +27,11 @@ export const run = {
             thumbnail: await Utils.fetchAsBuffer(json.data.map),
             icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
+         limitter()
       } catch (e) {
          client.reply(m.chat, Utils.jsonFormat(e), m)
       }
    },
-   error: false
+   error: false,
+   limit: true
 }

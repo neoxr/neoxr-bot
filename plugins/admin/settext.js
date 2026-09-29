@@ -8,17 +8,17 @@ export const run = {
       text,
       isPrefix,
       command,
+      groupSet,
       Utils
    }) => {
       try {
-      let setup = global.db.groups.find(v => v.jid == m.chat)
       if (command == 'setwelcome') {
          if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
-         setup.text_welcome = text
+         groupSet.text_welcome = text
          await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
       } else if (/set(out|left)/i.test(command)) {
          if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
-         setup.text_left = text
+         groupSet.text_left = text
          await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
       }
       } catch (e) {
