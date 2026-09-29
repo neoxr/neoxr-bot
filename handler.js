@@ -1,6 +1,7 @@
 import { Utils, Scraper, Cooldown, Spam, Config } from '@neoxr/wb'
 import cron from 'node-cron'
 import path from 'path'
+
 const cooldown = new Cooldown(Config.cooldown)
 const spam = new Spam({
    RESET_TIMER: Config.cooldown,
@@ -10,6 +11,7 @@ const spam = new Spam({
    NOTIFY_THRESHOLD: Config.notify_threshold,
    BANNED_THRESHOLD: Config.banned_threshold
 })
+
 import schema from './lib/schema.js'
 
 if (!global.typo) global.typo = new Map()
@@ -86,7 +88,7 @@ export default async (client, ctx) => {
 
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
-         show: 'all', // options: 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
+         show: 'all',
          banned_times: users?.ban_times,
          exception: isOwner || isPrem,
          store
@@ -147,7 +149,7 @@ export default async (client, ctx) => {
             groupSet.member[m.sender].lastseen = now
          }
       }
-      if (body && !setting.self && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !Config.evaluate_chars.includes(core.command)) return client.reply(m.chat, `🚩 *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
+      if (body && !setting.self && core.prefix != setting.onlyprefix && commands.includes(core.command) && !setting.multiprefix && !Config.evaluate_chars.includes(core.command)) return client.reply(m.chat, `❌ *Incorrect prefix!*, this bot uses prefix : *[ ${setting.onlyprefix} ]*\n\n➠ ${setting.onlyprefix + core.command} ${text || ''}`, m)
 
       const matcher = Utils.matcher(command, commands).filter(v => v.accuracy >= 60)
       if (prefix && !commands.includes(command) && matcher.length > 0 && !setting.self) {
@@ -169,7 +171,7 @@ export default async (client, ctx) => {
                }, 180000)
             })
 
-            let caption = `🚩 *Command not found.* Did you mean :\n\n`
+            let caption = `❌ *Command not found.* Did you mean :\n\n`
             caption += global.typo.get(m.sender).commands.map((v, i) => `*${i + 1}.* ${prefix + v} (${matcher[i].accuracy}%)`).join('\n')
             caption += `\n\n> Reply with the *number* to execute. (Expires in 3 minutes)`
 
@@ -183,7 +185,7 @@ export default async (client, ctx) => {
          body && prefix && commands.includes(command) && !setting.multiprefix && setting.onlyprefix === prefix ||
          body && !prefix && commands.includes(command) && Config.evaluate_chars.includes(command)
       ) {
-         if (setting.error.includes(command)) return client.reply(m.chat, Utils.texted('bold', `🚩 Command _${(prefix ? prefix : '') + command}_ disabled.`), m)
+         if (setting.error.includes(command)) return client.reply(m.chat, Utils.texted('bold', `❌ Command _${(prefix ? prefix : '') + command}_ disabled.`), m)
          if (!m.isGroup && Config.blocks.some(no => m.sender?.startsWith(no))) return client.updateBlockStatus(m.sender, 'block')
          if (commands.includes(command)) {
             users.hit += 1
@@ -198,74 +200,119 @@ export default async (client, ctx) => {
             const turn_hidden = cmd.hidden instanceof Array ? cmd.hidden.includes(command) : cmd.hidden instanceof String ? cmd.hidden == command : false
             if (!turn && !turn_hidden) continue
             if (m.isBot || m.chat.endsWith('broadcast') || /edit/.test(m.mtype)) continue
-            if (setting.self && !isOwner && !m.fromMe) continue
-            if (!m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < Config.timeout) continue
-            if (!m.isGroup && !['owner', 'menfess', 'scan', 'verify', 'payment', 'premium'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) {
+
+            let allowed = true
+
+            if (setting.self && !isOwner && !m.fromMe) allowed = false
+
+            if (allowed && !m.isGroup && !['owner'].includes(name) && chats && !isPrem && !users.banned && new Date() * 1 - chats.lastchat < Config.timeout) allowed = false
+
+            if (allowed && !m.isGroup && !['owner', 'menfess', 'scan', 'verify', 'payment', 'premium'].includes(name) && chats && !isPrem && !users.banned && setting.groupmode) {
                client.sendMessageModify(m.chat, `⚠️ Using bot in private chat only for premium user, want to upgrade to premium plan ? send *${prefixes[0]}premium* to see benefit and prices.`, m, {
                   largeThumb: true,
                   thumbnail: 'https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg',
                   type: 'preview-link',
-                  /* choose: landscape (default), potrait, square */
                   ratio: 'landscape',
                   url: setting.link,
                   icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
                }).then(() => chats.lastchat = new Date() * 1)
-               continue
+               allowed = false
             }
-            if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < Config.timeout)) {
+
+            if (allowed && !['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < Config.timeout)) {
                client.reply(m.chat, Utils.texted('bold', `⚠️ ${isSpam.msg}`), m)
-               continue
+               allowed = false
             }
-            if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
-            if (cmd.owner && !isOwner) {
+
+            if (allowed && m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) allowed = false
+
+            if (allowed && cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
-               continue
+               allowed = false
             }
-            if (cmd.restrict && !isPrem && !isOwner && text && new RegExp('\\b' + setting.toxic.join('\\b|\\b') + '\\b').test(text.toLowerCase())) {
+
+            if (allowed && cmd.restrict && !isPrem && !isOwner && text && new RegExp('\\b' + setting.toxic.join('\\b|\\b') + '\\b').test(text.toLowerCase())) {
                client.reply(m.chat, `⚠️ You violated the *Terms & Conditions* of using bots by using blacklisted keywords, as a penalty for your violation being blocked and banned.`, m).then(() => {
                   users.banned = true
                   client.updateBlockStatus(m.sender, 'block')
                })
-               continue
+               allowed = false
             }
-            if (setting.antispam && isSpam && /(BANNED|NOTIFY)/.test(isSpam.state)) {
+
+            if (allowed && setting.antispam && isSpam && /(BANNED|NOTIFY)/.test(isSpam.state)) {
                client.reply(m.chat, Utils.texted('bold', `⚠️ ${isSpam.msg}`), m)
-               continue
+               allowed = false
             }
-            if (setting.antispam && isSpam && /HOLD/.test(isSpam.state)) continue
-            if (cmd.premium && !isPrem) {
+
+            if (allowed && setting.antispam && isSpam && /HOLD/.test(isSpam.state)) allowed = false
+
+            if (allowed && cmd.premium && !isPrem) {
                client.reply(m.chat, global.status.premium, m)
-               continue
+               allowed = false
             }
-            if (cmd.limit && users.limit < 1) {
+
+            if (allowed && cmd.limit && users.limit < 1) {
                client.reply(m.chat, `⚠️ You reached the limit and will be reset at 00.00\n\nTo get more limits upgrade to premium plans.`, m).then(() => users.premium = false)
-               continue
+               allowed = false
             }
-            if (cmd.limit && users.limit > 0) {
-               const limit = cmd.limit.constructor.name == 'Boolean' ? 1 : cmd.limit
-               if (users.limit >= limit) {
-                  users.limit -= limit
-               } else {
+
+            let limitCost = 0
+            if (allowed && cmd.limit) {
+               limitCost = cmd.limit.constructor.name == 'Boolean' ? 1 : cmd.limit
+               if (users.limit < limitCost) {
                   client.reply(m.chat, Utils.texted('bold', `⚠️ Your limit is not enough to use this feature.`), m)
-                  continue
+                  allowed = false
                }
             }
-            if (cmd.group && !m.isGroup) {
-               client.reply(m.chat, global.status.group, m)
-               continue
-            } else if (cmd.botAdmin && !isBotAdmin) {
-               client.reply(m.chat, global.status.botAdmin, m)
-               continue
-            } else if (cmd.admin && !isAdmin) {
-               client.reply(m.chat, global.status.admin, m)
-               continue
+
+            if (allowed) {
+               if (cmd.group && !m.isGroup) {
+                  client.reply(m.chat, global.status.group, m)
+                  allowed = false
+               } else if (cmd.botAdmin && !isBotAdmin) {
+                  client.reply(m.chat, global.status.botAdmin, m)
+                  allowed = false
+               } else if (cmd.admin && !isAdmin) {
+                  client.reply(m.chat, global.status.admin, m)
+                  allowed = false
+               }
             }
-            if (cmd.private && m.isGroup) {
+
+            if (allowed && cmd.private && m.isGroup) {
                client.reply(m.chat, global.status.private, m)
-               continue
+               allowed = false
             }
-            cmd.async(m, { client, args, text, isPrefix: prefix, prefixes, command, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper })
-            break
+
+            if (allowed) {
+               const pluginParams = { client, args, text, isPrefix: prefix, prefixes, command, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper }
+               const exempt = ['game', 'rpg'].includes(cmd.category)
+
+               if (limitCost > 0 && !exempt) {
+                  const reservation = { cost: limitCost, committed: false, settled: false }
+                  users.limit -= limitCost
+
+                  pluginParams.limitter = () => {
+                     if (reservation.committed) return
+                     reservation.committed = true
+                     if (reservation.settled) users.limit = Math.max(0, users.limit - reservation.cost)
+                  }
+
+                  Promise.resolve(cmd.async(m, pluginParams))
+                     .catch(e => {
+                        console.error(e)
+                        client.reply(m.chat, global.status.error, m)
+                     })
+                     .finally(() => {
+                        reservation.settled = true
+                        if (!reservation.committed) users.limit += reservation.cost
+                     })
+               } else {
+                  if (limitCost > 0) users.limit -= limitCost
+                  pluginParams.limitter = () => { }
+                  cmd.async(m, pluginParams)
+               }
+               break
+            }
          }
       } else {
          const is_events = Object.fromEntries(Object.entries(plugins).filter(([name, prop]) => !prop.run.usage))
@@ -299,7 +346,18 @@ export default async (client, ctx) => {
             if (event.admin && !isAdmin) continue
             if (event.private && m.isGroup) continue
             if (event.download && body && Utils.socmed(body) && !setting.autodownload && Utils.generateLink(body) && Utils.generateLink(body).some(v => Utils.socmed(v))) continue
-            event.async(m, { client, body, prefixes, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper })
+
+            let charged = false
+            const limitter = event.limit ? () => {
+               if (charged) return
+               charged = true
+               users.limit = Math.max(0, users.limit - 1)
+            } : () => { }
+
+            Promise.resolve(event.async(m, { client, body, prefixes, groupMetadata, participants, users, chats, groupSet, setting, isOwner, isAdmin, isBotAdmin, plugins: Object.fromEntries(Object.entries(plugins).filter(([name, _]) => !setting.pluginDisable.includes(name))), blockList, Config, ctx, store, system, Utils, Scraper, limitter })).catch(e => {
+               console.error(e)
+               client.reply(m.chat, global.status.error, m)
+            })
          }
       }
    } catch (e) {
