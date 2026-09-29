@@ -24,8 +24,8 @@ export const run = {
                   image: image.data.url
                })
                if (!json.status) return m.reply(Utils.jsonFormat(json))
-               client.sendFile(m.chat, json.data.no_background, 'image.png', '', m)
-            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
+               client.sendFile(m.chat, json.data.no_background, '', '', m)
+            } else return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
@@ -38,7 +38,7 @@ export const run = {
                image: image.data.url
             })
             if (!json.status) return m.reply(Utils.jsonFormat(json))
-            client.sendFile(m.chat, json.data.no_background, 'image.png', '', m)
+            client.sendFile(m.chat, json.data.no_background, '', '', m)
          }
          limitter()
       } catch (e) {

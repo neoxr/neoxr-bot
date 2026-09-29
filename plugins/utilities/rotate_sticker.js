@@ -7,10 +7,10 @@ export const run = {
       command,
       Utils,
       Scraper,
-      limitter,
-      setting
+      limitter
    }) => {
       try {
+         const setting = global.db.setting
          if (!m.quoted) return client.reply(m.chat, Utils.texted('bold', `❌ Reply to sticker you want to ${command.toLowerCase()}.`), m)
          let q = m.quoted ? m.quoted : m
          let mime = (q.msg || q).mimetype || ''

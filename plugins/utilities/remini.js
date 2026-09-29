@@ -1,5 +1,6 @@
 export const run = {
    usage: ['remini'],
+   hidden: ['hd'],
    use: 'reply photo',
    category: 'utilities',
    async: async (m, {
@@ -23,7 +24,7 @@ export const run = {
                })
                if (!json.status) return m.reply(Utils.jsonFormat(json))
                client.sendFile(m.chat, json.data.url, 'image.jpg', '', m)
-            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
+            } else return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
@@ -45,6 +46,5 @@ export const run = {
       }
    },
    error: false,
-   limit: true,
-   premium: true
+   limit: true
 }

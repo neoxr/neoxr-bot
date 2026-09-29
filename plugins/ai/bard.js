@@ -1,7 +1,7 @@
 export const run = {
-   usage: ['chord'],
-   use: 'query',
-   category: 'utilities',
+   usage: ['bard'],
+   use: 'prompt',
+   category: 'ai',
    async: async (m, {
       client,
       text,
@@ -11,13 +11,13 @@ export const run = {
       limitter
    }) => {
       try {
-         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'lathi'), m)
+         if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'apa itu kucing'), m)
          client.sendReact(m.chat, '🕒', m.key)
-         const json = await Api.neoxr('/chord', {
+         const json = await Api.neoxr('/bard', {
             q: text
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)
-         client.reply(m.chat, json.data.chord, m)
+         client.reply(m.chat, json.data.message, m)
          limitter()
       } catch (e) {
          console.error(e)
@@ -25,6 +25,5 @@ export const run = {
       }
    },
    error: false,
-   limit: true,
-   restrict: true
+   limit: true
 }
