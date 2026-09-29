@@ -24,16 +24,6 @@ export default async (client, ctx) => {
          client.fetchBlocklist().catch(() => [])
       ])
 
-      if (m.isGroup && groupMetadata?.participants) {
-         if (m?.sender?.endsWith('lid')) m.sender = groupMetadata.participants?.find(v =>
-            v.lid === m.sender || v.id === m.sender
-         )?.phoneNumber
-
-         if (m?.quoted?.sender?.endsWith('lid')) m.quoted.sender = groupMetadata.participants?.find(v =>
-            v.lid === m.quoted.sender || v.id === m.quoted.sender
-         )?.phoneNumber
-      }
-
       schema(m, Config)
 
       const groupSet = global.db.groups.get(m.chat)
