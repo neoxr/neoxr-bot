@@ -23,7 +23,7 @@ export const run = {
                })
                if (!json.status) return m.reply(Utils.jsonFormat(json))
                client.reply(m.chat, json.data.text, m)
-            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
+            } else return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''

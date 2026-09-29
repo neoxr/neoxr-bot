@@ -11,10 +11,11 @@ export const run = {
       limitter
    }) => {
       try {
-         if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'hosico_cat'), m)
+         const [input, duration] = args || []
+         if (!args || !input) return client.reply(m.chat, Utils.example(isPrefix, command, 'hosico_cat'), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/igstalk', {
-         	username: args[0]
+         	username: input
          })
          if (!json.status) return client.reply(m.chat, Utils.texted('bold', `❌ Account not found.`), m)
          let caption = `乂  *I G - S T A L K*\n\n`

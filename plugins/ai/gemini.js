@@ -1,7 +1,7 @@
 export const run = {
    usage: ['gemini'],
-   use: 'query',
-   category: 'utilities',
+   use: 'prompt',
+   category: 'ai',
    async: async (m, {
       client,
       text,
