@@ -10,7 +10,8 @@ export const run = {
    async: async (m, {
       client,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (m.quoted && typeof m.quoted.buttons != 'undefined' && typeof m.quoted.videoMessage != 'undefined') {
@@ -19,7 +20,7 @@ export const run = {
             const result = Utils.filename('mp3')
             execFile('ffmpeg', ['-i', media, result], async (err, stderr, stdout) => {
                remove(media)
-               if (err) return client.reply(m.chat, Utils.texted('bold', `🚩 Conversion failed.`), m)
+               if (err) return client.reply(m.chat, Utils.texted('bold', `❌ Conversion failed.`), m)
                let buff = read(result)
                if (/tomp3|toaudio/.test(command)) return client.sendFile(m.chat, buff, 'audio.mp3', '', m).then(() => {
                   remove(result)
@@ -45,11 +46,13 @@ export const run = {
                   })
                }
             } else {
-               client.reply(m.chat, Utils.texted('bold', `🚩 This feature only for audio / video.`), m)
+               client.reply(m.chat, Utils.texted('bold', `❌ This feature only for audio / video.`), m)
             }
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

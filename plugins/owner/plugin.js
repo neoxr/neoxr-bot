@@ -13,6 +13,7 @@ export const run = {
       setting,
       Utils
    }) => {
+      try {
       const [pluginName] = args
       if (!pluginName) return client.reply(m.chat, Utils.example(isPrefix, command, 'tiktok'), m)
 
@@ -23,7 +24,7 @@ export const run = {
       if (command === 'plugdis') {
          const matched = plugins.filter(p => regex.test(p))
 
-         if (matched.length === 0) return client.reply(m.chat, Utils.texted('bold', `🚩 Plugin ${pluginName}.js not found.`), m)
+         if (matched.length === 0) return client.reply(m.chat, Utils.texted('bold', `❌ Plugin ${pluginName}.js not found.`), m)
 
          let disabledCount = 0
          for (const name of matched) {
@@ -33,9 +34,9 @@ export const run = {
             }
          }
 
-         if (disabledCount === 0) return client.reply(m.chat, Utils.texted('bold', `🚩 All matched plugins are already disabled.`), m)
+         if (disabledCount === 0) return client.reply(m.chat, Utils.texted('bold', `❌ All matched plugins are already disabled.`), m)
 
-         client.reply(m.chat, Utils.texted('bold', `🚩 ${disabledCount} plugin(s) successfully disabled.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ ${disabledCount} plugin(s) successfully disabled.`), m)
       } else if (command === 'plugen') {
          const before = setting.pluginDisable.length
 
@@ -44,9 +45,13 @@ export const run = {
          const after = setting.pluginDisable.length
          const enabledCount = before - after
 
-         if (enabledCount === 0) return client.reply(m.chat, Utils.texted('bold', `🚩 No matching plugin found in disabled list.`), m)
+         if (enabledCount === 0) return client.reply(m.chat, Utils.texted('bold', `❌ No matching plugin found in disabled list.`), m)
 
-         client.reply(m.chat, Utils.texted('bold', `🚩 ${enabledCount} plugin(s) successfully enabled.`), m)
+         client.reply(m.chat, Utils.texted('bold', `✅ ${enabledCount} plugin(s) successfully enabled.`), m)
+      }
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

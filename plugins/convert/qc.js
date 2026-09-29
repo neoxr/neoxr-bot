@@ -10,11 +10,12 @@ export const run = {
       isPrefix,
       command,
       setting: exif,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'Hi!'), m)
-         if (text.length > 30) return client.reply(m.chat, Utils.texted('bold', `🚩 Max 30 character.`), m)
+         if (text.length > 30) return client.reply(m.chat, Utils.texted('bold', `❌ Max 30 character.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          let avatar = await client.profilePicture(m.quoted ? m.quoted.sender : m.sender)
          if (Buffer.isBuffer(avatar)) {
@@ -51,9 +52,10 @@ export const run = {
             packname: exif.sk_pack,
             author: exif.sk_author
          })
+         limitter()
       } catch (e) {
-         console.log(e)
-         client.reply(m.chat, Utils.texted('bold', `🚩 Can't generate sticker.`), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

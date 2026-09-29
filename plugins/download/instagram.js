@@ -8,7 +8,8 @@ export const run = {
       args,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.instagram.com/p/CK0tLXyAzEI'), m)
@@ -23,9 +24,10 @@ export const run = {
             client.sendFile(m.chat, v.url, v.type == 'mp4' ? Utils.filename('mp4') : Utils.filename('jpg'), `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
             await Utils.delay(1500)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

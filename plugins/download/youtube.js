@@ -11,7 +11,8 @@ export const run = {
       users,
       setting,
       Config,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (/yt?(a|mp3)/i.test(command)) {
@@ -91,8 +92,10 @@ export const run = {
             })
             client.sendFile(m.chat, json.data.url, json.data.filename, caption, m)
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

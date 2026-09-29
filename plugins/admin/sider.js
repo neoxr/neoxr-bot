@@ -26,14 +26,14 @@ export const run = {
          if (args && args[0] == '-y') {
             if (!isBotAdmin) return client.reply(m.chat, global.status.botAdmin, m)
             let arr = lastseen.map(v => v.jid).concat(sider2)
-            if (arr.length == 0) return client.reply(m.chat, Utils.texted('bold', `🚩 There is no sider in this group.`), m)
+            if (arr.length == 0) return client.reply(m.chat, Utils.texted('bold', `❌ There is no sider in this group.`), m)
             for (let jid of arr) {
                await Utils.delay(2000)
                await client.groupParticipantsUpdate(m.chat, [jid], 'remove')
             }
-            await client.reply(m.chat, Utils.texted('bold', `🚩 Done, ${arr.length} siders successfully removed.`), m)
+            await client.reply(m.chat, Utils.texted('bold', `✅ Done, ${arr.length} siders successfully removed.`), m)
          } else {
-            if (sider2.length == 0 && lastseen.length == 0) return client.reply(m.chat, Utils.texted('bold', `🚩 There is no sider in this group.`), m)
+            if (sider2.length == 0 && lastseen.length == 0) return client.reply(m.chat, Utils.texted('bold', `❌ There is no sider in this group.`), m)
             let teks = `乂  *S I D E R*\n\n`
             teks += sider2.length == 0 ? '' : `“List of *${sider2.length}* members no activity.”\n\n`
             teks += sider2.length == 0 ? '' : sider2.map(v => '	◦  @' + v.replace(/@.+/, '')).join('\n') + '\n\n'

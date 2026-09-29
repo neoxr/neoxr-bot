@@ -8,7 +8,8 @@ export const run = {
       args,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!args || !args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://twitter.com/mosidik/status/1475812845249957889?s=20'), m)
@@ -28,9 +29,10 @@ export const run = {
                })
             }
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

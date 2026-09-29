@@ -8,10 +8,11 @@ export const run = {
       isPrefix,
       command,
       Utils,
-      Scraper
+      Scraper,
+      limitter,
+      setting
    }) => {
       try {
-         let exif = global.db.setting
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'Hi | Dude'), m)
          client.sendReact(m.chat, '🕒', m.key)
          let [top, bottom] = text.split`|`
@@ -23,25 +24,27 @@ export const run = {
                let json = await Scraper.uploadImageV2(img)
                let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
                client.sendSticker(m.chat, res, m, {
-                  packname: exif.sk_pack,
-                  author: exif.sk_author
+                  packname: setting.sk_pack,
+                  author: setting.sk_author
                })
-            } else client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            } else client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
          } else {
             let q = m.quoted ? m.quoted : m
             let mime = (q.msg || q).mimetype || ''
-            if (!mime) return client.reply(m.chat, Utils.texted('bold', `🚩 Reply photo.`), m)
-            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `🚩 Only for photo.`), m)
+            if (!mime) return client.reply(m.chat, Utils.texted('bold', `❌ Reply photo.`), m)
+            if (!/image\/(jpe?g|png)/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Only for photo.`), m)
             let img = await q.download()
             let json = await Scraper.uploadImageV2(img)
             let res = `https://api.memegen.link/images/custom/${encodeURIComponent(top ? top : ' ')}/${encodeURIComponent(bottom ? bottom : '')}.png?background=${json.data.url}`
             client.sendSticker(m.chat, res, m, {
-               packname: exif.sk_pack,
-               author: exif.sk_author
+               packname: setting.sk_pack,
+               author: setting.sk_author
             })
          }
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

@@ -107,7 +107,7 @@ export const run = {
                         name: "cta_url",
                         buttonParamsJson: JSON.stringify({
                            display_text: 'Community',
-                           url: global.db.setting.link,
+                           url: setting.link,
                            webview_presentation: null
                         })
                      }]

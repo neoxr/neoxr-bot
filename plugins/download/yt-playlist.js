@@ -11,15 +11,16 @@ export const run = {
       users,
       setting,
       Config,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          client.ytplaylist = client.ytplaylist ? client.ytplaylist : []
          if (!args[0]) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://www.youtube.com/playlist?list=PLFIM0718LjIW-XBdVOerYgKegBtD6rSfD'), m)
          const check = client.ytplaylist.find(v => v.jid == m.sender)
-         if (/get?(mp4|mp3)/.test(command) && !check && !isNaN(args[0])) return m.reply(Utils.texted('bold', `🚩 Your session has expired / does not exist, do another search using the keywords you want.`))
+         if (/get?(mp4|mp3)/.test(command) && !check && !isNaN(args[0])) return m.reply(Utils.texted('bold', `❌ Your session has expired / does not exist, do another search using the keywords you want.`))
          if (/get?(mp4|mp3)/.test(command) && check && !isNaN(args[0])) {
-            if (Number(args[0]) > check.results.length) return m.reply(Utils.texted('bold', `🚩 Exceed amount of data.`))
+            if (Number(args[0]) > check.results.length) return m.reply(Utils.texted('bold', `❌ Exceed amount of data.`))
             client.sendReact(m.chat, '🕒', m.key)
             if (command === 'getmp3') {
                var json = await Api.neoxr('/youtube', {
@@ -120,8 +121,10 @@ export const run = {
                Utils.removeItem(client.ytplaylist, session)
             }
          }, 60_000)
+         limitter()
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

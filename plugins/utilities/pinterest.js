@@ -7,7 +7,8 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, `panda`), m)
@@ -22,9 +23,10 @@ export const run = {
             client.sendFile(m.chat, json.data[rand], '', `🍟 *Fetching* : ${((new Date - old) * 1)} ms`, m)
             await Utils.delay(2000)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

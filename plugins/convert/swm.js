@@ -7,7 +7,8 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          let [packname, ...author] = text.split`|`
@@ -17,7 +18,7 @@ export const run = {
             let q = m.quoted ? m.quoted.message[type] : m.msg
             let img = await client.downloadMediaMessage(q)
             if (/video/.test(type)) {
-               if (q.seconds > 10) return client.reply(m.chat, Utils.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
+               if (q.seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
                return await client.sendSticker(m.chat, img, m, {
                   packname: packname || '',
                   author: author || ''
@@ -39,18 +40,19 @@ export const run = {
                   author: author || ''
                })
             } else if (/video/.test(mime)) {
-               if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `🚩 Maximum video duration is 10 seconds.`), m)
+               if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
                let img = await q.download()
                if (!img) return client.reply(m.chat, global.status.wrong, m)
                return await client.sendSticker(m.chat, img, m, {
                   packname: packname || '',
                   author: author || ''
                })
-            } else client.reply(m.chat, `🚩 To create a watermark on sticker reply media photo or video and use this format *${isPrefix + command} packname | author*`, m)
+            } else client.reply(m.chat, `❌ To create a watermark on sticker reply media photo or video and use this format *${isPrefix + command} packname | author*`, m)
          }
+         limitter()
       } catch (e) {
-         console.log(e)
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

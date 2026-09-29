@@ -7,7 +7,8 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter
    }) => {
       try {
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'cat'), m)
@@ -42,8 +43,10 @@ export const run = {
                await Utils.delay(2500)
             }
          }
+         limitter()
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

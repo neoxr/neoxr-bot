@@ -7,23 +7,26 @@ export const run = {
       text,
       isPrefix,
       command,
-      Utils
+      Utils,
+      limitter,
+      setting
    }) => {
       try {
-         let exif = global.db.setting
          if (!text) return client.reply(m.chat, Utils.example(isPrefix, command, 'neoxr bot'), m)
-         if (text.length > 30) return client.reply(m.chat, Utils.texted('bold', `🚩 Max 30 character.`), m)
+         if (text.length > 30) return client.reply(m.chat, Utils.texted('bold', `❌ Max 30 character.`), m)
          client.sendReact(m.chat, '🕒', m.key)
          const json = await Api.neoxr('/brat', {
             text
          })
-         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `🚩 Can't generate brat sticker.`), m)
+         if (!json.status) return client.reply(m.chat, Utils.texted('bold', `❌ Can't generate brat sticker.`), m)
          await client.sendSticker(m.chat, json.data.url, m, {
-            packname: exif.sk_pack,
-            author: exif.sk_author
+            packname: setting.sk_pack,
+            author: setting.sk_author
          })
+         limitter()
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,
