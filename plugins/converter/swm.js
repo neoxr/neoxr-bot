@@ -19,7 +19,6 @@ export const run = {
             let img = await q.download()
             if (!img) return client.reply(m.chat, global.status.wrong, m)
             limitter()
-            limitter()
             return await client.sendSticker(m.chat, img, m, {
                packname: packname || '',
                author: author || '',
@@ -29,7 +28,6 @@ export const run = {
             if ((q.msg || q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
             let img = await q.download()
             if (!img) return client.reply(m.chat, global.status.wrong, m)
-            limitter()
             limitter()
             return await client.sendSticker(m.chat, img, m, {
                packname: packname || '',

@@ -31,13 +31,11 @@ export const run = {
          if (command === 'tikmp3') {
             if (!data?.audio) return client.reply(m.chat, global.status.fail, m)
             limitter()
-            limitter()
             return client.sendFile(m.chat, data.audio, 'audio.mp3', '', m)
          }
 
          if (command === 'tikwm') {
             if (!data?.videoWM) return client.reply(m.chat, global.status.fail, m)
-            limitter()
             limitter()
             return client.sendFile(m.chat, data.videoWM, 'video.mp4', `🍟 *Fetching* : ${Date.now() - old} ms`, m)
          }

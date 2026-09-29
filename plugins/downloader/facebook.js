@@ -34,7 +34,6 @@ export const run = {
                type: v.type
             }))
             limitter()
-            limitter()
             return client.sendAlbumMessage(m.chat, album, m)
          }
 

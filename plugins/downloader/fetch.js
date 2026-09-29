@@ -26,7 +26,6 @@ export const run = {
             const [, user, repo] = ghMatch
             const zipball = `https://api.github.com/repos/${user.trim()}/${repo.trim()}/zipball`
             limitter()
-            limitter()
             return client.sendFile(m.chat, zipball, `${repo}.zip`, '', m)
          }
 

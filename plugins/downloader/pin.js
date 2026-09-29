@@ -26,7 +26,6 @@ export const run = {
 
          if (json.data.length === 1) {
             limitter()
-            limitter()
             return client.sendFile(m.chat, json.data[0].url, '', `🍟 *Fetching* : ${Date.now() - old} ms`, m)
          }
 
