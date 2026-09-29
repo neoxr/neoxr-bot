@@ -17,6 +17,6 @@ export const run = {
          client.reply(m.chat, global.status.error, m)
       }
    },
-   error: true,
+   error: false,
    group: true
 }

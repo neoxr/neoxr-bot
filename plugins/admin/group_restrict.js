@@ -13,12 +13,13 @@ export const run = {
          await client.groupSettingUpdate(m.chat, 'not_announcement')
       } else if (args[0] == 'close') {
          await client.groupSettingUpdate(m.chat, 'announcement')
-      }
+      }
+
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
-   },
+   error: false
    error: true,
    admin: true,
    botAdmin: true
