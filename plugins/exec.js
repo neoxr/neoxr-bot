@@ -7,50 +7,59 @@ export const run = {
       client,
       body,
       ctx,
+      plugins,
       isOwner,
       Utils,
-      Scraper
+      Scraper,
+      waSocket
    }) => {
-      if (typeof body !== 'string' || !isOwner) return
+      try {
+         if (typeof body !== 'string' || !isOwner) return
 
-      const command = body.trim().split(/\s+/)[0]
-      let text = body.trim().substring(command.length).trim()
+         const command = body.trim().split(/\s+/)[0]
+         let text = body.trim().substring(command.length).trim()
 
-      if (!text && m.quoted) {
-         text = m.quoted.text || m.quoted.body || m.quoted.conversation || (typeof m.quoted === 'string' ? m.quoted : '')
-         text = text.trim()
-      }
-
-      if (!text) return
-
-      if (command === '=>') {
-         try {
-            const evL = await eval(`(async () => { return ${text} })()`)
-            m.reply(util.format(evL))
-         } catch (e) {
-            console.error(e)
-            client.reply(m.chat, global.status.error, m)
+         if (!text && m.quoted) {
+            text = m.quoted.text || m.quoted.body || m.quoted.conversation || (typeof m.quoted === 'string' ? m.quoted : '')
+            text = text.trim()
          }
-      } else if (command === '>') {
-         try {
-            const evL = await eval(`(async () => { ${text} })()`)
-            const res = evL === undefined ? '✅ Success (No output)' : util.format(evL)
-            m.reply(res)
-         } catch (e) {
-            console.error(e)
-            client.reply(m.chat, global.status.error, m)
+
+         if (!text) return
+
+         if (command === '=>') {
+            try {
+               const evL = await eval(`(async () => { return ${text} })()`)
+               m.reply(util.format(evL))
+            } catch (e) {
+               const err = syntax(text)
+               const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
+               m.reply(errMsg + util.format(e))
+            }
+         } else if (command === '>') {
+            try {
+               const evL = await eval(`(async () => { ${text} })()`)
+               const res = evL === undefined ? '✅ Success (No output)' : util.format(evL)
+               m.reply(res)
+            } catch (e) {
+               const err = syntax(text)
+               const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
+               m.reply(errMsg + util.format(e))
+            }
+         } else if (command === '$') {
+            if (client.sendReact) client.sendReact(m.chat, '🕒', m.key)
+
+            exec(text, (err, stdout, stderr) => {
+               let res = ''
+               if (err) res += util.format(err) + '\n\n'
+               if (stderr) res += stderr.toString() + '\n\n'
+               if (stdout) res += stdout.toString()
+
+               m.reply(res.trim() || '✅ Success (No output)')
+            })
          }
-      } else if (command === '$') {
-         if (client.sendReact) client.sendReact(m.chat, '🕒', m.key)
-
-         exec(text, (err, stdout, stderr) => {
-            let res = ''
-            if (err) res += util.format(err) + '\n\n'
-            if (stderr) res += stderr.toString() + '\n\n'
-            if (stdout) res += stdout.toString()
-
-            m.reply(res.trim() || '✅ Success (No output)')
-         })
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false
