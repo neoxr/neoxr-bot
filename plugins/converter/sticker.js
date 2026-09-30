@@ -6,7 +6,7 @@ export const run = {
       client,
       command,
       setting: exif,
-      limiter,
+      limitter,
       Utils
    }) => {
       try {
@@ -24,7 +24,7 @@ export const run = {
                exclusive: true
             }).then(() => {
                m.react('✅')
-               limiter()
+               limitter()
             })
          } else if (/video/.test(mime)) {
             if (client.message.get(q).seconds > 10) return client.reply(m.chat, Utils.texted('bold', `❌ Maximum video duration is 10 seconds.`), m)
@@ -38,7 +38,7 @@ export const run = {
                exclusive: true
             }).then(() => {
                m.react('✅')
-               limiter()
+               limitter()
             })
          } else client.reply(m.chat, Utils.texted('bold', `Stress ??`), m)
       } catch (e) {
@@ -46,5 +46,6 @@ export const run = {
          client.reply(m.chat, global.status.error, m)
       }
    },
-   error: false
+   error: false,
+   limit: true
 }
