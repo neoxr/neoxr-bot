@@ -3,23 +3,25 @@ export const run = {
    category: 'example',
    async: async (m, {
       client,
+      setting,
       Utils
    }) => {
       try {
-         await client.sendStickerPack(m.chat, [
-            'https://cdn.videy.co/7QUk0zRO1.mp4',
-            { data: 'https://i.pinimg.com/736x/07/bf/a7/07bfa713160beb74c29b77bdb7c9debd.jpg', emojis: ['😺'] },
-            { data: 'https://i.pinimg.com/736x/ff/42/4d/ff424d927ff03ec8b1e0e89d2547cad4.jpg', emojis: ['😂'] },
-            'https://i.pinimg.com/736x/28/f0/2c/28f02c0145df8c303d8211c21e747128.jpg',
-         ],
-            m,
-            {
-               name: 'Pack Anjing Gemas',
-               publisher: 'BotKu',
-               description: 'Custom dari user',
-               cover: './media/image/default.jpg'
-            }
-         )
+         client.sendReact(m.chat, '🕒', m.key)
+
+         const stickers = [
+            'https://i.pinimg.com/736x/84/2b/14/842b14c54213c8115324d1efad21bb3e.jpg',
+            { data: 'https://i.pinimg.com/736x/30/82/35/3082351c533bd4e27a2fa569f652ff8a.jpg', emojis: ['😺'] },
+            { data: 'https://i.pinimg.com/736x/f0/e6/c7/f0e6c7be15e45d0e4e758565735a024e.jpg', emojis: ['😂'] },
+            'https://i.pinimg.com/736x/4a/4c/e0/4a4ce081e6d12ab0a860fdfb4a7c89a7.jpg',
+         ]
+
+         client.sendStickerPack(m.chat, stickers, m, {
+            name: 'Patrick Stickers',
+            publisher: setting.sk_author,
+            description: `${stickers.length} Stickers`,
+            cover: './media/image/thumb.jpg'
+         })
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
