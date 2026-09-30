@@ -12,7 +12,8 @@ export const run = {
             // thumbnail: Buffer | URL | Path
          })
       } catch (e) {
-         m.reply(Utils.jsonFormat(e))
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

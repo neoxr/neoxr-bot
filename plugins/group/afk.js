@@ -14,7 +14,8 @@ export const run = {
          user.afkObj = m
          let tag = m.sender.split`@`[0]
          return client.reply(m.chat, Utils.texted('bold', `❌ @${tag} is now AFK!`), m)
-      } catch {
+      } catch (e) {
+         console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },

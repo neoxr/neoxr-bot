@@ -9,7 +9,8 @@ export const run = {
          // only work in private chat
          client.sendFromAI(m.chat, 'Hi!', m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

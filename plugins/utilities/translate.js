@@ -22,8 +22,9 @@ export const run = {
                   to: lang
                })
                client.reply(m.chat, result[0].replace(new RegExp('‾', 'g'), '\n'), m)
-            } catch {
-               return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
+            } catch (e) {
+               console.error(e)
+               client.reply(m.chat, global.status.error, m)
             }
          } else if (text) {
             let lang = text.slice(0, 2)
@@ -33,8 +34,9 @@ export const run = {
                   to: lang
                })
                client.reply(m.chat, result[0].replace(new RegExp('‾', 'g'), '\n'), m)
-            } catch {
-               return client.reply(m.chat, Utils.texted('bold', `❌ Language code not supported.`), m)
+            } catch (e) {
+               console.error(e)
+               client.reply(m.chat, global.status.error, m)
             }
          }
       } catch (e) {

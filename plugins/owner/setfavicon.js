@@ -17,7 +17,8 @@ export const run = {
          setting.icon = Buffer.from(buffer).toString('base64')
          client.reply(m.chat, Utils.texted('bold', `✅ Icon successfully set.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

@@ -58,7 +58,8 @@ const getWebpExif = async (buffer) => {
 
       return parsedData
 
-   } catch (error) {
-      return null
+   } catch (e) {
+      console.error(e)
+      client.reply(m.chat, global.status.error, m)
    }
 }

@@ -20,7 +20,8 @@ export const run = {
             m.reply('✅ Database was successfully restored.')
          } else m.reply(Utils.texted('bold', '❌ Reply to the backup file first then reply with this feature.'))
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

@@ -21,7 +21,8 @@ export const run = {
             await fsPromise.unlink(filename)
          })
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

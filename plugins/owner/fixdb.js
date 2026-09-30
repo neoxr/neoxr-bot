@@ -11,7 +11,10 @@ export const run = {
 
          const clone = (data) => {
             if (typeof structuredClone === 'function') {
-               try { return structuredClone(data) } catch {}
+               try { return structuredClone(data) } catch (e) {
+                  console.error(e)
+                  client.reply(m.chat, global.status.error, m)
+               }
             }
             return JSON.parse(JSON.stringify(data))
          }

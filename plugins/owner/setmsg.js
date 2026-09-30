@@ -15,7 +15,8 @@ export const run = {
          setting.msg = text
          client.reply(m.chat, Utils.texted('bold', `✅ Menu Message successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

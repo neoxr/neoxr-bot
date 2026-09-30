@@ -18,7 +18,8 @@ export const run = {
          setting.cover = Buffer.from(buffer).toString('base64')
          client.reply(m.chat, Utils.texted('bold', `✅ Cover successfully set.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true
@@ -58,8 +59,8 @@ const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9, quality 
 
       const outputBuffer = await image.getBufferAsync(Jimp.MIME_JPEG)
       return outputBuffer
-   } catch (error) {
-      console.error('Error cropping image:', error.message)
-      throw error
+   } catch (e) {
+      console.error(e)
+      client.reply(m.chat, global.status.error, m)
    }
 }

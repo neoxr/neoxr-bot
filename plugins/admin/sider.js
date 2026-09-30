@@ -43,8 +43,9 @@ export const run = {
             teks += `\n\n${global.footer}`
             client.reply(m.chat, teks, m)
          }
-      } catch (e){
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

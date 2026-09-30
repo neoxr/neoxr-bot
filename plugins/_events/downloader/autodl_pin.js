@@ -33,7 +33,8 @@ export const run = {
             }
          }
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    limit: true,

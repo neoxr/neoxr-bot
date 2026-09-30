@@ -57,7 +57,7 @@ export const run = {
          })
       } catch (e) {
          console.error(e)
-         return client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

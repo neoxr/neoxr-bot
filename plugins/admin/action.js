@@ -35,7 +35,7 @@ export const run = {
          }
       } catch (e) {
          console.error(e)
-         m.reply(Utils.texted('bold', `❌ ${e.message}`))
+         client.reply(m.chat, global.status.error, m)
       }
    },
    group: true,
