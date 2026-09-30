@@ -38,8 +38,9 @@ export const run = {
             thumbnail: Utils.isUrl(setting.cover) ? setting.cover : Buffer.from(setting.cover, 'base64'),
             icon: setting.icon ? Utils.isUrl(setting.icon) ? setting.icon : Buffer.from(setting.icon, 'base64') : null
          })
-      } catch (error) {
-         client.reply(m.chat, Utils.jsonFormat(error), m)
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

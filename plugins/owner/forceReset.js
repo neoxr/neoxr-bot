@@ -14,7 +14,8 @@ export const run = {
          setting.lastReset = new Date * 1
          client.reply(m.chat, Utils.texted('bold', `✅ Successfully reset limit for user free to default.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

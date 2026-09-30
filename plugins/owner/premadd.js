@@ -142,7 +142,7 @@ export const run = {
          }
       } catch (e) {
          console.error(e)
-         client.reply(m.chat, Utils.texted('bold', `❌ User does not exist in the database or an error occurred.`), m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,

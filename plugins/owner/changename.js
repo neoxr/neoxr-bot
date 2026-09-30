@@ -15,8 +15,9 @@ export const run = {
          client.authState.creds.me.name = text
          await props.save(global.db)
          return client.reply(m.chat, `✅ Name successfully changed.`, m)
-      } catch {
-         return client.reply(m.chat, Utils.texted('bold', `❌ Name failed to change.`), m)
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

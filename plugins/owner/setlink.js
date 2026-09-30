@@ -17,7 +17,8 @@ export const run = {
          setting.link = text
          client.reply(m.chat, Utils.texted('bold', `✅ Link successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

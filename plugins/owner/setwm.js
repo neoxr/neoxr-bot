@@ -18,7 +18,8 @@ export const run = {
          setting.sk_author = author || ''
          client.reply(m.chat, Utils.texted('bold', `✅ Sticker Watermark successfully set.`), m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

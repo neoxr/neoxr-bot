@@ -145,22 +145,9 @@ async function getMedia(message) {
       }
 
       return buffer
-   } catch (streamError) {
-      const key = msg?.key || message?.key
-
-      if (!key) return null
-
-      try {
-         return await downloadMediaMessage(
-            {
-               key,
-               message: msg.message
-            },
-            'buffer'
-         )
-      } catch {
-         return null
-      }
+   } catch (e) {
+      console.error(e)
+      client.reply(m.chat, global.status.error, m)
    }
 }
 

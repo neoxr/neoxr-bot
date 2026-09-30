@@ -18,8 +18,9 @@ export const run = {
          if (!id.endsWith('g.us')) return client.reply(m.chat, Utils.texted('bold', `❌ Sorry i can't join to this group :(`), m)
          let member = await (await client.groupMetadata(id)).participants.map(v => v.id)
          return client.reply(m.chat, `✅ Joined!`, m)
-      } catch {
-         return client.reply(m.chat, Utils.texted('bold', `❌ Sorry i can't join to this group :(`), m)
+      } catch (e) {
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

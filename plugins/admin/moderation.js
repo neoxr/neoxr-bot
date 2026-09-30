@@ -23,7 +23,8 @@ export const run = {
          groupSet[type] = status
          client.reply(m.chat, Utils.texted('bold', `✅ ${Utils.ucword(command)} has been ${option == 'on' ? 'activated' : 'inactivated'} successfully.`), m)
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    admin: true,

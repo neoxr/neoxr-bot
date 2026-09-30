@@ -168,8 +168,8 @@ export const run = {
             }
          }
       } catch (e) {
-         console.log(e)
-         m.reply(Utils.jsonFormat(e))
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    owner: true

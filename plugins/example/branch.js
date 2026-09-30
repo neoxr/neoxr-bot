@@ -12,7 +12,8 @@ export const run = [{
       try {
          client.reply(m.chat, 'Hi!, this is from branch-1', m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,
@@ -27,7 +28,8 @@ export const run = [{
       try {
          client.reply(m.chat, 'Hi!, this is from branch-2', m)
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,
@@ -43,7 +45,8 @@ export const run = [{
             m.reply('Sama-Sama 😁')
          }
       } catch (e) {
-         return client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false

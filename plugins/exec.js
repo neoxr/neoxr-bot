@@ -28,9 +28,8 @@ export const run = {
             const evL = await eval(`(async () => { return ${text} })()`)
             m.reply(util.format(evL))
          } catch (e) {
-            const err = syntax(text)
-            const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
-            m.reply(errMsg + util.format(e))
+            console.error(e)
+            client.reply(m.chat, global.status.error, m)
          }
       } else if (command === '>') {
          try {
@@ -38,9 +37,8 @@ export const run = {
             const res = evL === undefined ? '✅ Success (No output)' : util.format(evL)
             m.reply(res)
          } catch (e) {
-            const err = syntax(text)
-            const errMsg = err ? Utils.texted('monospace', err) + '\n\n' : ''
-            m.reply(errMsg + util.format(e))
+            console.error(e)
+            client.reply(m.chat, global.status.error, m)
          }
       } else if (command === '$') {
          if (client.sendReact) client.sendReact(m.chat, '🕒', m.key)

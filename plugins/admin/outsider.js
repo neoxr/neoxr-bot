@@ -25,7 +25,8 @@ export const run = {
             await client.reply(m.chat, Utils.texted('bold', `✅ Done, ${member.length} outsiders successfully removed.`), m)
          }
       } catch (e) {
-         client.reply(m.chat, Utils.jsonFormat(e), m)
+         console.error(e)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    admin: true,

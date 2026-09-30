@@ -28,7 +28,7 @@ export const run = {
          client.sendFile(m.chat, avatar, '', '', m)
       } catch (e) {
          console.error(e)
-         return client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status.error, m)
       }
    },
    error: false
