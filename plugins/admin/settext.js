@@ -12,15 +12,15 @@ export const run = {
       Utils
    }) => {
       try {
-      if (command == 'setwelcome') {
-         if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
-         groupSet.text_welcome = text
-         await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
-      } else if (/set(out|left)/i.test(command)) {
-         if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
-         groupSet.text_left = text
-         await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
-      }
+         if (command == 'setwelcome') {
+            if (!text) return client.reply(m.chat, formatWel(isPrefix, command), m)
+            groupSet.text_welcome = text
+            await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
+         } else if (/set(out|left)/i.test(command)) {
+            if (!text) return client.reply(m.chat, formatLef(isPrefix, command), m)
+            groupSet.text_left = text
+            await client.reply(m.chat, Utils.texted('bold', `✅ Successfully set.`), m)
+         }
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)

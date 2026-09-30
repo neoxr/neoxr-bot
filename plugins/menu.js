@@ -127,7 +127,7 @@ export const run = {
                if (text) {
                   const cmds = getCategoryCommands(text.trim().toLowerCase())
                   if (!cmds.length) return
-                  m.reply(Utils.Styles(renderTree(cmds)))
+                  m.reply(renderTree(cmds))
                } else {
                   const buttons = [{
                      name: 'single_select',
@@ -151,7 +151,7 @@ export const run = {
                if (text) {
                   const cmds = getCategoryCommands(text.trim().toLowerCase())
                   if (!cmds.length) return
-                  m.reply(Utils.Styles(renderTree(cmds)))
+                  m.reply(renderTree(cmds))
                } else {
                   const buttons = [
                      {

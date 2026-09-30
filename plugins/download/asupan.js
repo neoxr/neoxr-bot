@@ -13,11 +13,11 @@ export const run = {
          // TikTok Username
          const json = await Api.neoxr('/asupan', {
             username: args[0] || Utils.random([
-              'hosico_cat',
-              'dibdiby',
-              'bulansutena',
-              'sesaaak',
-              'ordinary307girl'
+               'hosico_cat',
+               'dibdiby',
+               'bulansutena',
+               'sesaaak',
+               'ordinary307girl'
             ])
          })
          if (!json.status) return client.reply(m.chat, Utils.jsonFormat(json), m)

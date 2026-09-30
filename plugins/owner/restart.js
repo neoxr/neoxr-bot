@@ -7,10 +7,10 @@ export const run = {
       Utils
    }) => {
       try {
-      await client.reply(m.chat, Utils.texted('bold', 'Restarting . . .'), m).then(async () => {
-         await system.database.save(global.db)
-         process.send('reset')
-      })
+         await client.reply(m.chat, Utils.texted('bold', 'Restarting . . .'), m).then(async () => {
+            await system.database.save(global.db)
+            process.send('reset')
+         })
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
