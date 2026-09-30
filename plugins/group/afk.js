@@ -12,7 +12,7 @@ export const run = {
          user.afk = +new Date
          user.afkReason = text
          user.afkObj = m
-         let tag = m.sender.split`@` [0]
+         let tag = m.sender.split`@`[0]
          return client.reply(m.chat, Utils.texted('bold', `❌ @${tag} is now AFK!`), m)
       } catch {
          client.reply(m.chat, global.status.error, m)
