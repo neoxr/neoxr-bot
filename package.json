@@ -14,7 +14,7 @@
     "@neoxr/store": "^0.0.6",
     "@neoxr/zapo": "^1.0.1",
     "@zapo-js/store-sqlite": "^1.2.0",
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "~12.1.1",
     "cfonts": "3.1.1",
     "cheerio": "~1.0.0-rc.5",
     "html-entities": "^2.6.0",
