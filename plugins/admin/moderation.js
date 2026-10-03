@@ -1,5 +1,5 @@
 export const run = {
-   usage: ['actinfo', 'antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'left', 'filter', 'welcome'],
+   usage: ['actinfo', 'antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'left', 'norejoin', 'filter', 'welcome'],
    use: 'on / off',
    category: 'admin tools',
    async: async (m, {
@@ -12,7 +12,7 @@ export const run = {
    }) => {
       try {
          const type = command.toLowerCase()
-         if (!isBotAdmin && /antilink|antivirtex|filter|antitagsw/.test(type)) {
+         if (!isBotAdmin && /antilink|antivirtex|filter|antitagsw|norejoin/.test(type)) {
             return client.reply(m.chat, global.status.botAdmin, m)
          }
 

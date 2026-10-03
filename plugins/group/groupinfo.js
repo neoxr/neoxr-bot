@@ -32,6 +32,7 @@ export const run = {
          caption += `   ◦  ${Utils.switcher(groupSet.filter, '[ √ ]', '[ × ]')} Filter\n`
          caption += `   ◦  ${Utils.switcher(groupSet.antitagsw, '[ √ ]', '[ × ]')} Anti Story Tag\n`
          caption += `   ◦  ${Utils.switcher(groupSet.autosticker, '[ √ ]', '[ × ]')} Auto Sticker\n`
+         caption += `   ◦  ${Utils.switcher(groupSet.norejoin, '[ √ ]', '[ × ]')} No Re-Join\n`
          caption += `   ◦  ${Utils.switcher(groupSet.left, '[ √ ]', '[ × ]')} Left Message\n`
          caption += `   ◦  ${Utils.switcher(groupSet.welcome, '[ √ ]', '[ × ]')} Welcome Message\n\n`
          caption += `乂  *G R O U P - S T A T U S*\n\n`
