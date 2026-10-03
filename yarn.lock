@@ -512,10 +512,10 @@
   resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.6.tgz#eeec1c485b4112c5a6e0ddae124452fdce561fbf"
   integrity sha512-/G3wO6G2394E10uiUFFwFzx9Ef8Jf0fBVHf2EqXiyFs9RNBFdm5LL7sLEEblX+ctS7a8Gpx2E2Tbo1l11qHkLg==
 
-"@neoxr/wb@^6.0.0-rc.79":
-  version "6.0.0-rc.79"
-  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.0-rc.79.tgz#1aeb2968f7cb45906a550505afc7936306502469"
-  integrity sha512-7Sj36HVSiV64mJ9Np4GOVnosKxNLMvF40e/m5dYEJhsY6fhGDDlH/pJ5ze4FzDcY9HEnVugvmNIYhL380ECWJA==
+"@neoxr/wb@^6.0.0-rc.80":
+  version "6.0.0-rc.80"
+  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.0-rc.80.tgz#95e206b5c80409cd37be303978095698d904830b"
+  integrity sha512-tzf0sw0ZpTBSq9cid+kRMAqlIlJLGz2h/AXJMUsTOowYC19i8AZDXP5iihcfa37kVL1rKfbejXYwtOelvNVm4w==
   dependencies:
     "@cacheable/node-cache" "~3.0.1"
     "@neoxr/api" "^1.5.3"
