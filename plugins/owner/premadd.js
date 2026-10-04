@@ -72,7 +72,6 @@ export const run = {
 
       try {
          const [replyDuration, mentionDuration] = args
-         let user = global.db.users
 
          if (m.quoted) {
             if (m.quoted.isBot) return client.reply(m.chat, Utils.texted('bold', `❌ Cannot make the bot a premium user.`), m)
@@ -87,12 +86,17 @@ export const run = {
             let durationUnitName = parsedDuration.unitName
 
             const jid = client.decodeJid(m.quoted.sender)
-            let users = user.get(jid)
+            const users = global.db.users.get(jid)
+            if (!users) return client.reply(m.chat, Utils.texted('bold', `❌ Could not find user data.`), m)
+
+            const isExtended = users.premium && users.expired > Date.now()
+
             users.limit += 1000
             users.limit_game += 1000
-            users.expired += users.premium ? durationMs : ((new Date() * 1) + durationMs)
+            users.expired = (isExtended ? users.expired : Date.now()) + durationMs
+            users.premium = true
 
-            client.reply(m.chat, users.premium ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m).then(() => users.premium = true)
+            client.reply(m.chat, isExtended ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m)
          } else if (m.mentionedJid.length != 0) {
             const parsedDuration = parseDuration(mentionDuration)
             if (!parsedDuration) {
@@ -103,12 +107,17 @@ export const run = {
             let durationValue = parsedDuration.value
             let durationUnitName = parsedDuration.unitName
 
-            let jid = client.decodeJid(m.mentionedJid[0])
-            const users = user.find(v => v.jid == jid)
-            users.limit += 1000
-            users.expired += users.premium ? durationMs : ((new Date() * 1) + durationMs)
+            const jid = client.decodeJid(m.mentionedJid[0])
+            const users = global.db.users.get(jid)
+            if (!users) return client.reply(m.chat, Utils.texted('bold', `❌ Could not find user data.`), m)
 
-            client.reply(m.chat, users.premium ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m).then(() => users.premium = true)
+            const isExtended = users.premium && users.expired > Date.now()
+
+            users.limit += 1000
+            users.expired = (isExtended ? users.expired : Date.now()) + durationMs
+            users.premium = true
+
+            client.reply(m.chat, isExtended ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m)
          } else if (text && /\|/.test(text)) {
             let [number, durationInput] = text.split`|`
             let p = (await client.onWhatsApp(String(number).startsWith('0') ? '62' + String(number).slice(1) : number.startsWith('+') ? number.match(/\d+/g).join('') : number))[0] || {}
@@ -123,14 +132,17 @@ export const run = {
             let durationValue = parsedDuration.value
             let durationUnitName = parsedDuration.unitName
 
-            let jid = client.decodeJid(p.jid)
-            const users = user.find(v => v.jid == jid)
+            const jid = client.decodeJid(p.jid)
+            const users = global.db.users.get(jid)
             if (!users) return client.reply(m.chat, Utils.texted('bold', `❌ Could not find user data.`), m)
 
-            users.limit += 1000
-            users.expired += users.premium ? durationMs : ((new Date() * 1) + durationMs)
+            const isExtended = users.premium && users.expired > Date.now()
 
-            client.reply(m.chat, users.premium ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m).then(() => users.premium = true)
+            users.limit += 1000
+            users.expired = (isExtended ? users.expired : Date.now()) + durationMs
+            users.premium = true
+
+            client.reply(m.chat, isExtended ? Utils.texted('bold', `✅ Successfully added ${durationValue} ${durationUnitName} premium access for @${jid.replace(/@.+/, '')}.`) : Utils.texted('bold', `✅ Successfully added @${jid.replace(/@.+/, '')} as a premium user for ${durationValue} ${durationUnitName}.`), m)
 
          } else {
             let teks = `• *Usage Example* :\n\n`
