@@ -1,6 +1,11 @@
 import baileys from '../../lib/engine.js'
 const { S_WHATSAPP_NET } = baileys
 
+import sharp from 'sharp'
+
+sharp.cache(false)
+sharp.concurrency(Math.max(1, Math.min(2, Number(process.env.SHARP_CONCURRENCY || 2))))
+
 export const run = {
    usage: ['setpp'],
    use: 'reply photo',
@@ -44,13 +49,22 @@ export const run = {
 }
 
 async function generate(media) {
-   const Jimp = (await import('jimp')).default
-   const jimp = await Jimp.read(media)
-   const min = jimp.getWidth()
-   const max = jimp.getHeight()
-   const cropped = jimp.crop(0, 0, min, max)
-   return {
-      img: await cropped.scaleToFit(720, 720).getBufferAsync(Jimp.MIME_JPEG),
-      preview: await cropped.normalize().getBufferAsync(Jimp.MIME_JPEG)
+   try {
+      const base = sharp(media)
+
+      const [img, preview] = await Promise.all([
+         base.clone().resize(720, 720, { fit: 'inside' }).jpeg().toBuffer(),
+         base.clone().normalise().jpeg().toBuffer()
+      ])
+
+      return {
+         img,
+         preview
+      }
+   } catch (e) {
+      return {
+         img: media,
+         preview: media
+      }
    }
 }
