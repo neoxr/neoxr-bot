@@ -1,3 +1,8 @@
+import sharp from 'sharp'
+
+sharp.cache(false)
+sharp.concurrency(Math.max(1, Math.min(2, Number(process.env.SHARP_CONCURRENCY || 2))))
+
 export const run = {
    usage: ['setcover'],
    hidden: ['cover'],
@@ -11,11 +16,16 @@ export const run = {
       try {
          const q = m.quoted ? m.quoted : m
          const mime = (q.msg || q).mimetype || ''
+
          if (!/image/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Image not found.`), m)
+
          client.sendReact(m.chat, '🕒', m.key)
+
          const buffer = await cropToLandscapeBuffer(await q.download())
          if (!buffer) throw new Error(global.status.wrong)
+
          setting.cover = Buffer.from(buffer).toString('base64')
+
          client.reply(m.chat, Utils.texted('bold', `✅ Cover successfully set.`), m)
       } catch (e) {
          console.error(e)
@@ -34,9 +44,10 @@ export const run = {
  */
 const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9, quality = 50) => {
    try {
-      const Jimp = (await import('jimp')).default
-      const image = await Jimp.read(inputBuffer)
-      const { width, height } = image.bitmap
+      const image = sharp(inputBuffer)
+      const metadata = await image.metadata()
+
+      const { width, height } = metadata
       const currentAspectRatio = width / height
 
       let cropWidth, cropHeight
@@ -49,18 +60,16 @@ const cropToLandscapeBuffer = async (inputBuffer, aspectRatio = 16 / 9, quality 
          cropHeight = Math.floor(width / aspectRatio)
       }
 
-      const x = Math.floor((width - cropWidth) / 2)
-      const y = Math.floor((height - cropHeight) / 2)
+      const left = Math.floor((width - cropWidth) / 2)
+      const top = Math.floor((height - cropHeight) / 2)
 
-      image.crop(x, y, cropWidth, cropHeight)
+      const outputBuffer = await image
+         .extract({ left, top, width: cropWidth, height: cropHeight })
+         .jpeg({ quality })
+         .toBuffer()
 
-      // Tambahkan kompresi JPEG (semakin kecil, semakin terkompres)
-      image.quality(quality) // default: 100
-
-      const outputBuffer = await image.getBufferAsync(Jimp.MIME_JPEG)
       return outputBuffer
-   } catch (e) {
-      console.error(e)
-      client.reply(m.chat, global.status.error, m)
+   } catch (error) {
+      console.error('Error cropping image:', error.message)
    }
 }
