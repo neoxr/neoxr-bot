@@ -14,7 +14,7 @@ export const run = {
          if (!/image/.test(mime)) return client.reply(m.chat, Utils.texted('bold', `❌ Image not found.`), m)
 
          client.sendReact(m.chat, '🕒', m)
-         const buffer = await crop(await q.download())
+         const buffer = await q.download()
          if (!buffer) throw new Error(global.status.wrong)
 
          setting.icon = Buffer.from(buffer).toString('base64')
