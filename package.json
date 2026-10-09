@@ -20,7 +20,7 @@
     "html-entities": "^2.6.0",
     "translate-google-api": "^1.0.4",
     "yt-search": "^2.13.1",
-    "zapo-js": "^1.9.0"
+    "zapo-js": "^1.10.0"
   },
   "devDependencies": {
     "pm2": "~7.0.3"
