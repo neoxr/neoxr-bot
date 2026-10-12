@@ -250,10 +250,10 @@
     file-type "~16.5.2"
     form-data "~4.0.0"
 
-"@neoxr/store@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.6.tgz#eeec1c485b4112c5a6e0ddae124452fdce561fbf"
-  integrity sha512-/G3wO6G2394E10uiUFFwFzx9Ef8Jf0fBVHf2EqXiyFs9RNBFdm5LL7sLEEblX+ctS7a8Gpx2E2Tbo1l11qHkLg==
+"@neoxr/store@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.7.tgz#bbe4e0a7b9f53278a830f91497bafb9c878b73ab"
+  integrity sha512-mBHByjMNLzR9m54wXENTxyYUyfgBL2VrdyKJtq7kiWuYS592yegzd1yhs/XUuDcJNvfeKKMW3ZEuwJmnd8jgsQ==
 
 "@neoxr/wb@^6.0.0-rc.81":
   version "6.0.0-rc.81"
