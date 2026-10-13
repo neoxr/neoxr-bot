@@ -58,6 +58,9 @@ Configuration of this script consists of two files: [config.json](https://github
 ### Neoxr API : https://api.neoxr.my.id
 API_KEY = ''
 
+### WhatsApp Payload API : https://whatsapp-payload.pages.dev/
+WP_KEY = ''
+
 ### Database (Mongo, PostgreSQL, MySQL, Redis) — leave empty for local (JSON)
 DATABASE_URL = ''
 
