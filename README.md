@@ -176,5 +176,11 @@ npm install --cpu=wasm32 sharp
 ```
 Related issue : [#213](https://github.com/neoxr/neoxr-bot/issues/213)
 
+### ⌗ SPR & SBPR
+The SPR system must be used moderately and responsibly. Sending multimedia payloads to groups with more than **300 participants** can significantly increase RAM consumption, CPU usage, and network traffic, potentially saturating the bot or causing it to become unresponsive or crash.
+
+Avoid unnecessary executions and mass multimedia operations in large groups. Ensure your server has sufficient resources to handle the workload, as excessive usage may affect the bot's overall stability and other running processes.
+
+---
 > [!IMPORTANT]
 > Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.
