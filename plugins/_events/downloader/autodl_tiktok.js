@@ -1,5 +1,5 @@
 export const run = {
-   regex: /^(?:https?:\/\/)?(?:www\.|vt\.|vm\.|t\.)?(?:tiktok\.com\/)(?:\S+)?$/i,
+   regex: /^(?:https?:\/\/)?(?:(?:www\.|vt\.|vm\.|t\.)?tiktok\.com|(?:www\.)?tt\.site)\/(?:\S+)?$/i,
    async: async (m, {
       client,
       body,
@@ -11,7 +11,7 @@ export const run = {
          const extract = body ? Utils.generateLink(body) : null
          if (!extract) return
 
-         const regex = /(?:tiktok\.com\/)/i
+         const regex = /(?:tiktok\.com\/|(?:www\.)?tt\.site\/t\/)/i
          const links = extract.filter(v => regex.test(Utils.ttFixed ? Utils.ttFixed(v) : v) && !/tiktoklite/i.test(v))
          if (!links.length) return
 
@@ -20,9 +20,7 @@ export const run = {
          Utils.hitstat('tiktok', m.sender)
 
          for (const link of links) {
-            const json = await Api.neoxr('/tiktok', {
-               url: Utils.ttFixed ? Utils.ttFixed(link) : link
-            })
+            const json = await Api.neoxr('/tiktok', { url: link })
             if (!json.status) return client.reply(m.chat, `❌ ${json.msg || 'An error occurred while processing the data.'}`, m)
 
             if (json.data?.video) {
