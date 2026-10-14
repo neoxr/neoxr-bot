@@ -16,7 +16,7 @@ export const run = {
       try {
          const [url] = args || []
          if (!url) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://vm.tiktok.com/ZSR7c5G6y/'), m)
-         if (!/tiktok\.com/i.test(url)) return client.reply(m.chat, global.status.invalid, m)
+         if (!/(?:tiktok\.com|tt\.site)/i.test(url)) return client.reply(m.chat, global.status.invalid, m)
 
          await client.sendReact(m.chat, '🕒', m.key)
          const old = Date.now()
