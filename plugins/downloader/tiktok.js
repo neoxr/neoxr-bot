@@ -21,9 +21,7 @@ export const run = {
          await client.sendReact(m.chat, '🕒', m.key)
          const old = Date.now()
 
-         const json = await Api.neoxr('/tiktok', {
-            url: Utils.ttFixed(url)
-         })
+         const json = await Api.neoxr('/tiktok', { url })
          if (!json.status) return client.reply(m.chat, `❌ ${json.msg || 'An error occurred while processing the data.'}`, m)
 
          const data = json.data
