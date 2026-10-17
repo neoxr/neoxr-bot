@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@neoxr/store": "^0.0.7",
-    "@neoxr/zapo": "^1.0.5",
+    "@neoxr/zapo": "^1.1.9",
     "@zapo-js/store-sqlite": "^1.2.0",
     "better-sqlite3": "~12.1.1",
     "cfonts": "3.1.1",
