@@ -1,5 +1,34 @@
 import os from 'node:os'
 
+let cachedCpuUsage = '0%'
+
+function calculateCpu() {
+   const startStats = os.cpus().map(cpu => cpu.times)
+
+   setTimeout(() => {
+      const endStats = os.cpus().map(cpu => cpu.times)
+      let idleDiff = 0
+      let totalDiff = 0
+
+      for (let i = 0; i < startStats.length; i++) {
+         const start = startStats[i]
+         const end = endStats[i]
+
+         const startTotal = Object.values(start).reduce((a, b) => a + b, 0)
+         const endTotal = Object.values(end).reduce((a, b) => a + b, 0)
+
+         idleDiff += end.idle - start.idle
+         totalDiff += endTotal - startTotal
+      }
+
+      const percentage = totalDiff > 0 ? 100 - Math.floor((idleDiff / totalDiff) * 100) : 0
+      cachedCpuUsage = `${percentage}%`
+   }, 1000)
+}
+
+setInterval(calculateCpu, 3000)
+calculateCpu()
+
 export const run = {
    usage: ['server'],
    hidden: ['p'],
@@ -14,7 +43,7 @@ export const run = {
          delete json.query
 
          const memoryUsage = getMemoryStats()
-         const cpuUsage = await getCpuPercentage()
+         const cpuUsage = cachedCpuUsage
 
          let caption = `┌  ◦  Directory : ${process.cwd()}\n`
          caption += `│  ◦  OS : ${os.type()} (${os.arch()} / ${os.release()})\n`
@@ -30,7 +59,7 @@ export const run = {
          for (let key in json) caption += `│  ◦  ${Utils.ucword(key)} : ${json[key]}\n`
          caption += `│  ◦  Platform : ${os.platform()}\n`
          caption += `│  ◦  Uptime : ${Utils.toTime(os.uptime() * 1000)}\n`
-         caption += `└  ◦  Processor : ${os.cpus()[0].model}\n\n`
+         caption += `└  ◦  Processor : ${os.cpus()[0]?.model || 'Unknown'}\n\n`
 
          client.replyButton(m.chat, [{
             name: 'inapp_signup',
@@ -42,7 +71,7 @@ export const run = {
          })
       } catch (e) {
          console.error(e)
-         client.reply(m.chat, global.status.error, m)
+         client.reply(m.chat, global.status?.error || 'Error', m)
       }
    },
    error: false
@@ -59,28 +88,4 @@ function getMemoryStats() {
       external: formatMemory(memoryData.external),
       arrayBuffers: formatMemory(memoryData.arrayBuffers || 0)
    }
-}
-
-function getCpuPercentage() {
-   return new Promise(resolve => {
-      const startStats = os.cpus().reduce((acc, cpu) => {
-         acc.idle += cpu.times.idle
-         acc.total += Object.values(cpu.times).reduce((sum, val) => sum + val, 0)
-         return acc
-      }, { idle: 0, total: 0 })
-
-      setTimeout(() => {
-         const endStats = os.cpus().reduce((acc, cpu) => {
-            acc.idle += cpu.times.idle
-            acc.total += Object.values(cpu.times).reduce((sum, val) => sum + val, 0)
-            return acc
-         }, { idle: 0, total: 0 })
-
-         const idleDiff = endStats.idle - startStats.idle
-         const totalDiff = endStats.total - startStats.total
-         const percentage = 100 - Math.floor((idleDiff / totalDiff) * 100)
-
-         resolve(`${percentage}%`)
-      }, 100)
-   })
 }

@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "yarn install --ignore-engines && yarn cache clean",
-    "start": "NODE_ENV=production MALLOC_ARENA_MAX=2 node index.js",
-    "test": "node test.js"
+    "start": "NODE_ENV=production MALLOC_ARENA_MAX=2 node index.js"
   },
   "author": "neoxr <neoxr@null.net>",
   "license": "MIT",
   "dependencies": {
     "@neoxr/store": "^0.0.7",
-    "@neoxr/zapo": "^1.1.9",
+    "@neoxr/zapo": "^1.2.13",
     "@zapo-js/store-sqlite": "^1.2.0",
     "better-sqlite3": "~12.1.1",
     "cfonts": "3.1.1",

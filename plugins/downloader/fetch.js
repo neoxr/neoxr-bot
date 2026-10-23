@@ -17,7 +17,7 @@ export const run = {
    }) => {
       try {
          const [url] = args || []
-         if (!url) return client.reply(m.chat, Utils.example(isPrefix, command, setting.cover), m)
+         if (!url) return client.reply(m.chat, Utils.example(isPrefix, command, 'https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip'), m)
 
          await client.sendReact(m.chat, '🕒', m.key)
 
