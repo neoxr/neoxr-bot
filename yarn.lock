@@ -250,15 +250,15 @@
     file-type "~16.5.2"
     form-data "~4.0.0"
 
-"@neoxr/store@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.7.tgz#bbe4e0a7b9f53278a830f91497bafb9c878b73ab"
-  integrity sha512-mBHByjMNLzR9m54wXENTxyYUyfgBL2VrdyKJtq7kiWuYS592yegzd1yhs/XUuDcJNvfeKKMW3ZEuwJmnd8jgsQ==
+"@neoxr/store@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@neoxr/store/-/store-0.0.8.tgz#fec39ab777f9384db4480a6d3a4871fbe811d422"
+  integrity sha512-oRETD4mvMQkrYMF2xa7DtwMhgBXnpp1ybil413zy+8Vb57wNyG2RVW18A5iOyVbIGNvqVtW3y36pSQyJQ7ggYg==
 
-"@neoxr/wb@^6.0.2":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.2.tgz#ba93736cdc61c53e905df7bb3b23faef7843689f"
-  integrity sha512-qsGU7rNHu/CgQlWd20nhKdAYnycvQQRXeNd+GSGOsWiLEueo8RH9s380YqNNybqXMPHEqgQbXeliEHCJjIRErQ==
+"@neoxr/wb@^6.0.5":
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/@neoxr/wb/-/wb-6.0.5.tgz#0b12bae20ede80aa3d5877263c2fc779fda2c765"
+  integrity sha512-tWW2pX9XaDeWPcs2XYf7/GA76RFlcoD5E4GJhmqbjj08Shl6/kjszBsGnh7xPVPRspLIYz5FWsALyYBJvXC6uA==
   dependencies:
     "@cacheable/node-cache" "~3.0.1"
     "@neoxr/api" "^1.5.3"
