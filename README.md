@@ -198,5 +198,31 @@ npm install --cpu=wasm32 sharp
 ```
 Related issue : [#213](https://github.com/neoxr/neoxr-bot/issues/213)
 
+### 3. Read View Once Message
+
+This document explains the values of `UserAgent.Platform` in WhatsApp's protobuf,
+especially the `SMB_*` group, and the limitations when using them in Baileys.
+ 
+> [!IMPORTANT] 
+> This bot **must** use `@neoxr/baileys` version **8.3.12** and **must** have a `platform`
+attribute in [config.json](https://github.com/neoxr/neoxr-bot/blob/5.0-ESM/config.json).
+
+| Platform      | Client type                           | Category  |
+| ------------- | ------------------------------------- | --------- |
+| `ANDROID`     | WhatsApp Android app                  | Personal  |
+| `IOS`         | WhatsApp iOS app                      | Personal  |
+| `SMB_ANDROID` | WhatsApp Business Android app         | Business  |
+| `SMB_IOS`     | WhatsApp Business iOS app             | Business  |
+| `WEB`         | WhatsApp Web (companion)              | Companion |
+| `WINDOWS`     | Windows desktop app (companion)       | Companion |
+| `MACOS`       | macOS desktop app (companion)         | Companion |
+ 
+`SMB` stands for *Small and Medium Business*.
+ 
+- The `SMB_*` prefix identifies a **WhatsApp Business** client (primary device).
+- Platforms without the `SMB_` prefix (`ANDROID`, `IOS`) identify a **personal WhatsApp** client.
+- `WEB`, `WINDOWS`, and `MACOS` are **companion** clients (linked devices), not the primary phone.
+
+
 > [!IMPORTANT]
 > Check this repository regularly to get updates because the progress base is not 100% yet (this is just a base or beta test), if you find an error please make an issue. Thanks.
