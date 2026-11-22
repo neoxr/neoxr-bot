@@ -1,5 +1,5 @@
 export const run = {
-   usage: ['antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'left', 'filter', 'localonly', 'welcome'],
+   usage: ['antidelete', 'antilink', 'antivirtex', 'antitagsw', 'autosticker', 'left', 'filter', 'localonly', 'welcome', 'viewonce'],
    use: 'on / off',
    category: 'admin tools',
    async: async (m, {
