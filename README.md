@@ -198,7 +198,23 @@ npm install --cpu=wasm32 sharp
 ```
 Related issue : [#213](https://github.com/neoxr/neoxr-bot/issues/213)
 
-### 3. Read View Once Message
+### 3. Bad Session
+
+Some common causes of a bad session include:
+
+- WhatsApp Soft Ban
+- Using a Virtual Number (Nokos)
+- An outdated WhatsApp Web version in [config.json](https://github.com/neoxr/neoxr-bot/blob/5.0-ESM/config.json). You can get the latest version here: [https://wppconnect.io/whatsapp-versions/](https://wppconnect.io/whatsapp-versions/)
+
+```JSON
+{
+   "pairing": {
+     "version": [2, 3000, 1053100174]
+   }
+}
+```
+
+### 4. Read View Once Message
 
 This document explains the values of `UserAgent.Platform` in WhatsApp's protobuf,
 especially the `SMB_*` group, and the limitations when using them in Baileys.
