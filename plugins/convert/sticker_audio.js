@@ -132,7 +132,7 @@ export const run = {
             return limitter()
          }
 
-         client.reply(m.chat, Utils.texted('bold', `Send or reply to an audio (max ${MAX_SECONDS} seconds) with the caption ${isPrefix + command} to get started.`), m)
+         client.reply(m.chat, Utils.texted('bold', `❌ Send or reply to an audio (max ${MAX_SECONDS} seconds) with the caption ${isPrefix + command} to get started.`), m)
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
