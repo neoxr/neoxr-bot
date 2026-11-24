@@ -1,3 +1,12 @@
+/*
+ * IMPORTANT: 
+ * This feature requires the @neoxr/baileys library to function.
+ */
+
+import { normalizeMessageContent } from 'baileys'
+
+const MEDIA_TYPES = ['imageMessage', 'videoMessage', 'audioMessage']
+
 export const run = {
    usage: ['rvo'],
    use: 'reply viewonce',
@@ -12,23 +21,22 @@ export const run = {
          await client.sendReact(m.chat, '🕒', m.key)
 
          const history = await store.loadMessage(m.chat, m.quoted.id)
-         if (!history) return client.reply(m.chat, Utils.texted('bold', `❌ Message not found in history.`), m)
+         if (!history?.message) return client.reply(m.chat, Utils.texted('bold', `❌ Message not found in history.`), m)
 
-         
-         const type = Object.keys(history.message)?.[0]
-         const message = history.message?.[type]
+         const unwrapped = normalizeMessageContent(history.message)
+         const type = MEDIA_TYPES.find(v => unwrapped?.[v])
+         const message = type ? unwrapped[type] : null
 
-         if (!type || !message) return
+         if (!type || !message) return client.reply(m.chat, Utils.texted('bold', `❌ Invalid viewOnce message.`), m)
+         if (!message.viewOnce) return client.reply(m.chat, Utils.texted('bold', `❌ This is not a viewOnce message.`), m)
 
-         if (!message.viewOnce) return client.reply(m.chat, Utils.texted('bold', `❌ Invalid viewOnce message.`), m)
-
-         delete message.viewOnce
+         const { viewOnce, ...media } = message
 
          const content = {
             [type]: {
-               ...message,
+               ...media,
                contextInfo: {
-                  ...message.contextInfo,
+                  ...media.contextInfo,
                   stanzaId: history?.key?.id || history?.id,
                   participant: history?.key?.participant || history?.key?.remoteJid,
                   quotedType: 0,
@@ -37,12 +45,12 @@ export const run = {
             }
          }
 
-         client.relayMessage(m.chat, content, {})
+         await client.relayMessage(m.chat, content, {})
       } catch (e) {
          console.error(e)
          client.reply(m.chat, global.status.error, m)
       }
    },
    error: false,
-   owner: true
+   group: true
 }
