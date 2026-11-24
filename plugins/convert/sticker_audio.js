@@ -1,19 +1,35 @@
 import fs from 'node:fs'
+import { randomBytes } from 'node:crypto'
 import { Converter } from '@neoxr/wb'
-import { proto, prepareWAMessageMedia, generateMessageIDV2 } from 'baileys'
+import { proto, prepareWAMessageMedia } from 'baileys'
 
 const queue = new Map()
 const TTL = 5 * 60 * 1000
 const MAX_SECONDS = 10
 
-if (!proto.Message.StickerMessage.__patched) {
-   const originalEncode = proto.Message.StickerMessage.encode
-   proto.Message.StickerMessage.encode = function (message, writer) {
+const RAW = Symbol('rawFields')
+if (!proto.Message.__rawPatched) {
+   const originalEncode = proto.Message.encode
+   proto.Message.encode = function (message, writer) {
       const w = originalEncode.call(this, message, writer)
-      if (message?.__extra) w.uint32(210).bytes(message.__extra)
+      if (message?.[RAW]) for (const [f, body] of message[RAW]) w.uint32(f * 8 + 2).bytes(body)
       return w
    }
-   proto.Message.StickerMessage.__patched = true
+   proto.Message.__rawPatched = true
+}
+
+const varint = (n) => { const o = []; while (n > 127) { o.push((n % 128) | 128); n = Math.floor(n / 128) } o.push(n); return Buffer.from(o) }
+const ld = (f, body) => Buffer.concat([varint(f * 8 + 2), varint(body.length), body])
+
+const mediaDomainInfo = (key) => ld(74, Buffer.concat([Buffer.from([0x08, 0x01]), ld(2, Buffer.from(key))]))
+
+const parseWebp = (b) => {
+   if (b.length < 30 || b.toString('ascii', 0, 4) !== 'RIFF' || b.toString('ascii', 8, 12) !== 'WEBP') throw new Error('sticker must be WebP')
+   const c = b.toString('ascii', 12, 16)
+   if (c === 'VP8 ') return { width: b.readUInt16LE(26) & 0x3fff, height: b.readUInt16LE(28) & 0x3fff, isAnimated: false }
+   if (c === 'VP8L') return { width: 1 + (b[21] | ((b[22] & 0x3f) << 8)), height: 1 + ((b[22] >> 6) | (b[23] << 2) | ((b[24] & 0x0f) << 10)), isAnimated: false }
+   if (c === 'VP8X') return { width: 1 + b.readUIntLE(24, 3), height: 1 + b.readUIntLE(27, 3), isAnimated: (b[20] & 2) !== 0 }
+   throw new Error('unsupported WebP chunk ' + c)
 }
 
 const getEntry = (sender) => {
@@ -45,8 +61,8 @@ export const run = {
       isPrefix,
       command,
       setting: exif,
-      Utils,
-      limitter
+      limitter,
+      Utils
    }) => {
       try {
          const q = m?.quoted ?? m
@@ -61,7 +77,7 @@ export const run = {
             const audio = await q.download()
             if (!audio) return client.reply(m.chat, global.status.wrong, m)
 
-            queue.set(m.sender, { audio, time: Date.now() })
+            queue.set(m.sender, { audio, seconds, time: Date.now() })
             return client.reply(m.chat, Utils.texted('bold', `✅ Audio saved. Now send a photo/video (max ${MAX_SECONDS} seconds) with the caption .stcaudio, or reply to one with .stcaudio (valid for 5 minutes).`), m)
          }
 
@@ -81,14 +97,18 @@ export const run = {
 
             const ptt = await toBuffer(await Converter.toPTT(data.audio))
             const { audioMessage } = await prepareWAMessageMedia(
-               { audio: ptt, mimetype: 'audio/ogg; codecs=opus', ptt: true },
+               { audio: ptt, mimetype: 'audio/ogg; codecs=opus' },
                { upload: client.waUploadToServer }
             )
-            const audioBytes = proto.Message.AudioMessage.encode({
-               ...audioMessage,
-               mimetype: 'audio/ogg; codecs=opus',
-               ptt: true
-            }).finish()
+
+            const audioBytes = Buffer.concat([
+               Buffer.from(proto.Message.AudioMessage.encode(proto.Message.AudioMessage.create({
+                  ...audioMessage,
+                  mimetype: 'audio/ogg; codecs=opus',
+                  seconds: audioMessage.seconds ?? (data.seconds != null ? Math.round(data.seconds) : undefined)
+               })).finish()),
+               ld(17, mediaDomainInfo(audioMessage.mediaKey)) // AudioMessage.contextInfo
+            ])
 
             const options = {
                packname: exif.sk_pack,
@@ -106,28 +126,40 @@ export const run = {
                      : await Converter.videoToWebp(media))
             )
 
+            const info = parseWebp(webp)
             const { stickerMessage } = await prepareWAMessageMedia(
                { sticker: webp },
                { upload: client.waUploadToServer }
             )
 
-            const message = {
-               stickerMessage: {
+            const contextInfo = Buffer.concat([
+               Buffer.from(proto.ContextInfo.encode(proto.ContextInfo.create({
+                  stanzaId: m.key.id,
+                  participant: m.key.participant || m.sender,
+                  quotedMessage: m.message
+               })).finish()),
+               mediaDomainInfo(stickerMessage.mediaKey),
+               ld(82, varint(13001))
+            ])
+
+            const stickerBase = Buffer.concat([
+               Buffer.from(proto.Message.StickerMessage.encode(proto.Message.StickerMessage.create({
                   ...stickerMessage,
                   mimetype: 'image/webp',
-                  contextInfo: {
-                     stanzaId: m.key.id,
-                     participant: m.sender,
-                     quotedMessage: m.message
-                  },
-                  __extra: audioBytes
-               }
-            }
+                  height: info.height,
+                  width: info.width,
+                  isAnimated: info.isAnimated,
+                  stickerSentTs: Date.now()
+               })).finish()),
+               ld(17, contextInfo)
+            ])
 
-            await client.relayMessage(m.chat, message, {
-               messageId: generateMessageIDV2(client.user?.id),
-               additionalAttributes: { type: 'media' }
-            })
+            const futureProofBody = ld(1, ld(26, Buffer.concat([stickerBase, ld(26, audioBytes)])))
+
+            const payload = proto.Message.create({ messageContextInfo: { messageSecret: randomBytes(32) } })
+            payload[RAW] = [[134, futureProofBody]]
+
+            await client.relayMessage(m.chat, payload, {})
 
             return limitter()
          }
